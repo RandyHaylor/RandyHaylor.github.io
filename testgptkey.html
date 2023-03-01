@@ -1,0 +1,36 @@
+<html>
+  <head>
+    <title>Test OpenAI API Key</title>
+  </head>
+  <body>
+    <h1>Test OpenAI API Key</h1>
+    <label for="apiKey">API Key:</label><br>
+    <input type="text" id="apiKey" value="YOUR_API_KEY"><br>
+    <button id="testButton">Test API Key</button>
+    <p id="result"></p>
+
+    <script>
+      function testApiKey() {
+        var apiKey = document.getElementById("apiKey").value;
+        var resultElem = document.getElementById("result");
+
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", "https://api.openai.com/v1/models");
+        xhr.setRequestHeader("Content-Type", "application/json");
+        xhr.setRequestHeader("Authorization", "Bearer " + apiKey);
+        xhr.onreadystatechange = function() {
+          if (xhr.readyState === 4) {
+            if (xhr.status === 200) {
+              resultElem.innerHTML = "API key is valid!";
+            } else {
+              resultElem.innerHTML = "API key is invalid: " + xhr.status;
+}
+}
+};
+xhr.send();
+}
+
+  document.getElementById("testButton").addEventListener("click", testApiKey);
+</script>
+  </body>
+</html>

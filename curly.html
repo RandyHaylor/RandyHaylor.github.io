@@ -1,0 +1,41 @@
+<html>
+<head>
+  <style>
+    body {
+      background-color: black;
+    }
+    canvas {
+      width: 100vw;
+      height: 100vh;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="canvas"></canvas>
+  <script>
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    let x = canvas.width / 2;
+    let y = canvas.height / 2;
+    let angle = 0;
+    let offset = 0;
+    let speed = 0.1;
+
+    function drawLine() {
+      ctx.beginPath();
+      ctx.strokeStyle = 'green';
+      ctx.lineWidth = 3;
+      ctx.lineCap = 'round';
+      ctx.moveTo(x, y);
+      x += Math.cos(angle) * speed;
+      y += Math.sin(angle) * speed;
+      angle += Math.sin(offset) / 50;
+      offset += 0.1;
+      ctx.lineTo(x, y);
+      ctx.stroke();
+    }
+
+    setInterval(drawLine, 16); // Call drawLine function every 16 milliseconds (approx 60 fps)
+  </script>
+</body>
+</html>

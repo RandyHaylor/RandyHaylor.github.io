@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Google Keep to Trello Migration</title>
+</head>
+<body>
+  <h1>Google Keep to Trello Migration</h1>
+
+  <!-- Add a button to initiate the migration process -->
+  <button id="migration-button">Migrate Google Keep Notes to Trello</button>
+
+  <!-- Display a message to show the status of the migration process -->
+  <div id="migration-status"></div>
+
+  <!-- Include the Trello API script -->
+  <script src="https://api.trello.com/1/client.js?key= 68c4b9225a5c4ac0763f33f5fbf858184ce4ce3e76c3fbfbc0694f0f7401e223"></script>
+
+  <!-- Add a script to handle the migration process -->
+  <script>
+    // Get the migration button and status div
+    const migrationButton = document.getElementById('migration-button');
+    const migrationStatus = document.getElementById('migration-status');
+
+    // Set the Trello API key (replace YOUR_TRELLO_API_KEY with your actual Trello API key)
+    Trello.setKey('68c4b9225a5c4ac0763f33f5fbf858184ce4ce3e76c3fbfbc0694f0f7401e223');
+
+    // Add an event listener to the migration button to initiate the migration process when clicked
+    migrationButton.addEventListener('click', () => {
+      // Display a message to show that the migration process has started
+      migrationStatus.innerHTML = 'Migration process started...';
+
+      // Get the list of notes from Google Keep (replace YOUR_GOOGLE_KEEP_NOTES_URL with the URL of your Google Keep notes)
+      fetch('https://keep.google.com/u/0/')
+        .then(response => response.json())
+        .then(notes => {
+          // Loop through the notes and create a card for each one in a Trello board (replace YOUR_TRELLO_BOARD_ID with the ID of your Trello board)
+          notes.forEach(note => {
+            Trello.post('/cards', {
+              name: note.title,
+              desc: note.content,
+              idBoard: 63aa87bb9694f6015e796636
+            }, (success, data) => {
+              if (success) {
+                // Display a message to show that the card was created successfully
+                migrationStatus.innerHTML = 'Migration process completed successfully!';
+              } else {
+                // Display an error message if there was an issue creating the card
+                migrationStatus.innerHTML = 'There was an issue creating the card: ' + data;
+              }
+            });
+          });
+        })
+        .catch(error => {
+          // Display an error message if there was an issue getting the notes from Google Keep
+          migrationStatus.innerHTML = 'There was an issue getting the notes from Google Keep: ' + error;
+        });
+    });
+  </script>
+</body>
+</html>
+
+
+//68c4b9225a5c4ac0763f33f5fbf858184ce4ce3e76c3fbfbc0694f0f7401e223

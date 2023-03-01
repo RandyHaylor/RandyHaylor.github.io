@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chat GPT Summarizer</title>
+<script>
+var OPENAI_API_KEY = "";
+function Send() {
+	OPENAI_API_KEY = document.getElementById("apiKey").value;
+    var sQuestion = txtMsg.value;
+
+    if (sQuestion.split(" ").length >= 1800) {
+        // First prompt
+        SendToChatGPT("I am about to send several blocks of text. Do not respond until I tell you I have finished sending all of the text. For each block of text, store a summary in your own memory permanently of that block for later reference.");
+
+        // Split the text into chunks and send each chunk to ChatGPT
+        var chunks = [];
+        var chunk = "";
+        var words = sQuestion.split(" ");
+        for (var i = 0; i < words.length; i++) {
+            chunk += words[i] + " ";
+            if (chunk.split(" ").length >= 1800 || i == words.length - 1) {
+                chunks.push(chunk);
+                chunk = "";
+            }
+        }
+        for (var i = 0; i < chunks.length; i++) {
+            SendToChatGPT(chunks[i]);
+        }
+
+        // Second prompt
+        SendToChatGPT("I have finished sending all of the text. Please summarize the entire text as succinctly as possible. Use bullet points where it makes sense.");
+    } else {
+        SendToChatGPT(sQuestion);
+    }
+}
+
+function SendToChatGPT(sQuestion) {
+    var oHttp = new XMLHttpRequest();
+    oHttp.open("POST", "https://api.openai.com/v1/completions");
+    oHttp.setRequestHeader("Accept", "application/json");
+    oHttp.setRequestHeader("Content-Type", "application/json");
+    oHttp.setRequestHeader("Authorization", "Bearer " + OPENAI_API_KEY)
+
+    oHttp.onreadystatechange = function () {
+        if (oHttp.readyState === 4) {
+            //...
+        }
+    };
+
+    var sModel = selModel.value;
+    var iMaxTokens = 2048;
+    var sUserId = "1";
+    var dTemperature = 0.5;    
+
+    var data = {
+        model: sModel,
+        prompt: sQuestion,
+        max_tokens: iMaxTokens,
+        user: sUserId,
+        temperature:  dTemperature,
+        frequency_penalty: 0.0,
+        presence_penalty: 0.0,
+        stop: ["#", ";"]
+    }
+
+    oHttp.send(JSON.stringify(data));
+
+    if (txtOutput.value != "") txtOutput.value += "\n";
+    txtOutput.value += "Me: " + sQuestion;
+}
+
+</script>
+</head>
+<body>
+ <label for="apiKey">OpenAI API Key:</label>
+ <input type="text" id="apiKey" value="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">
+ <button id="testButton">Test API Key</button>
+ <text id="result"></text>
+ <br>
+ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;If you need to get a key, log in with your google account and generate one here: <a href="https://beta.openai.com/account/api-keys">https://beta.openai.com/account/api-keys</a><br>
+
+    <script>
+      function testApiKey() {
+        var apiKey = document.getElementById("apiKey").value;
+        var resultElem = document.getElementById("result");
+
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", "https://api.openai.com/v1/models");
+        xhr.setRequestHeader("Content-Type", "application/json");
+        xhr.setRequestHeader("Authorization", "Bearer " + apiKey);
+        xhr.onreadystatechange = function() {
+          if (xhr.readyState === 4) {
+            if (xhr.status === 200) {
+              resultElem.innerHTML = "API key is valid!";
+            } else {
+              resultElem.innerHTML = "API key is invalid: " + xhr.status;
+}
+}
+};
+xhr.send();
+}
+
+  document.getElementById("testButton").addEventListener("click", testApiKey);
+</script>
+	
+    <div id="idContainer">
+        <textarea id="txtOutput" rows="10" style="margin-top: 10px; width: 100%;" placeholder="Output"></textarea>
+
+        <div>
+            <button type="button" onclick="Send()" id="btnSend">Send</button>
+
+            <select id="selModel">
+                <option value="text-davinci-003">text-davinci-003</option>
+                <option value="text-davinci-002">text-davinci-002</option>
+                <option value="code-davinci-002">code-davinci-002</option>
+            </select>
+
+            <select id="selLang" onchange="ChangeLang(this)">
+                <option value="en-US">English (United States)</option>
+                <option value="es-ES">Spanish (Spain)</option>
+
+            </select>
+
+        </div>
+
+        <textarea id="txtMsg" rows="5" wrap="soft" style="width: 98%; margin-left: 3px; margin-top: 6px" placeholder="Input Text"></textarea>
+
+        <div id="idText"></div>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    .panel {
+      width: 100px;
+      height: 100px;
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+  </style>
+</head>
+<body>
+  <div id="panel-container">
+    <div class="panel"></div>
+    <div class="panel"></div>
+    <div class="panel"></div>
+    <div class="panel"></div>
+  </div>
+  <script>
+    const panelContainer = document.getElementById("panel-container");
+    for (let i = 0; i < 100; i++) {
+      const panel = document.createElement("div");
+      panel.classList.add("panel");
+
+      // Set the panel's background color to a random color
+      panel.style.backgroundColor = `rgb(${Math.random() * 255}, ${Math.random() * 255}, ${Math.random() * 255})`;
+
+      // Create a function and object to generate a unique random movement for the panel
+      function generateRandomMovement(panel) {
+        const movement = {
+          x: Math.random() * 4 - 2,
+          y: Math.random() * 4 - 2,
+        };
+
+        // Update the panel's position every few seconds
+        setInterval(() => {
+          let x = panel.offsetLeft + movement.x;
+
+          let y = panel.offsetTop + movement.y;
+
+          // Ensure that the panel stays within the bounds of the visible screen
+          if (x < 0) {
+            x = 0;
+            movement.x = Math.abs(movement.x);
+          }
+          if (x > window.innerWidth - 100) {
+            x = window.innerWidth - 100;
+            movement.x = -Math.abs(movement.x);
+          }
+          if (y < 0) {
+            y = 0;
+            movement.y = Math.abs(movement.y);
+          }
+          if (y > window.innerHeight - 100) {
+            y = window.innerHeight - 100;
+            movement.y = -Math.abs(movement.y);
+          }
+
+          panel.style.top = y + "px";
+          panel.style.left = x + "px";
+        }, 30);
+      }
+      generateRandomMovement(panel);
+
+      // Add randomness and organic movement to the panels using the sin function
+      let x = Math.sin(i / 5) * 100 + Math.random() * 200;
+      let y = Math.cos(i / 5) * 100 + Math.random() * 200;
+
+      // Ensure that the panel stays within the bounds of the visible screen
+      if (x < 0) x = 0;
+      if (x > window.innerWidth - 100) x = window.innerWidth - 100;
+      if (y < 0) y = 0;
+      if (y > window.innerHeight - 100) y = window.innerHeight - 100;
+
+      panel.style.top = y + "px";
+      panel.style.left = x + "px";
+
+      panelContainer.appendChild(panel);
+    }
+  </script>
+</body>
+</html>
+
+

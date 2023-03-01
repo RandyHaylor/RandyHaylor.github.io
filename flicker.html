@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    /* Keyframe animation for flickering effect */
+    @keyframes flicker {
+      0% {
+        opacity: 1;
+      }
+      50% {
+        opacity: 0;
+      }
+      100% {
+        opacity: 1;
+      }
+    }
+
+    /* Apply flickering effect to all sections */
+    section {
+      animation: flicker 1s infinite;
+    }
+  </style>
+</head>
+<body>
+  <section id="welcome">
+    <h1>Welcome</h1>
+    <p>Welcome to my website!</p>
+  </section>
+  <section id="portfolio">
+    <h1>Portfolio</h1>
+    <p>Here are some examples of my work:</p>
+    <ul>
+      <li>Project 1</li>
+      <li>Project 2</li>
+      <li>Project 3</li>
+    </ul>
+  </section>
+  <section id="ideas">
+    <h1>Ideas</h1>
+    <p>Here are some ideas I've been thinking about:</p>
+    <ul>
+      <li>Idea 1</li>
+      <li>Idea 2</li>
+      <li>Idea 3</li>
+    </ul>
+  </section>
+  <script>
+    // Scroll website up and down rapidly
+    function scroll() {
+      window.scrollTo(0, window.scrollY + 1);
+      setTimeout(scroll, 10);
+    }
+
+    // Start scrolling
+    let timer = setTimeout(scroll, 10);
+
+    // Stop scrolling after 3 seconds
+    setTimeout(function() {
+      clearTimeout(timer);
+    }, 3000);
+  </script>
+</body>
+</html>

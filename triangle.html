@@ -1,0 +1,224 @@
+<html>
+<head>
+    <style>
+        /* Add some styling for the game */
+        #game {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            background-color: black;
+            touch-action: none;
+        }
+        #triangle {
+            position: absolute;
+            width: 0;
+            height: 0;
+            border-style: solid;
+            border-width: 20px 0 20px 40px;
+            border-color: transparent transparent transparent white;
+            left: 0;
+            top: calc(50% - 20px);
+        }
+        .obstacle {
+            position: absolute;
+            width: 5px;
+            height: 50%;
+            background-color: white;
+        }
+        .goal {
+            position: absolute;
+            width: 100%;
+            height: 3px;
+            background-color: green;
+            top: calc(50% - 1.5px);
+        }
+        .target {
+            position: absolute;
+            width: 0;
+            height: 0;
+            border-style: solid;
+            border-width: 20px 20px 0 20px;
+            border-color: red transparent transparent transparent;
+        }
+    </style>
+</head>
+<body>
+    <!-- Create a canvas element to draw the game -->
+    <canvas id="game"></canvas>
+
+    <!-- Add a triangle element -->
+    <div id="triangle"></div>
+
+    <script>
+        // Get the canvas element
+        var canvas = document.getElementById('game');
+        // Get the 2D context of the canvas
+        var ctx = canvas.getContext('2d');
+        // Set the width and height of the canvas to match the window size
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        // Create a triangle object
+        var triangle = {
+            x: 0,
+            y: canvas.height / 2,
+            vx: 0,
+            vy: 0,
+            ax: 0,
+            ay: 0,
+            size: 40
+        };
+
+        // Create a target object
+        var target = {
+            x: 0,
+            y: 0,
+            size: 40
+        };
+
+        // Create an array to store the obstacles
+        var obstacles = [];
+
+        // Create a flag to track when the level is complete
+        var levelComplete = false;
+
+        // Function to reset the game
+        function reset() {
+            // Reset the triangle position and velocity
+            triangle.x = 0;
+            triangle.y = canvas.height / 2;
+            triangle.vx = 0;
+            triangle.vy = 0;
+            // Reset the target position
+            target.x = 0;
+            target.y = 0;
+            // Clear the obstacles array
+            obstacles = [];
+            // Reset the level complete flag
+            levelComplete = false;
+            // Generate a new random set of obstacles
+            generateObstacles();
+        }
+
+        // Function to generate a random set of obstacles
+        function generateObstacles() {
+            // Clear the obstacles array
+            obstacles = [];
+            // Generate a random number of obstacles
+            var numObstacles = Math.floor(Math.random() * 10) + 5;
+            // Generate random positions and heights for the obstacles
+            for (var i = 0; i < numObstacles; i++) {
+                var obstacle = {
+                    x: (i+1) * (canvas.width / (numObstacles+1)),
+                    y: Math.random() > 0.5 ? 0 : canvas.height,
+                    height: Math.random() * (canvas.height / 2) + (canvas.height / 4)
+                };
+                obstacles.push(obstacle);
+            }
+        }
+
+        // Function to update the game state
+        function update() {
+            // Update the triangle position based on velocity
+            triangle.x += triangle.vx;
+            triangle.y += triangle.vy;
+            // Update the velocity based on acceleration
+            triangle.vx += triangle.ax;
+            triangle.vy += triangle.ay;
+            // Apply some friction to slow down the triangle
+            triangle.vx *= 0.9;
+            triangle.vy *= 0.9;
+
+            // Check if the triangle has reached the target
+            if (Math.abs(triangle.x - target.x) < triangle.size / 2 &&
+                Math.abs(triangle.y - target.y) < triangle.size / 2) {
+                // Set the target position to the current mouse position
+                target.x = mouse.x;
+                target.y = mouse.y;
+            }
+
+            // Check if the triangle has reached the goal
+            if (triangle.x > canvas.width - triangle.size / 2) {
+                levelComplete = true;
+            }
+
+            // Check if the triangle has collided with any obstacles
+            for (var i = 0; i < obstacles.length; i++) {
+                var obstacle = obstacles[i];
+                if (triangle.x > obstacle.x - triangle.size / 2 &&
+                    triangle.x < obstacle.x + triangle.size / 2 &&
+                    triangle.y > obstacle.y - triangle.size / 2 &&
+                    triangle.y < obstacle.y + triangle.size / 2) {
+                    // Reset the game if the triangle collides with an obstacle
+                    reset();
+                    break;
+                }
+            }
+        }
+
+        // Function to render the game
+        function render() {
+            // Clear the canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            // Draw the triangle
+            ctx.fillStyle = 'white';
+            ctx.beginPath();
+            ctx.moveTo(triangle.x, triangle.y - triangle.size / 2);
+            ctx.lineTo(triangle.x + triangle.size / 2, triangle.y + triangle.size / 2);
+            ctx.lineTo(triangle.x - triangle.size / 2, triangle.y + triangle.size / 2);
+            ctx.fill();
+            // Draw the target
+            ctx.fillStyle = 'red';
+            ctx.beginPath();
+            ctx.moveTo(target.x, target.y - target.size / 2);
+            ctx.lineTo(target.x + target.size / 2, target.y);
+            ctx.lineTo(target.x, target.y + target.size / 2);
+            ctx.fill();
+            // Draw the obstacles
+            ctx.fillStyle = 'white';
+            for (var i = 0; i < obstacles.length; i++) {
+                var obstacle = obstacles[i];
+                ctx.fillRect(obstacle.x - triangle.size / 2, obstacle.y, triangle.size, obstacle.height);
+            }
+            // Draw the goal
+            ctx.fillStyle = 'green';
+            ctx.fillRect(canvas.width - triangle.size / 2, 0, triangle.size, canvas.height);
+        }
+
+        // Function to run the game loop
+        function loop() {
+            update();
+            render();
+            // Check if the level is complete
+            if (levelComplete) {
+                // Reset the game if the level is complete
+                reset();
+            } else {
+                // Continue the game loop
+                requestAnimationFrame(loop);
+            }
+        }
+
+        // Set the initial target position to the center of the screen
+        target.x = canvas.width / 2;
+        target.y = canvas.height / 2;
+        // Generate the initial set of obstacles
+        generateObstacles();
+
+        // Create a mouse object to track the mouse position
+        var mouse = {x: 0, y: 0};
+        // Update the mouse position when the mouse moves
+        canvas.addEventListener('mousemove', function(e) {
+            mouse.x = e.clientX;
+            mouse.y = e.clientY;
+        });
+        // Update the target position when the mouse is clicked
+        canvas.addEventListener('click', function(e) {
+            target.x = e.clientX;
+            target.y = e.clientY;
+        });
+        // Start the game loop
+        loop();
+    </script>
+</body>
+</html>

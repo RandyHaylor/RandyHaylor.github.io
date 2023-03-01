@@ -1,0 +1,100 @@
+<html>
+  <head>
+    <title>3D Cube</title>
+    <style>
+      body {
+        margin: 0;
+        overflow: hidden;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="container"></div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r121/three.min.js"></script>
+    <script>
+      // Set up the scene, camera, and renderer
+      var scene = new THREE.Scene();
+      var camera = new THREE.PerspectiveCamera(
+        75,
+        window.innerWidth / window.innerHeight,
+        0.1,
+        1000
+      );
+      var renderer = new THREE.WebGLRenderer();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      document.body.appendChild(renderer.domElement);
+
+      // Create the cube
+      var geometry = new THREE.BoxGeometry(1, 1, 1);
+      var material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+      var cube = new THREE.Mesh(geometry, material);
+      scene.add(cube);
+
+      // Position the camera
+      camera.position.z = 5;
+
+      // Add the right angle bracket element
+      var rightBracket = document.createElement("div");
+      rightBracket.innerHTML = "&gt;";
+      rightBracket.style.position = "absolute";
+      rightBracket.style.top = "50%";
+      rightBracket.style.right = "20px";
+      rightBracket.style.fontSize = "50px";
+      rightBracket.style.color = "green";
+      rightBracket.style.border = "2px solid red";
+      rightBracket.style.cursor = "pointer";
+      document.body.appendChild(rightBracket);
+
+      // Add the left angle bracket element
+      var leftBracket = document.createElement("div");
+      leftBracket.innerHTML = "&lt;";
+      leftBracket.style.position = "absolute";
+      leftBracket.style.top = "50%";
+      leftBracket.style.left = "20px";
+      leftBracket.style.fontSize = "50px";
+leftBracket.style.color = "green";
+leftBracket.style.border = "2px solid red";
+      leftBracket.style.cursor = "pointer";
+      document.body.appendChild(leftBracket);
+
+   // Rotate the cube by the specified amount
+function rotateCube(amount) {
+  // Use the Tween.js library to animate the rotation
+  var rotation = { y: cube.rotation.y };
+  var target = { y: cube.rotation.y + amount };
+  var tween = new TWEEN.Tween(rotation)
+    .to(target, 2000)
+    .easing(TWEEN.Easing.Elastic.InOut)
+    .onUpdate(function() {
+      cube.rotation.y = rotation.y;
+    })
+    .start();
+}
+
+// Rotate the cube when the right angle bracket is clicked or touched
+rightBracket.addEventListener("click", function() {
+  rotateCube(Math.PI / 2);
+});
+rightBracket.addEventListener("touchstart", function() {
+  rotateCube(Math.PI / 2);
+});
+
+// Rotate the cube when the left angle bracket is clicked or touched
+leftBracket.addEventListener("click", function() {
+  rotateCube(-Math.PI / 2);
+});
+leftBracket.addEventListener("touchstart", function() {
+  rotateCube(-Math.PI / 2);
+});
+
+
+      // Render the scene and update the tweens
+      function render() {
+        requestAnimationFrame(render);
+        renderer.render(scene, camera);
+        TWEEN.update();
+      }
+      render();
+    </script>
+  </body>
+</html>

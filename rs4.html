@@ -1,0 +1,53 @@
+<html>
+  <head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+  </head>
+  <body>
+    <form>
+      <label for="search">Search:</label><br>
+      <input type="text" id="search" name="search"><br>
+      <input type="button" value="Submit" onclick="searchReddit()">
+    </form> 
+    <div id="results">
+      <!-- Results will be added here -->
+    </div>
+    <script>
+      function searchReddit() {
+        var searchTerm = $('#search').val();
+        var url = 'https://www.reddit.com/search.json?q=' + searchTerm;
+
+        $.get(url, function(data) {
+          var results = '';
+          data.data.children.forEach(function(item) {
+            // Get the comments for the post
+            var commentsUrl = 'https://www.reddit.com' + item.data.permalink + '.json';
+            $.get(commentsUrl, function(commentsData) {
+              // Sort the comments by the number of upvotes
+              var sortedComments = commentsData[1].data.children.sort(function(a, b) {
+                return b.data.ups - a.data.ups;
+              });
+
+              // Display the top-ranked comments
+              results += '<div style="border: 1px solid black; padding: 10px; margin: 10px">';
+              results += '<h2>' + item.data.title + '</h2>';
+              for (var i = 0; i < sortedComments.length; i++) {
+                results += '<p>' + sortedComments[i].data.body + '</p>';
+              }
+              // Add a link to the original Reddit post
+              results += '<p><a href="https://www.reddit.com' + item.data.permalink + '">View on Reddit</a></p>';
+              
+
+          // Display the main post image
+              if (item.data.thumbnail) {
+                results += '<img src="' + item.data.thumbnail + '" alt="Post Image">';
+              }
+
+              results += '</div>';
+              $('#results').html(results);
+            });
+          });
+        });
+      }
+    </script>
+  </body>
+</html>

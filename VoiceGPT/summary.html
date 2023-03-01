@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chat GPT</title>
+    <script src="ChatGPT.js?v=12"></script>
+	<script>
+		function processInput() {
+			var sInput = document.getElementById("txtMsg").value.trim();
+			var sMaxChars = 1800;
+			var iNumChunks = Math.ceil(sInput.length / sMaxChars);
+			var aChunks = [];
+			for (var i = 0; i < iNumChunks; i++) {
+				aChunks.push(sInput.substr(i * sMaxChars, sMaxChars));
+			}
+			sendChunksToGPT(aChunks);
+		}	
+    
+    function sendChunksToGPT(aChunks) {
+		var sSummaryPrompt = "I will send several blocks of text. store a meaningful but brief summary of each block permanently in your own memory for reference. Do not respond until I say that I have sent all of the text";
+		var sSummaryMessage = "I have sent all of the text. Please summarize it succinctly and briefly, using bullet points where it makes sense.";
+		var iChunkIndex = 0;
+		var oHttp = new XMLHttpRequest();
+		oHttp.open("POST", "https://api.openai.com/v1/completions");
+		oHttp.setRequestHeader("Accept", "application/json");
+		oHttp.setRequestHeader("Content-Type", "application/json");
+		var OPENAI_API_KEY = document.getElementById("apiKey").value;
+		oHttp.setRequestHeader("OPENAI_API_KEY", OPENAI_API_KEY);
+		oHttp.setRequestHeader("Authorization", "Bearer " + OPENAI_API_KEY)
+		oHttp.onreadystatechange = function () {
+			if (oHttp.readyState === 4) {
+				var oJson = {}
+				if (txtOutput.value != "") txtOutput.value += "\n";
+				try {
+					oJson = JSON.parse(oHttp.responseText);
+				} catch (ex) {
+					txtOutput.value += "Error: " + ex.message
+				}
+				if (oJson.error && oJson.error.message) {
+					txtOutput.value += "Error: " + oJson.error.message;
+				} else if (oJson.choices && oJson.choices[0].text) {
+					var s = oJson.choices[0].text;
+					if (s == "") s = "No response";
+					txtOutput.value += "Chat GPT: " + s;
+					if (iChunkIndex == aChunks.length - 1) {
+						TextToSpeech(sSummaryMessage);
+					} else {
+						sendNextChunk();
+					}
+				} 
+			}
+		};
+		function sendNextChunk() {
+  var chunk = chunksToSend.shift();
+  var OPENAI_API_KEY = document.getElementById("apiKey").value;
+  var oHttp = new XMLHttpRequest();
+  oHttp.open("POST", "https://api.openai.com/v1/completions");
+  oHttp.setRequestHeader("Accept", "application/json");
+  oHttp.setRequestHeader("Content-Type", "application/json");
+  oHttp.setRequestHeader("Authorization", "Bearer " + OPENAI_API_KEY);
+
+  oHttp.onreadystatechange = function() {
+    if (oHttp.readyState === 4) {
+      if (oHttp.status === 200) {
+        var oJson = JSON.parse(oHttp.responseText);
+        if (oJson.choices && oJson.choices[0].text) {
+          var response = oJson.choices[0].text;
+          document.getElementById("txtOutput").value += response + "\n";
+          // check if there are more chunks to send
+          if (chunksToSend.length > 0) {
+            sendNextChunk();
+          } else {
+            // if all chunks have been sent, send the summary prompt
+            var summaryPrompt = "I have sent all of the text. Please summarize it succinctly and briefly, using bullet points where it makes sense.";
+            document.getElementById("txtOutput").value += "Chat GPT: " + summaryPrompt + "\n";
+          }
+        }
+      } else {
+        console.error(oHttp.statusText);
+      }
+    }
+  };
+
+  var model = document.getElementById("selModel").value;
+  var maxTokens = 1024;
+  var prompt = chunk;
+  var data = {
+    model: model,
+    prompt: prompt,
+    max_tokens: maxTokens,
+  };
+  oHttp.send(JSON.stringify(data));
+}
+
+		TextToSpeech(sSummaryPrompt);
+		sendNextChunk();
+	}
+</script>
+
+  </head>
+<body onload="OnLoad()">
+	<label for="apiKey">OpenAI API Key:</label>
+	<input type="text" id="apiKey" value="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">
+	<button id="testButton">Test API Key</button>
+<text id="result"></text>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;If you need to get a key, log in with your google account and generate one here: <a href="https://beta.openai.com/account/api-keys">https://beta.openai.com/account/api-keys</a><br>
+
+<div id="idContainer">
+	<textarea id="txtOutput" rows="10" style="margin-top: 10px; width: 100%;" placeholder="Output"></textarea>
+
+	<div>
+		<button type="button" onclick="processInput()" id="btnSend">Send</button>
+
+		<select id="selModel">
+			<option value="text-davinci-003">text-davinci-003</option>
+			<option value="text-davinci-002">text-davinci-002</option>
+			<option value="code-davinci-002">code-davinci-002</option>
+		</select>
+
+		<select id="selLang" onchange="ChangeLang(this)">
+			<option value="en-US">English (United States)</option>
+			<option value="fr-FR">French (France)</option>
+			<option value="ru-RU">Russian (Russia)</option>
+			<option value="pt-BR">Portuguese (Brazil)</option>
+			<option value="es-ES">Spanish (Spain)</option>
+			<option value="de-DE">German (Germany)</option>
+			<option value="it-IT">Italian (Italy)</option>
+			<option value="pl-PL">Polish (Poland)</option>
+			<option value="nl-NL">Dutch (Netherlands)</option>
+		</select>
+	</div>
+
+	<textarea id="txtMsg" rows="5" wrap="soft" style="width: 98%; margin-left: 3px; margin-top: 6px" placeholder="Input Text"></textarea>
+</div>
+	<br>
+	ignore this<br>
+	<select id="selVoices"></select><label id="lblMute"><input id="chkMute" type="checkbox"/>Mute</label>
+
+
+</body>
+</html>

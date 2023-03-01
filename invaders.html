@@ -1,0 +1,84 @@
+<html>
+<head>
+  <title>Space Invaders</title>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+    }
+  </style>
+</head>
+<body>
+  <script src="https://threejs.org/build/three.min.js"></script>
+  <script>
+    // Set up the scene, camera, and renderer
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
+
+    // Create the player's spaceship using a cube and an ASCII character texture
+    const playerGeometry = new THREE.BoxGeometry(1, 1, 1);
+    const playerMaterial = new THREE.MeshBasicMaterial({map: new THREE.TextureLoader().load("player.png")});
+    const player = new THREE.Mesh(playerGeometry, playerMaterial);
+    scene.add(player);
+
+    // Create the enemy spaceships using cubes and ASCII character textures
+    const enemyGeometry = new THREE.BoxGeometry(1, 1, 1);
+    const enemyMaterial = new THREE.MeshBasicMaterial({map: new THREE.TextureLoader().load("enemy.png")});
+    const enemies = [];
+    for (let i = 0; i < 10; i++) {
+      const enemy = new THREE.Mesh(enemyGeometry, enemyMaterial);
+      enemy.position.x = i - 5;
+      enemy.position.y = 5;
+      scene.add(enemy);
+      enemies.push(enemy);
+    }
+
+    // Set up keyboard controls for the player's spaceship
+    const keydown = {};
+    window.addEventListener("keydown", event => keydown[event.code] = true);
+    window.addEventListener("keyup", event => keydown[event.code] = false);
+
+    // Set up touch controls for the player's spaceship on mobile devices
+    let touchX = 0;
+    window.addEventListener("touchstart", event => touchX = event.touches[0].clientX);
+    window.addEventListener("touchmove", event => touchX = event.touches[0].clientX);
+    window.addEventListener("touchend", event => touchX = 0);
+
+    // Animate the scene
+    function animate() {
+      requestAnimationFrame(animate);
+
+      // Update the player's position based on keyboard or touch controls
+      if (keydown.ArrowLeft || (touchX > 0 && touchX < window.innerWidth / 2)) {
+        player.position.x -= 0.1;
+      }
+      if (keydown.ArrowRight || (touchX > window.innerWidth / 2)) {
+        player.position.x += 0.1;
+      }
+
+      // Update the enemies' positions
+      for (const enemy of enemies) {
+        enemy.position.y -= 0.01;
+      }
+
+      renderer.render(scene);
+
+
+      // Check for collisions between the player and enemies
+      for (const enemy of enemies) {
+        if (enemy.position.distanceTo(player.position) < 1.5) {
+          // Game over, reset the game
+          player.position.set(0, 0, 0);
+          for (const enemy of enemies) {
+            enemy.position.set(enemy.position.x, 5, 0);
+          }
+        }
+      }
+    }
+    animate();
+  </script>
+</body>
+</html>

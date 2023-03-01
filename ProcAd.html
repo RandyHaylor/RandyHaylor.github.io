@@ -1,0 +1,125 @@
+<html>
+  <head>
+    <title>Procedurally Generated Text Adventure</title>
+  </head>
+  <body>
+    <h1>Procedurally Generated Text Adventure</h1>
+    <p id="game-text"></p>
+    <button id="north-button">Go North</button>
+    <button id="south-button">Go South</button>
+    <button id="east-button">Go East</button>
+    <button id="west-button">Go West</button>
+    <script>
+      // Initialize variables for the game
+      let currentLocation = "Start";
+      let visitedLocations = [];
+      let locationDescriptions = {
+        Start: "You are at the starting location. You see paths leading north, south, east, and west.",
+        Forest: "You are in a dense forest. The trees are tall and the underbrush is thick. You see paths leading north, south, east, and west.",
+        Mountain: "You are at the base of a mountain. The path ahead is steep and rocky. You see paths leading north, south, east, and west.",
+        Beach: "You are on a sandy beach. The ocean stretches out before you. You see paths leading north, south, east, and west.",
+        Desert: "You are in a hot, dry desert. The sand dunes seem to go on forever. You see paths leading north, south, east, and west."
+      };
+
+      // Function to update the game text and enable/disable buttons based on the current location
+      function updateGame() {
+        document.getElementById("game-text").innerHTML = locationDescriptions[currentLocation];
+        if (currentLocation === "Start") {
+          document.getElementById("north-button").disabled = false;
+          document.getElementById("south-button").disabled = false;
+          document.getElementById("east-button").disabled = false;
+          document.getElementById("west-button").disabled = false;
+        } else if (currentLocation === "Forest") {
+          document.getElementById("north-button").disabled = false;
+          document.getElementById("south-button").disabled = false;
+          document.getElementById("east-button").disabled = false;
+          document.getElementById("west-button").disabled = false;
+        } else if (currentLocation === "Mountain") {
+          document.getElementById("north-button").disabled = false;
+          document.getElementById("south-button").disabled = false;
+          document.getElementById("east-button").disabled = false;
+          document.getElementById("west-button").disabled = false;
+        } else if (currentLocation === "Beach") {
+          document.getElementById("north-button").disabled = false;
+          document.getElementById("south-button").disabled = false;
+          document.getElementById("east-button").disabled = false;
+          document.getElementById("west-button").disabled = false;
+        } else if (currentLocation === "Desert") {
+          document.getElementById("north-button").disabled = false;
+          document.getElementById("south-button").disabled = false;
+          document.getElementById("east-button").disabled = false;
+document.getElementById("west-button").disabled = false;
+} else {
+document.getElementById("north-button").disabled = true;
+document.getElementById("south-button").disabled = true;
+document.getElementById("east-button").disabled = true;
+document.getElementById("west-button").disabled = true;
+}
+}
+  // Initialize the game
+  updateGame();
+
+  // Event listeners for the buttons to move the player to a different location
+  document.getElementById("north-button").addEventListener("click", function() {
+    if (currentLocation === "Start") {
+      currentLocation = "Forest";
+    } else if (currentLocation === "Forest") {
+      currentLocation = "Mountain";
+    } else if (currentLocation === "Mountain") {
+      currentLocation = "Desert";
+    } else if (currentLocation === "Beach") {
+      currentLocation = "Mountain";
+    } else if (currentLocation === "Desert") {
+      currentLocation = "Beach";
+    }
+    visitedLocations.push(currentLocation);
+    updateGame();
+  });
+  document.getElementById("south-button").addEventListener("click", function() {
+    if (currentLocation === "Start") {
+      currentLocation = "Beach";
+    } else if (currentLocation === "Forest") {
+      currentLocation = "Start";
+    } else if (currentLocation === "Mountain") {
+      currentLocation = "Forest";
+    } else if (currentLocation === "Beach") {
+      currentLocation = "Desert";
+    } else if (currentLocation === "Desert") {
+      currentLocation = "Mountain";
+    }
+    visitedLocations.push(currentLocation);
+    updateGame();
+  });
+  document.getElementById("east-button").addEventListener("click", function() {
+    if (currentLocation === "Start") {
+      currentLocation = "Desert";
+    } else if (currentLocation === "Forest") {
+      currentLocation = "Beach";
+    } else if (currentLocation === "Mountain") {
+      currentLocation = "Start";
+    } else if (currentLocation === "Beach") {
+      currentLocation = "Forest";
+    } else if (currentLocation === "Desert") {
+      currentLocation = "Mountain";
+    }
+    visitedLocations.push(currentLocation);
+    updateGame();
+  });
+  document.getElementById("west-button").addEventListener("click", function() {
+    if (currentLocation === "Start") {
+      currentLocation = "Mountain";
+    } else if (currentLocation === "Forest") {
+      currentLocation = "Desert";
+    } else if (currentLocation === "Mountain") {
+      currentLocation = "Beach";
+    } else if (currentLocation === "Beach") {
+      currentLocation = "Start";
+    } else if (currentLocation === "Desert") {
+      currentLocation = "Forest";
+    }
+    visitedLocations.push(currentLocation);
+    updateGame();
+  });
+</script>
+  </body>
+</html>

@@ -1,0 +1,73 @@
+<html>
+  <head>
+    <style>
+      .emoji {
+        font-size: 32px;
+        width: 50px;
+        height: 50px;
+        text-align: center;
+      }
+      .hidden {
+        background-color: #ffffff;
+      }
+      .visible {
+        background-color: #ffcccc;
+      }
+    </style>
+  </head>
+  <body>
+    <table>
+      <tr>
+        <td id="cell-1" class="emoji hidden" onclick="hit(1)">😊</td>
+        <td id="cell-2" class="emoji hidden" onclick="hit(2)">😊</td>
+      </tr>
+      <tr>
+        <td id="cell-3" class="emoji hidden" onclick="hit(3)">😊</td>
+        <td id="cell-4" class="emoji hidden" onclick="hit(4)">😊</td>
+      </tr>
+    </table>
+    <script>
+      let hits = 0;
+      let misses = 0;
+      let currentCell = null;
+
+      function hit(cellId) {
+        if (currentCell == cellId) {
+          hits++;
+          document.getElementById("cell-" + cellId).classList.remove("visible");
+          document.getElementById("cell-" + cellId).classList.add("hidden");
+          currentCell = null;
+        } else {
+          misses++;
+        }
+
+        if (hits == 10) {
+          alert("You won!");
+          hits = 0;
+          misses = 0;
+        }
+
+        if (misses == 10) {
+          alert("You lost!");
+          hits = 0;
+          misses = 0;
+        }
+      }
+
+      function showMole() {
+        if (currentCell != null) {
+          document.getElementById("cell-" + currentCell).classList.remove("visible");
+          document.getElementById("cell-" + currentCell).classList.add("hidden");
+        }
+
+        currentCell = Math.floor(Math.random() * 4) + 1;
+        document.getElementById("cell-" + currentCell).classList.remove("hidden");
+        document.getElementById("cell-" + currentCell).classList.add("visible");
+
+        setTimeout(showMole, 1000);
+      }
+
+      showMole();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,39 @@
+<html>
+  <head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+    <style>
+      img {
+        width: 100px;
+        height: 100px;
+        border: 1px solid black;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Reddit Search</h1>
+    <p>Enter a search term and specify the percentage of top comments and maximum age of the results to find the most upvoted comments on Reddit.</p>
+    <form>
+      <label for="search">Search:</label><br>
+      <input type="text" id="search" name="search"><br>
+      <label for="percentage">Top Comments:</label><br>
+      <input type="range" min="0" max="100" value="50" class="slider" id="percentage"><br>
+      <label for="age">Maximum Age:</label><br>
+      <input type="range" min="1" max="365" value="7" class="slider" id="age"><br>
+      <input type="button" value="Submit" onclick="searchReddit()">
+    </form> 
+    <div id="results"></div>
+    <script>
+      function searchReddit() {
+        var searchTerm = $('#search').val();
+        var percentage = $('#percentage').val();
+        var age = $('#age').val();
+        var url = 'https://www.reddit.com/search.json?q=' + searchTerm + '&t=' + age;
+
+        $.get(url, function(data) {
+          var results = '';
+          data.data.children.forEach(function(item) {
+            // Get the comments for the post
+            var commentsUrl = 'https://www.reddit.com' + item.data.permalink + '.json';
+            $.get(commentsUrl, function(commentsData) {
+              // Sort the comments by the number of upvotes
+              var sortedComments = comments

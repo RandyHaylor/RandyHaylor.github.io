@@ -1,0 +1,58 @@
+//Add an option to specify the maximum age of the results
+
+//To allow the user to specify the maximum age of the results, you can add another form element to the HTML code, such as a range input or a dropdown menu. You can then use the value of this form element to specify the maximum age of the results using the t query parameter in the Reddit API URL.
+
+//Here is an example of how you can do this using a range input:
+
+
+<html>
+  <head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+  </head>
+  <body>
+    <form>
+      <label for="search">Search:</label><br>
+      <input type="text" id="search" name="search"><br>
+      <label for="percentage">Top Comments:</label><br>
+      <input type="range" min="0" max="100" value="50" class="slider" id="percentage"><br>
+      <label for="age">Maximum Age:</label><br>
+      <input type="range" min="1" max="365" value="7" class="slider" id="age"><br>
+      <input type="button" value="Submit" onclick="searchReddit()">
+    </form> 
+    <div id="results"></div>
+    <script>
+      function searchReddit() {
+        var searchTerm = $('#search').val();
+        var percentage = $('#percentage').val();
+        var age = $('#age').val();
+        var url = 'https://www.reddit.com/search.json?q=' + searchTerm + '&t=' + age;
+
+        $.get(url, function(data) {
+          var results = '';
+          data.data.children.forEach(function(item) {
+            // Get the comments for the post
+            var commentsUrl = 'https://www.reddit.com' + item.data.permalink + '.json';
+            $.get(commentsUrl, function(commentsData) {
+              // Sort the comments by the number of upvotes
+              var sortedComments = commentsData[1].data.children.sort(function(a, b) {
+                return b.data.ups - a.data.ups;
+              });
+
+              // Calculate the number of comments to display based on the percentage
+              var numComments = Math.round(sortedComments.length * (percentage / 100));
+
+              // Display the top-ranked comments
+              results += '<h2>' + item.data.title + '</h2>';
+              for (var i = 0; i < numComments; i++) {
+                results += '<p>' + sortedComments[i].data.body + '</p>';
+              }
+              results += '<hr>';
+              $('#results').html(results);
+            });
+          });
+        });
+      }
+    </script>
+  </body>
+</html>
+//In this version of the code, we added a range input to the form that allows the user to specify the maximum age of the results in days. The searchReddit function uses the value of this input to set the t query parameter in the Reddit API URL, which specifies the maximum age of

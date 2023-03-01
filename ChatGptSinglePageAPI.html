@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chat GPT Basic HTML API Example</title>    
+</head>
+<body>
+ <label for="apiKey">OpenAI API Key:</label>
+ <input type="text" id="apiKey" value="Enter Your OpenAI API Key Here">
+ <button id="testButton">Test API Key</button>
+ <text id="result"></text>
+ <br>
+ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;If you need to get a key, log in with your google account and generate one here: <a href="https://beta.openai.com/account/api-keys">https://beta.openai.com/account/api-keys</a><br>
+
+<script>
+	//select text in api key field when it is focused
+document.addEventListener("DOMContentLoaded", function() {
+  document.getElementById("apiKey").addEventListener("focus", function() {
+    this.select();
+  });
+});
+
+function testApiKey() 
+{
+	var apiKey = document.getElementById("apiKey").value;
+	var resultElem = document.getElementById("result");
+
+	var xhr = new XMLHttpRequest();
+	xhr.open("GET", "https://api.openai.com/v1/models");
+	xhr.setRequestHeader("Content-Type", "application/json");
+	xhr.setRequestHeader("Authorization", "Bearer " + apiKey);
+	xhr.onreadystatechange = function() 
+	{
+		if (xhr.readyState === 4) 
+		{
+			if (xhr.status === 200) {
+			  resultElem.innerHTML = "API key is valid!";
+			} else {
+			  resultElem.innerHTML = "API key is invalid: " + xhr.status;
+			}
+		}
+	};
+	try {
+	xhr.send();
+	} catch (error) {
+	  console.error("An error occurred while sending the request to test api key:", error);
+	}
+
+}
+  document.getElementById("testButton").addEventListener("click", testApiKey);
+</script>
+	
+	
+
+    <div id="idContainer">
+        <textarea id="output" rows="10" style="margin-top: 10px; width: 100%;" placeholder="Output"></textarea>
+
+        <div>
+            <button type="button" id="send">Send</button>
+
+            <select id="selModel">
+                <option value="text-davinci-003">text-davinci-003</option>
+                <option value="text-davinci-002">text-davinci-002</option>
+                <option value="code-davinci-002">code-davinci-002</option>
+            </select>
+        </div>
+
+        <textarea id="input" rows="5" wrap="soft" style="width: 98%; margin-left: 3px; margin-top: 6px" placeholder="Input Text"></textarea>
+
+    </div>
+<script>
+//set up config vars
+let wordRangeToSearchForLineBreak = 50;
+let chunkWordLimit = 600;
+//set up temp vars
+
+let OPENAI_API_KEY = "";
+let textToEvaluate = "";
+let summaryChunks = [];
+let currentWordCount = 0;
+let chunksToEvaluate = [];
+let lastNumberOfChunks = 0;
+let isWorking = false;
+
+//set up Submit button listener (to be loaded after doc is loaded)
+document.addEventListener("DOMContentLoaded", function() {
+  document.getElementById("send").addEventListener("click",  Send);
+  });
+
+//function to respond to event and evaluate input
+async function Send() {
+	if (isWorking === true)
+	{
+		alert("The system is stil processing. Refresh the page if you think it's taking too long. It will take some time as it talks back and forth to ChatGPT");
+		return;
+	}
+	isWorking = true;
+	textToEvaluate = document.getElementById("input").value;
+	if (textToEvaluate== "") 
+	{
+        alert("Type in your question!");
+        input.focus();
+		isWorking = false;
+        return;
+    }
+	OPENAI_API_KEY = document.getElementById("apiKey").value;
+	currentWordCount = textToEvaluate.split(" ").length;
+	console.log(`The number of words in the input is: ${currentWordCount}`);
+	
+	
+	if (currentWordCount > chunkWordLimit)
+	{
+		alert("Your input is over the limit defined in this ChatGPT interface code. Limit is " + chunkWordLimit + " words.");
+	}else{
+	output.value += "\n\n";
+	output.value += await SendChunk(textToEvaluate);
+	}
+	
+	isWorking = false; //restore functionality to submit button
+}
+
+
+
+async function SendChunk(gptSendText) {
+  return new Promise((resolve, reject) => {
+    var oHttp = new XMLHttpRequest();
+    oHttp.open("POST", "https://api.openai.com/v1/completions");
+    oHttp.setRequestHeader("Accept", "application/json");
+    oHttp.setRequestHeader("Content-Type", "application/json");
+    oHttp.setRequestHeader("OPENAI_API_KEY", OPENAI_API_KEY);
+    oHttp.setRequestHeader("Authorization", "Bearer " + OPENAI_API_KEY);
+
+    oHttp.onreadystatechange = function () {
+      if (oHttp.readyState === 4) {
+        var oJson = {};
+
+        try {
+          oJson = JSON.parse(oHttp.responseText);
+        } catch (ex) {
+          output.value += "Error: " + ex.message;
+          reject(ex);
+        }
+
+        if (oJson.error && oJson.error.message) {
+          output.value += "Error: " + oJson.error.message;
+        } else if (oJson.choices && oJson.choices[0].text) {
+          var gptResponse = oJson.choices[0].text;
+
+          if (gptResponse === "") gptResponse = "No response";
+          else if (gptResponse === null) gptResponse = "Null";
+          
+          resolve(gptResponse);
+        }
+      }
+    };
+
+    var data = {
+      model: "text-davinci-003",
+	  max_tokens: 2048,
+      prompt: gptSendText
+    };
+
+	try {
+	  oHttp.send(JSON.stringify(data));
+	} catch (error) {
+	  console.error("An error occurred while sending the request:", error);
+	  return "An error occurred while sending the request: " + error;
+	}	
+ 
+    input.value = "";
+  });
+}
+
+
+
+
+//Enter key submits form, shift+Enter allows user to add acutal newline in text field
+document.addEventListener("keydown", function(event) {
+  if (event.keyCode === 13 && !event.shiftKey) {
+    event.preventDefault();
+    document.getElementById("send").click();
+  }
+});
+
+
+//put cursor in input field on document load
+document.addEventListener("DOMContentLoaded", function() {input.focus();});
+//standalone script to animate button text of Send button while 'isWorking' is true
+document.addEventListener("DOMContentLoaded", function() {
+	
+  let button = document.getElementById("send");
+  let states = ["o..", ".o.", "..o"];
+  let stateIndex = 0;
+
+  setInterval(async function() {
+    if (isWorking === true) {
+      button.innerHTML = states[stateIndex];
+      stateIndex = (stateIndex + 1) % states.length;
+    } else {
+      button.innerHTML = "Send";
+    }
+  }, 1000);
+});
+</script>
+
+</body>
+</html>

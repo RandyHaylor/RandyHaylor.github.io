@@ -1,0 +1,147 @@
+<html>
+  <head>
+    <style>
+      body {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        width: 100%;
+        margin: 0;
+        background-color: #333;
+      }
+
+      #game-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        width: 80%;
+        height: 80%;
+        background-color: #eee;
+        border-radius: 16px;
+      }
+
+      #game-area {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        height: 90%;
+      }
+
+      #score {
+        width: 100%;
+        height: 10%;
+        text-align: center;
+        font-size: 24px;
+        color: #333;
+        background-color: #eee;
+      }
+
+      #shield {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 0;
+        height: 0;
+        border-top: 16px solid transparent;
+        border-bottom: 16px solid transparent;
+        border-right: 16px solid blue;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="game-container">
+      <div id="game-area">
+        <div id="smiley-face">😊</div>
+        <div id="shield"></div>
+      </div>
+      <div id="score">0</div>
+    </div>
+    <script>
+      const gameArea = document.getElementById("game-area");
+      const shield = document.getElementById("shield");
+      const smileyFace = document.getElementById("smiley-face");
+      const score = document.getElementById("score");
+
+      let characters = [];
+      let speed = 1;
+      let quantity = 1;
+      let score = 0;
+
+      // ASCII characters to choose from
+      const charactersList = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890!@#$%^&*()_+-=[]{}|;':\",./<>?";
+
+      // Generate random characters
+      function generateCharacters() {
+        for (let i = 0; i < quantity; i++) {
+          let character = document.createElement("div");
+          character.innerHTML = charactersList[Math.floor(Math.random() * charactersList.length)];
+          character.style.fontSize = "24px";
+          character.style.color = "black";
+          character.style.position = "absolute";
+          character.style.top = Math.floor(Math.random() * gameArea.offsetHeight) + "px";
+          character.style.left = Math.floor(Math.random() * gameArea.offsetWidth) + "px";
+          character.speed = speed;
+          characters.push(character);
+          gameArea.appendChild(character);
+        }
+     
+      // Move characters towards smiley face
+      function moveCharacters() {
+        for (let i = 0; i < characters.length; i++) {
+          let character = characters[i];
+          let dx = smileyFace.offsetLeft - character.offsetLeft;
+          let dy = smileyFace.offsetTop - character.offsetTop;
+          let distance = Math.sqrt(dx * dx + dy * dy);
+          let unitX = dx / distance;
+          let unitY = dy / distance;
+          character.style.left = (character.offsetLeft + unitX * character.speed) + "px";
+          character.style.top = (character.offsetTop + unitY * character.speed) + "px";
+        }
+      }
+
+      // Check if characters hit the shield
+      function checkCollision() {
+        for (let i = 0; i < characters.length; i++) {
+          let character = characters[i];
+          if (character.offsetLeft + character.offsetWidth > shield.offsetLeft && character.offsetTop + character.offsetHeight > shield.offsetTop && character.offsetTop < shield.offsetTop + shield.offsetHeight) {
+            gameArea.removeChild(character);
+            characters.splice(i, 1);
+            score += 10;
+            score.innerHTML = score;
+          }
+        }
+      }
+
+      // Increase game difficulty over time
+      function increaseDifficulty() {
+        speed += 0.1;
+        quantity += 1;
+      }
+
+      // Main game loop
+      function loop() {
+        moveCharacters();
+        checkCollision();
+        increaseDifficulty();
+        requestAnimationFrame(loop);
+      }
+
+      // Drag shield with finger
+     
+gameArea.addEventListener("touchmove", function(event) {
+  event.preventDefault();
+  let touch = event.touches[0];
+  shield.style.left = touch.clientX - shield.offsetWidth / 2 + "px";
+  shield.style.top = touch.clientY - shield.offsetHeight / 2 + "px";
+});
+
+
+      // Start game
+      loop();
+    </script>
+  </body>
+</html>
