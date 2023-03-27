@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lambda Test</title>
+    <script>
+        async function getJoke() {
+            const requestOptions = {
+                method: 'POST',
+                headers: {
+                    "Accept": "application/json",
+                    "Content-Type": "application/json",
+                    "OPENAI_API_KEY": "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",
+                    "Authorization": "Bearer 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"
+                },
+                body: JSON.stringify({
+                    "model": "text-davinci-003",
+                    "prompt": "tell me a joke"
+                }),
+            };
+
+            try {
+                const response = await fetch("https://j0fckc8b0k.execute-api.us-east-1.amazonaws.com/LambdaTestFunction", requestOptions);
+                const data = await response.json();
+                document.getElementById('jokeDisplay').innerText = data.choices[0].text;
+            } catch (error) {
+                console.error("Error fetching joke:", error);
+            }
+        }
+    </script>
+</head>
+<body>
+    <h1>Lambda Test</h1>
+    <button onclick="getJoke()">Get a Joke</button>
+    <p id="jokeDisplay"></p>
+</body>
+</html>
