@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OpenAI Lambda Test</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .settings {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      padding: 10px;
+    }
+
+    #output {
+      flex-grow: 1;
+      border: 1px solid #ccc;
+      padding: 10px;
+      resize: none;
+      width: 100%;
+    }
+  </style>
+</head>
+<body>
+  <div class="settings">
+    <label for="api-key">API Key:</label>
+    <input type="text" id="api-key" placeholder="Enter your API key">
+    <label for="model">Model:</label>
+    <select id="model">
+      <option value="gpt-4-32k">gpt-4-32k</option>
+      <option value="gpt-4">gpt-4</option>
+      <option value="gpt-3.5-turbo">gpt-3.5-turbo</option>
+    </select>
+  </div>
+  <textarea id="input" rows="4" placeholder="Enter your prompt"></textarea>
+  <textarea id="output" readonly></textarea>
+
+  <script>
+    const API_ENDPOINT = "https://zx3jlwncbjojkyenylvso6m3pa0eimpm.lambda-url.us-east-1.on.aws/";
+
+    const apiKeyInput = document.getElementById("api-key");
+    const modelSelect = document.getElementById("model");
+    const inputField = document.getElementById("input");
+    const outputField = document.getElementById("output");
+
+    inputField.addEventListener("keydown", async (event) => {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        const apiKey = apiKeyInput.value;
+        const model = modelSelect.value;
+        const prompt = inputField.value;
+
+        if (!apiKey || !model || !prompt) {
+          alert("Please fill in all fields before submitting.");
+          return;
+        }
+
+        const requestOptions = {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ apiKey, model, prompt }),
+        };
+
+        try {
+          const response = await fetch(API_ENDPOINT, requestOptions);
+          const responseText = await response.text();
+          outputField.value += responseText + "\n";
+        } catch (error) {
+          console.error("Error:", error);
+          outputField.value += `Error: ${error.message}\n`;
+        }
+      }
+    });
+  </script>
+</body>
+</html>
