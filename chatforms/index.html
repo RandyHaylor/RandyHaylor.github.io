@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Subject-Specific LLM Prompt Assistant</title>
+  <style>
+    
+
+
+
+    .flex-container {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  padding: 15px;
+  border-bottom: 1px solid #7e7e7e;
+  background-color: #ffffff00;
+}
+
+/* Container to center-align the button */
+.button-container {
+  text-align: center;
+  margin-top: 20px;
+}
+
+/* Class for the button, overrides the ID styling for greater specificity */
+.copy-button {
+  width: 200px;
+  padding: 15px;  /* Adjust padding as needed */
+  font-size: 1.4em;
+  background-color: #0056b3;
+  border: none;
+  color: white;
+  text-align: center;
+  border-radius: 8px;
+  box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.16);
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.left-input {
+  width: 33%;
+  overflow-y: auto;
+  max-height: 5em; /* 5 lines max */
+  padding: 10px;
+  border: 1px solid #cccccc;
+  border-radius: 4px;
+  transition: border 0.3s;
+}
+
+.right-input {
+  width: 65%;
+  overflow-y: auto;
+  max-height: 5em; /* 5 lines max */
+  padding: 10px;
+  border: 1px solid #cccccc;
+  border-radius: 4px;
+  transition: border 0.3s;
+}
+
+.expandable-textarea {
+  resize: none;
+}
+
+div {
+  max-width: 1400px;
+}
+
+/* Additional styles */
+body {
+  font-family: 'Helvetica Neue', sans-serif;
+  margin: 20px;
+  background-color: #3d89d4;
+}
+
+h1 {
+  margin-bottom: 25px;
+  color: #343a40;
+}
+
+button {
+  background-color: #ffffff;
+  color: rgb(70, 70, 70);
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+button:hover {
+  background-color: #298af1;
+}
+
+label {
+  font-weight: 600;
+}
+
+textarea::placeholder {
+  color: #888;
+}
+
+.left-input:hover,
+.right-input:hover {
+  border: 1px solid #007bff;
+}
+.outer-container {
+  background-color: rgba(255, 255, 255, 0.5); /* Half transparent white */
+  border-radius: 12px; /* Rounded corners */
+  padding: 20px;
+  margin: 20px 0;
+}
+
+.inner-container {
+  background-color: #fff; /* Solid white */
+  border-radius: 8px; /* Inner rounded corners */
+  padding: 20px;
+}
+
+.title {
+  font-size: 2em;
+  margin-bottom: 20px;
+  font-weight: 600;
+  border-bottom: 2px solid #ccc; /* Line below title */
+  padding-bottom: 10px;
+}
+
+  </style>
+</head>
+<body>
+
+  <div class="outer-container">
+    <h1 class="title">Subject-Specific LLM Prompt Assistant</h1>
+    <div class="inner-container">
+      <div style="font-size: 1.1em; line-height: 1.6; color: #333;">
+        <p>
+          Use this tool to create a prompt for a subject-specific LLM.
+          <span style="font-weight: 600;">Copy from the output field at the bottom into your chatbot input.</span>
+        </p>
+        <ul style="margin-top: 20px;">
+          <li>Start by filling out the fields on the right, starting with the second row.</li>
+          <li>The output field will be automatically updated as you fill out the form.</li>
+          <li>If you want to add additional information, add it to the <span style="font-style: italic;">'Notes to Factor In:'</span> field.</li>
+          <li>You may change the fields on the left as well as on the right.</li>
+          <li>Empty fields on the right will be omitted (this includes the left field label).</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  
+  
+<!--dropdown menu to select form type-->
+<!--dropdown label-->
+<label for="formType">Select a form type (warning this will reset the form):</label>
+<select id="formType">
+  <option value="Document Creation">Document Creation</option>
+  <option value="Create Technical Instructions">Create Technical Instructions</option>
+</select>
+
+
+
+  <div id="form-container">
+    <!-- Target form container -->
+  </div>
+
+  <div id="output-container">
+    <!-- Target output container -->
+    <!-- copy button -->
+    <div class="button-container">
+      <button id="copy-button" class="copy-button">Copy to Clipboard</button>
+    </div>
+    
+    <br>
+    <br>
+    <!-- output text field max width of div, 10 lines high, expands height for new text without limit-->
+    <textarea id="output" style="width: 100%; height: 10em; resize: vertical;"></textarea>
+    
+
+  </div>
+
+  <script defer>
+    //Json schema
+const promptComponentSchema = [
+{
+    "elementType": "div",
+    "attributes": {
+      "class": "flex-container"
+    },
+    "children": [
+      {
+        "elementType": "textarea",
+        "attributes": {
+          "name": "PromptComponentQuestion",
+          "defaultText": "Factor the following into my request: ",
+          "placeholder": "Field for instruction on how to implement the text in the neighboring field",
+          "rows": "1",
+          "class": "left-input expandable-textarea"
+        },
+        "styles": {}
+      },
+      {
+        "elementType": "textarea",
+        "attributes": {
+          "name": "PromptComponentAnswer",
+          "defaultText": "",
+          "placeholder": "Placeholder2",
+          "rows": "1",
+          "class": "right-input expandable-textarea"
+        },
+        "styles": {}
+      }
+    ]
+  }
+];
+
+const promptCreationFormTemplates = {
+  "Document Creation" : [
+{
+    "PromptComponentQuestion": "As an experienced professional working for me: ",
+    "PromptComponentAnswer": {
+        "defaultText" : "Act as a writer to create a document",
+        "placeholder": "i.e: Act as a writer to create a document, Act as project manager to write a business proposal, ..."
+    }
+  },
+  {
+    "PromptComponentQuestion": "Document Type:",
+    "PromptComponentAnswer": {"placeholder": "apa, email to boss, announcement tweet, project proposal..."}
+  },
+  {
+    "PromptComponentQuestion": "Document Tone:",
+    "PromptComponentAnswer": {"placeholder": "formal, informal, professional, intimate..."}
+  },
+  {
+    "PromptComponentQuestion": "Notes to Factor In:",
+    "PromptComponentAnswer": {"placeholder": "any relevant definitions, facts, or other information..."}
+  },
+  {
+    "PromptComponentQuestion": "Original Document/Draft to Start From:",
+    "PromptComponentAnswer": {"placeholder": "If you're improving an existing document, paste it here..."}
+  },
+  {
+    "PromptComponentQuestion": "Example text for style and personality:",
+    "PromptComponentAnswer": {"placeholder": "Insert a sentence or two that has the style and personality you want to emulate..."}
+  },
+  {
+    "PromptComponentQuestion": "Primary purpose of the document:",
+    "PromptComponentAnswer": {"placeholder": "i.e. get a raise, attract new customers, welcome new employees..."}
+  },
+  {
+    "PromptComponentQuestion": "Points to emphasize:",
+    "PromptComponentAnswer": {"placeholder": "for example: focus on the recent revenue I've generated, highlight my experience in the industry..."}
+  }
+],
+"Create Technical Instructions" :[
+  {
+    "PromptComponentQuestion": "As an experienced professional working for me: ",
+    "PromptComponentAnswer": {
+        "defaultText" : "Act as an engineer to create technical instructions",
+        "placeholder": "i.e: Act as a writer to create a document, Act as project manager to write a business proposal, ..."
+    }
+  },
+  {
+    "PromptComponentQuestion": "Project Type:",
+    "PromptComponentAnswer": {"placeholder": "Carpentry, electrical engineering, software development..."}
+  },
+  {
+    "PromptComponentQuestion": "Level of detail:",
+    "PromptComponentAnswer": {"placeholder": "general concepts, lowest level simple steps, etc..."}
+  },
+  {
+    "PromptComponentQuestion": "Notes to Factor In:",
+    "PromptComponentAnswer": {"placeholder": "any relevant definitions, facts, or other information..."}
+  },
+  {
+    "PromptComponentQuestion": "Original Document/Draft to Start From:",
+    "PromptComponentAnswer": {"placeholder": "If you're improving an existing document, paste it here..."}
+  },
+  {
+    "PromptComponentQuestion": "Example text for style and personality:",
+    "PromptComponentAnswer": {"placeholder": "Insert a sentence or two that has the style and personality you want to emulate..."}
+  },
+  {
+    "PromptComponentQuestion": "Primary purpose of the document:",
+    "PromptComponentAnswer": {"placeholder": "i.e. build a fence, troubleshoot my computer, automate my todo list notifications..."}
+  },
+  {
+    "PromptComponentQuestion": "Areas to emphasize:",
+    "PromptComponentAnswer": {"placeholder": "i.e. what tools to use, what to avoid, what to do if something goes wrong..."}
+  },
+  {
+    "PromptComponentQuestion": "Target details to a reader with the following experience and education:",
+    "PromptComponentAnswer": {"placeholder": "i.e. have done small home projects like fixing a door hinge, have a degree in computer science..."}
+  }
+]
+
+};
+
+//function to make copy button put output text into clipboard
+function copyToClipboard() {
+  const outputTextArea = document.getElementById("output");
+  outputTextArea.select();
+  document.execCommand('copy');
+}
+
+// Event listener
+document.getElementById("copy-button").addEventListener("click", copyToClipboard);
+
+// Function to populate dropdown with available form types
+function populateDropdown() {
+  const dropdown = document.getElementById("formType");
+  const formTypes = Object.keys(promptCreationFormTemplates);
+
+  // Clear existing options
+  dropdown.innerHTML = "";
+
+  // Create and append new option elements
+  for (const formType of formTypes) {
+    const option = document.createElement("option");
+    option.value = formType;
+    option.text = formType;
+    dropdown.appendChild(option);
+  }
+}
+
+// Call the function to populate the dropdown
+populateDropdown();
+
+
+// Function to delete and recreate the form based on form type
+function regenerateForm() {
+  const formContainer = document.getElementById("form-container");
+  const selectedFormType = document.getElementById("formType").value;
+  const selectedTemplate = promptCreationFormTemplates[selectedFormType];
+
+  // Clear existing form
+  formContainer.innerHTML = '';
+
+  // Iterate over the template and populate new form
+  selectedTemplate.forEach((templateItem) => {
+    const newElement = document.createElement(promptComponentSchema[0].elementType);
+    newElement.setAttribute("class", promptComponentSchema[0].attributes.class);
+    
+    // Create children elements (textarea for PromptComponentQuestion and PromptComponentAnswer)
+    promptComponentSchema[0].children.forEach((childSchema, index) => {
+      const childElement = document.createElement(childSchema.elementType);
+      
+      for (const [key, value] of Object.entries(childSchema.attributes)) {
+        childElement.setAttribute(key, value);
+      }
+      
+      // Set default text or placeholder based on the template
+      if (index === 0) { // For PromptComponentQuestion
+        childElement.value = templateItem.PromptComponentQuestion;
+      } else { // For PromptComponentAnswer
+        childElement.placeholder = templateItem.PromptComponentAnswer.placeholder || "";
+        childElement.value = templateItem.PromptComponentAnswer.defaultText || "";
+      }
+      
+      newElement.appendChild(childElement);
+    });
+    
+    // Append to the form container
+    formContainer.appendChild(newElement);
+  });
+  updateOutput();
+}
+
+let prevSelectedValue = document.getElementById("formType").value; // Initialize with the default selected value
+
+// Attach the regenerateForm function to dropdown change event with confirmation
+document.getElementById("formType").addEventListener("change", function() {
+  const userConfirmed = window.confirm("This will clear your form, continue?");
+  if (userConfirmed) {
+    prevSelectedValue = this.value;  // Update to the new value
+    regenerateForm();
+  } else {
+    // Revert the dropdown to its previous value
+    this.value = prevSelectedValue;
+  }
+});
+
+
+// Initialize the form on page load
+regenerateForm();
+
+
+// Function to update the output field based on the current form state
+function updateOutput() {
+  const formContainer = document.getElementById("form-container");
+  const outputTextArea = document.getElementById("output");
+  let outputText = '';
+
+  // Loop through all flex-container divs within the form-container
+  Array.from(formContainer.querySelectorAll('.flex-container')).forEach((flexContainer) => {
+    const questionTextArea = flexContainer.querySelector('.left-input');
+    const answerTextArea = flexContainer.querySelector('.right-input');
+
+    // Include only if the answer field is not empty
+    if (answerTextArea.value.trim() !== '') {
+      outputText += `${questionTextArea.value}\n${answerTextArea.value}\n\n`;
+    }
+  });
+
+  // Update the output field
+  outputTextArea.value = outputText;
+}
+
+// Attach the updateOutput function to input event of form-container
+document.getElementById("form-container").addEventListener('input', updateOutput);
+
+// Call the function once to initialize the output field
+updateOutput();
+
+
+
+
+
+
+
+
+  </script>
+
+
+
+
+
+
+
+</body>
+</html>
