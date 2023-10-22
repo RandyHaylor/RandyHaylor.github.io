@@ -77,7 +77,7 @@ font-size: 1.2em;
   font-size: 1.2em; 
   color: #333;
   box-shadow: inset 0 0 5px rgba(0,0,0,0.1);
-  line-height: 1.4;
+  line-height: 1.2em;
   padding: 10px;
   border-radius: 4px;
   border: 1px solid #cccccc;
@@ -175,16 +175,11 @@ textarea::placeholder {
     <div class="inner-container">
       <div style="font-size: 1.1em; line-height: 1.6; color: #333;">
         <p>
-          Use this tool to create a detailed task-specific prompt for a LLM. Use the dropdown to switch form types. Fill in details about your request.
-          <span style="font-weight: 600;">Copy from the output field at the bottom into your chatbot input.</span>
+          <span style="font-weight: 600;">The first field is completed for you.<br>Fill out as many other fields on the right as you want.<br>Copy from the output field at the bottom into your chatbot input.</span>
         </p>
-        <ul style="margin-top: 20px;">
-          <li>Start by filling out the fields on the right, starting with the second row.</li>
-          <li>The output field will be automatically updated as you fill out the form.</li>
-          <li>If you want to add additional information, add it to the <span style="font-style: italic;">'Notes to Factor In:'</span> field.</li>
-          <li>You may change the fields on the left as well as on the right.</li>
-          <li>Empty fields on the right will be omitted (this includes the left field label).</li>
-        </ul>
+        <!--link to info and tips section - remove underline and make link bold not blue-->
+        <p><a href="#info" style="text-decoration: none; color: #333; font-weight: 600;">More Info and Tips</a></p>
+        
       </div>
 
   
@@ -214,9 +209,28 @@ textarea::placeholder {
     <br>
     <br>
     <!-- output text field max width of div, 10 lines high, expands height for new text without limit-->
-    <textarea id="output" style="width: 100%; height: 10em; resize: vertical;"></textarea>
+    <textarea id="output" style="width: 100%; height: 10em; resize: vertical;" class="expandable-textarea-nolimit"></textarea>
     
 
+  </div>
+  <br><br>
+  <div class="outer-container">
+    <h2>Info and Tips:</h2>
+    <div class="inner-container">
+      <div style="font-size: 1.1em; line-height: 1.6; color: #333;">
+        <p>
+          Use this tool to create a task-specific prompt for a LLM. Use the dropdown to switch form types. Fill in details about your request.
+          <span style="font-weight: 600;">Copy from the output field at the bottom into your chatbot input.</span>
+        </p>
+        <ul style="margin-top: 20px;">
+          <li>Start by filling out the fields on the right, starting with the second row.</li>
+          <li>The output field will be automatically updated as you fill out the form.</li>
+          <li>If you want to add additional information, add it to the <span style="font-style: italic;">'Notes to Factor In:'</span> field.</li>
+          <li>You may change the fields on the left as well as on the right.</li>
+          <li>Empty fields on the right will be omitted (this includes the left field label).</li>
+        </ul>
+      </div>
+    </div>
   </div>
 
   <script defer>
@@ -444,6 +458,14 @@ function updateOutput() {
 
   // Update the output field
   outputTextArea.value = outputText;
+
+  //trigger the output field resize by sending an input event
+  var event = new Event('input', {
+    'bubbles': true,
+    'cancelable': true
+  });
+  outputTextArea.dispatchEvent(event);
+
 }
 
 // Attach the updateOutput function to input event of form-container
@@ -454,12 +476,43 @@ updateOutput();
 
 
 
+// Get list of all text areas with autoresizing class
+var textareas = document.querySelectorAll('.expandable-textarea, .expandable-textarea-nolimit');
+
+// Set a maximum height for 5 lines (this would depend on your specific line-height and padding settings)
+var maxHeight = 100; // Replace with the calculated maximum height for 5 lines in pixels
+
+// Add listeners to all text areas
+Array.from(textareas).forEach(function(textarea) {
+  textarea.addEventListener('input', function autoResize() {
+    // Reset height to 'auto' before recalculating scrollHeight
+    this.style.height = 'auto';
+    
+    // Check if textarea has the class 'expandable-textarea-nolimit'
+    if (this.classList.contains('expandable-textarea-nolimit')) {
+      this.style.height = this.scrollHeight + 'px';
+    } else {
+      // Set the new height with a limit
+      if (this.scrollHeight <= maxHeight) {
+        this.style.height = this.scrollHeight + 'px';
+      } else {
+        this.style.height = maxHeight + 'px';
+        this.style.overflowY = 'auto'; // Add scroll if the content exceeds max height
+      }
+    }
+  }, false);
+});
 
 
 
 
 
-  </script>
+
+
+
+
+
+</script>
 
 
 
