@@ -8,7 +8,8 @@
 <body>
 
   <div class="outer-container">
-    <h1 class="title">Subject-Specific LLM Prompt Assistant</h1>
+    <h1 class="title">Subject-Specific LLM Prompt Assistant&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<button id="copy-button" class="copy-button-slim" onClick="copyToClipboard()">Copy to Clipboard</button></h1>     
+    
     <div class="inner-container">
       <div style="font-size: 1.1em; line-height: 1.6; color: #333;">
         <p>
@@ -39,7 +40,7 @@
     <!-- Target output container -->
     <!-- copy button -->
     <div class="button-container">
-      <button id="copy-button" class="copy-button">Copy to Clipboard</button>
+      <button id="copy-button" class="copy-button" onClick="copyToClipboard()">Copy to Clipboard</button>
     </div>
     
     <br>
@@ -50,6 +51,7 @@
 
   </div>
   <br><br>
+  <a name="info"></a>
   <div class="outer-container">
     <h2>Info and Tips:</h2>
     <div class="inner-container">
@@ -73,13 +75,13 @@
   <script defer>
     //Json schema
 const promptComponentSchema = [
-{
+  {
     "elementType": "div",
     "attributes": {
-      "class": "flex-container"
+      "class": "question-answer-div"
     },
     "children": [
-      {
+    {
         "elementType": "textarea",
         "attributes": {
           "name": "PromptComponentQuestion",
@@ -95,15 +97,32 @@ const promptComponentSchema = [
         "attributes": {
           "name": "PromptComponentAnswer",
           "defaultText": "",
-          "placeholder": "Placeholder2",
+          "placeholder": "",
           "rows": "2",
           "class": "right-input expandable-textarea"
         },
         "styles": {}
+      },
+      {
+        "elementType": "select",
+        "attributes": {
+          "name": "PromptSuggestionDropdown",
+          "class": "PromptSuggestionDropdown"
+        },
+        "children": [
+          {
+            "elementType": "option",
+            "attributes": {
+              "value": "",
+              "text": "Select Suggestion" 
+            }
+          }
+        ]
       }
     ]
   }
-];
+]
+
 
 const promptCreationFormTemplates = {
   "Document Creation" : [
@@ -111,14 +130,17 @@ const promptCreationFormTemplates = {
     "category": "General",
     "PromptComponentQuestion": "As an experienced professional working for me: ",
     "PromptComponentAnswer": {
-        "defaultText" : "Act as a writer to create a document",
-        "placeholder": ""
+      "defaultText" : "Act as a writer to create a document",
+      "placeholder": ""
     }
   },
   {
     "category": "General",
     "PromptComponentQuestion": "Document Content Description:",
-    "PromptComponentAnswer": {"placeholder": "outline business contract negotiation best practices, define metrics for customer satisfaction, explain the basics of microsoft excel"}
+    "PromptComponentAnswer": {
+      "defaultText" : "Short essay on the project management process",
+      "placeholder": "outline business contract negotiation best practices, define metrics for customer satisfaction, explain the basics of microsoft excel"
+    }
   },
   {
     "category": "General",
@@ -234,7 +256,10 @@ const categoryContainerSchema = {
           },          
           {
             "tag": "span",
-            "text": " (click to expand or collapse)"
+            "text": "  (click to expand or collapse)",
+            "attributes": {
+              "class": "categoryText"
+            }
           }
         ]
       },
@@ -290,8 +315,8 @@ function copyToClipboard() {
   document.execCommand('copy');
 }
 
-// Event listener
-document.getElementById("copy-button").addEventListener("click", copyToClipboard);
+// Event listener for copy button (where there was just 1)
+//document.getElementById("copy-button").addEventListener("click", copyToClipboard);
 
 // Function to populate dropdown with available form types
 function populateDropdown() {
@@ -340,7 +365,7 @@ function regenerateForm() {
     const categoryContainer = createElementFromSchema(categoryContainerSchema);
     const categoryNameTextArea = categoryContainer.querySelector('.category-textarea');
     const questionAnswerContainer = categoryContainer.querySelector('[name="question-answer-container"]');
-
+    
     categoryNameTextArea.value = category.category;
     const allDetailsElements = categoryContainer.querySelectorAll('details');
 
@@ -361,27 +386,62 @@ function regenerateForm() {
     category.items.forEach(questionAnswerItem => {
     const newQuestionAnswerElement = document.createElement(promptComponentSchema[0].elementType);
     newQuestionAnswerElement.setAttribute("class", promptComponentSchema[0].attributes.class);
+
+    const placeholderText = questionAnswerItem.PromptComponentAnswer.placeholder || "";
+    const suggestions = placeholderText?.split(',')
+     //console.log(suggestions);
     
     // Create children elements (textarea for PromptComponentQuestion and PromptComponentAnswer)
     promptComponentSchema[0].children.forEach((childSchema, index) => {
-      const childElement = document.createElement(childSchema.elementType);
+      var childElement = document.createElement(childSchema.elementType);
       
       for (const [key, value] of Object.entries(childSchema.attributes)) {
         childElement.setAttribute(key, value);
       }
       
       // Set default text or placeholder based on the template
-      if (index === 0) { // For PromptComponentQuestion
+      if (childElement.name === "PromptComponentQuestion") { // For PromptComponentQuestion
         childElement.value = questionAnswerItem.PromptComponentQuestion;
-      } else { // For PromptComponentAnswer
-        childElement.placeholder = questionAnswerItem.PromptComponentAnswer.placeholder || "";
+      } else if (childElement.name === "PromptComponentAnswer") { // For PromptComponentAnswer
+        childElement.placeholder = placeholderText;
         childElement.value = questionAnswerItem.PromptComponentAnswer.defaultText || "";
+      } else if (childElement.name == "PromptSuggestionDropdown"){
+        appendNewDropdownOption(childElement, childSchema.children[0].attributes.value || "", childSchema.children[0].attributes.text || "");
+        //create option elements for dropdown        
+        suggestions.forEach((suggestion) => {
+          if (suggestion.trim() != "") 
+            
+          appendNewDropdownOption(childElement, suggestion, suggestion);
+        });
+
+        if (suggestions.length <2) {
+          childElement = null;
+        }
+        else{       
+          //add listener to dropdown => when option selected, add to answer field and reset dropdown
+          childElement.addEventListener("change", function() {    
+              const answerTextArea = this.parentElement.querySelector('.right-input');
+              answerTextArea.value = this.value;
+              this.selectedIndex = 0;
+              updateOutput();            
+          });     
+        }
+
+
+
       }
       
-      newQuestionAnswerElement.appendChild(childElement);
+      if (childElement) {
+          newQuestionAnswerElement.appendChild(childElement); 
+        }
+       
+      
     });
     
+    //if newquestionanswerelement has a dropdown, create a new div element and move it there, then add both to qa container
+
     questionAnswerContainer.appendChild(newQuestionAnswerElement);
+    
 
     });
 
@@ -396,6 +456,13 @@ function regenerateForm() {
   applyAutoResizeToAllRelevantTextareas();
   collapseAllButFirstCategory();
 
+}
+
+function appendNewDropdownOption(dropdownElement, valueText, displayText){
+  const option = document.createElement("option");
+  option.value = valueText;
+  option.text = displayText;
+  dropdownElement.appendChild(option);
 }
 
 function collapseAllButFirstCategory(){
@@ -436,8 +503,8 @@ function updateOutput() {
   const outputTextArea = document.getElementById("output");
   let outputText = '';
 
-  // Loop through all flex-container divs within the form-container
-  Array.from(formContainer.querySelectorAll('.flex-container')).forEach((flexContainer) => {
+  // Loop through all question-answer-div divs within the form-container
+  Array.from(formContainer.querySelectorAll('.question-answer-div')).forEach((flexContainer) => {
     const questionTextArea = flexContainer.querySelector('.left-input');
     const answerTextArea = flexContainer.querySelector('.right-input');
 
