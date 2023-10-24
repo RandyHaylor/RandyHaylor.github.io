@@ -1,7 +1,7 @@
  
  
     /*large screen format*/
-  @media (min-width: 600px) {
+  @media (min-device-width: 1800px) {
     .left-input {
       grid-column: 1;
       grid-row: 1; 
@@ -26,7 +26,7 @@
   }
 
     /*narrow screen format*/
-  @media (max-width: 599px) {
+  @media (max-device-width: 1799px) {
     .left-input {
       grid-column: 1;
       grid-row: 1; 
@@ -65,8 +65,8 @@
 
 
     .question-answer-div {
-      margin-bottom: 20px;
-      padding: 15px;
+      
+      padding: 2px;
       border-bottom: 1px solid #7e7e7e;
       background-color: #ffffff00;
     }
@@ -115,9 +115,15 @@
     
     /* Class for the button, overrides the ID styling for greater specificity */
     .copy-button {
-      width: 200px;
-      padding: 15px;  /* Adjust padding as needed */
+      width: 300px;
+      padding: 20px;  /* Adjust padding as needed */
       font-size: 1.4em;
+
+    }
+
+    .copy-button-slim,
+    .copy-button {
+
       background-color: #0056b3;
       border: none;
       color: white;
@@ -126,6 +132,10 @@
       box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.16);
       cursor: pointer;
       transition: background-color 0.3s ease;
+    }
+      .copy-button-slim {
+        font-size: 0.6em;
+      font-weight: 600;
     }
     
     .categoryText {
@@ -219,13 +229,14 @@
     .outer-container {
       background-color: rgba(255, 255, 255, 0.5); /* Half transparent white */
       border-radius: 12px; /* Rounded corners */
-      padding: 20px;
+      padding: 5px;
       margin: 20px 0;
     }
 
     .category-container {
         background-color: rgba(255, 255, 255, 0.5); /* Half transparent white */
         border-radius: 12px; /* Rounded corners */
+        padding: 5px;
       }
     
     .inner-container {
@@ -240,4 +251,13 @@
       font-weight: 600;
       border-bottom: 2px solid #ccc; /* Line below title */
       padding-bottom: 10px;
+    }
+    .form-container{
+      /*minimize padding between elements*/
+      padding: 0px;
+    }
+
+    .form-container > div {
+      margin: 0;
+      padding: 0;
     }
