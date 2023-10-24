@@ -25,8 +25,7 @@
 <!--dropdown label-->
 <label for="formType">Select a form type (warning this will reset the form):</label>
 <select id="formType">
-  <option value="Document Creation">Document Creation</option>
-  <option value="Create Technical Instructions">Create Technical Instructions</option>
+  <!--options will be populated by javascript-->
 </select>
 
     </div>
@@ -70,6 +69,7 @@
     </div>
   </div>
 
+
   <script defer>
     //Json schema
 const promptComponentSchema = [
@@ -85,7 +85,7 @@ const promptComponentSchema = [
           "name": "PromptComponentQuestion",
           "defaultText": "Factor the following into my request: ",
           "placeholder": "Field for instruction on how to implement the text in the neighboring field",
-          "rows": "1",
+          "rows": "2",
           "class": "left-input expandable-textarea"
         },
         "styles": {}
@@ -96,7 +96,7 @@ const promptComponentSchema = [
           "name": "PromptComponentAnswer",
           "defaultText": "",
           "placeholder": "Placeholder2",
-          "rows": "1",
+          "rows": "2",
           "class": "right-input expandable-textarea"
         },
         "styles": {}
@@ -107,85 +107,181 @@ const promptComponentSchema = [
 
 const promptCreationFormTemplates = {
   "Document Creation" : [
-{
+  {
+    "category": "General",
     "PromptComponentQuestion": "As an experienced professional working for me: ",
     "PromptComponentAnswer": {
         "defaultText" : "Act as a writer to create a document",
-        "placeholder": "i.e: Act as a writer to create a document, Act as project manager to write a business proposal, ..."
+        "placeholder": ""
     }
   },
   {
+    "category": "General",
+    "PromptComponentQuestion": "Document Content Description:",
+    "PromptComponentAnswer": {"placeholder": "outline business contract negotiation best practices, define metrics for customer satisfaction, explain the basics of microsoft excel"}
+  },
+  {
+    "category": "General",
     "PromptComponentQuestion": "Document Type:",
-    "PromptComponentAnswer": {"placeholder": "apa, email to boss, announcement tweet, project proposal..."}
+    "PromptComponentAnswer": {"placeholder": "apa, email , announcement tweet, project proposal"}
   },
   {
+    "category": "General",
     "PromptComponentQuestion": "Document Tone:",
-    "PromptComponentAnswer": {"placeholder": "formal, informal, professional, intimate..."}
+    "PromptComponentAnswer": {"placeholder": "formal, informal, professional, intimate"}
   },
   {
+    "category": "Source Information",
     "PromptComponentQuestion": "Notes to Factor In:",
-    "PromptComponentAnswer": {"placeholder": "any relevant definitions, facts, or other information..."}
+    "PromptComponentAnswer": {"placeholder": "any relevant definitions, facts, or other information"}
   },
   {
+    "category": "Source Information",
     "PromptComponentQuestion": "Original Document/Draft to Start From:",
-    "PromptComponentAnswer": {"placeholder": "If you're improving an existing document, paste it here..."}
+    "PromptComponentAnswer": {"placeholder": "If you're improving an existing document, paste it here"}
   },
   {
+    "category": "Source Information",
     "PromptComponentQuestion": "Example text for style and personality:",
-    "PromptComponentAnswer": {"placeholder": "Insert a sentence or two that has the style and personality you want to emulate..."}
+    "PromptComponentAnswer": {"placeholder": "Insert a sentence or two that has the style and personality you want to emulate"}
   },
   {
+    "category": "Goals",
     "PromptComponentQuestion": "Primary purpose of the document:",
-    "PromptComponentAnswer": {"placeholder": "i.e. get a raise, attract new customers, welcome new employees..."}
+    "PromptComponentAnswer": {"placeholder": "get a raise, attract new customers, welcome new employees"}
   },
   {
+    "category": "Goals",
     "PromptComponentQuestion": "Points to emphasize:",
-    "PromptComponentAnswer": {"placeholder": "for example: focus on the recent revenue I've generated, highlight my experience in the industry..."}
+    "PromptComponentAnswer": {"placeholder": "for example: focus on the recent revenue I've generated, highlight my experience in the industry"}
   }
 ],
 "Create Technical Instructions" :[
   {
+    "category": "General",
     "PromptComponentQuestion": "As an experienced professional working for me: ",
     "PromptComponentAnswer": {
         "defaultText" : "Act as an engineer to create technical instructions",
-        "placeholder": "i.e: Act as a writer to create a document, Act as project manager to write a business proposal, ..."
+        "placeholder": ""
     }
   },
   {
+    "category": "General",
+    "PromptComponentQuestion": "Task to be explained:",
+    "PromptComponentAnswer": {"placeholder": "build a chain link fence, troubleshoot my refrigerator, automate my email response in gmail"}
+  },
+  {
+    "category": "General",
     "PromptComponentQuestion": "Project Type:",
-    "PromptComponentAnswer": {"placeholder": "Carpentry, electrical engineering, software development..."}
+    "PromptComponentAnswer": {"placeholder": "Carpentry, electrical engineering, software development"}
   },
   {
+    "category": "General",
     "PromptComponentQuestion": "Level of detail:",
-    "PromptComponentAnswer": {"placeholder": "general concepts, lowest level simple steps, etc..."}
+    "PromptComponentAnswer": {"placeholder": "general concepts, lowest level simple steps, etc"}
   },
   {
+    "category": "Source Information",
     "PromptComponentQuestion": "Notes to Factor In:",
-    "PromptComponentAnswer": {"placeholder": "any relevant definitions, facts, or other information..."}
+    "PromptComponentAnswer": {"placeholder": "any relevant definitions, facts, or other information"}
   },
   {
+    "category": "Source Information",
     "PromptComponentQuestion": "Original Document/Draft to Start From:",
-    "PromptComponentAnswer": {"placeholder": "If you're improving an existing document, paste it here..."}
+    "PromptComponentAnswer": {"placeholder": "If you're improving an existing document, paste it here"}
   },
   {
+    "category": "Source Information",
     "PromptComponentQuestion": "Example text for style and personality:",
-    "PromptComponentAnswer": {"placeholder": "Insert a sentence or two that has the style and personality you want to emulate..."}
+    "PromptComponentAnswer": {"placeholder": "Insert a sentence or two that has the style and personality you want to emulate"}
   },
   {
-    "PromptComponentQuestion": "Primary purpose of the document:",
-    "PromptComponentAnswer": {"placeholder": "i.e. build a fence, troubleshoot my computer, automate my todo list notifications..."}
-  },
-  {
+    "category": "Goals",
     "PromptComponentQuestion": "Areas to emphasize:",
-    "PromptComponentAnswer": {"placeholder": "i.e. what tools to use, what to avoid, what to do if something goes wrong..."}
+    "PromptComponentAnswer": {"placeholder": "what tools to use, what to avoid, what to do if something goes wrong"}
   },
   {
+    "category": "Goals",
     "PromptComponentQuestion": "Target details to a reader with the following experience and education:",
-    "PromptComponentAnswer": {"placeholder": "i.e. have done small home projects like fixing a door hinge, have a degree in computer science..."}
+    "PromptComponentAnswer": {"placeholder": "have done small home projects like fixing a door hinge, have a degree in computer science"}
   }
 ]
 
 };
+
+const categoryContainerSchema = {
+    "tag": "details",
+    "attributes": {
+      "class": "category-container outer-container",
+      "open": true
+    },
+    "children": [
+      {
+        "tag": "summary",
+        "attributes": {
+          "class": "category-summary"
+        },
+        "children": [
+          {
+            "tag": "textarea",
+            "attributes": {
+              "name": "categoryName",
+              "defaultText": "Category Name",
+              "placeholder": "Edit category name",
+              "rows": "1",
+              "class": "category-textarea"
+            }
+          },          
+          {
+            "tag": "span",
+            "text": " (click to expand or collapse)"
+          }
+        ]
+      },
+      {
+        "tag": "div",
+        "attributes": {
+          "name": "question-answer-container"
+        }
+      }
+    ]
+  };
+
+  function createElementFromSchema(schema) {
+  const el = document.createElement(schema.tag);
+
+  if (schema.attributes) {
+    for (const [key, value] of Object.entries(schema.attributes)) {
+      el.setAttribute(key, value);
+    }
+  }
+
+  if (schema.text) {
+    el.textContent = schema.text;
+  }
+  
+  if (schema.children) {
+    schema.children.forEach(c => el.appendChild(createElementFromSchema(c)));
+  }
+
+  return el;
+}
+
+function groupByCategory(singleTemplate) {
+  const grouped = [];
+  const categoryIndexMap = {};
+
+  singleTemplate.forEach((item, index) => {
+    const category = item.category || 'Uncategorized';
+    if (categoryIndexMap[category] === undefined) {
+      categoryIndexMap[category] = grouped.length;
+      grouped.push({ category, items: [] });
+    }
+    grouped[categoryIndexMap[category]].items.push(item);
+  });
+
+  return grouped;
+}
 
 //function to make copy button put output text into clipboard
 function copyToClipboard() {
@@ -218,19 +314,53 @@ function populateDropdown() {
 populateDropdown();
 
 
+
+
+
 // Function to delete and recreate the form based on form type
 function regenerateForm() {
   const formContainer = document.getElementById("form-container");
   const selectedFormType = document.getElementById("formType").value;
   const selectedTemplate = promptCreationFormTemplates[selectedFormType];
+  const groupedTemplate = groupByCategory(selectedTemplate);
+  //test groupedTemplate
+  //console.log(groupedTemplate);
+  //test category container generation
+  //const testCategoryContainer = createElementFromSchema(categoryContainerSchema);
+  //console.log(testCategoryContainer);
+  //add categoryContainer to formContainer to test
+  //formContainer.appendChild(categoryContainer);
+
 
   // Clear existing form
   formContainer.innerHTML = '';
 
-  // Iterate over the template and populate new form
-  selectedTemplate.forEach((templateItem) => {
-    const newElement = document.createElement(promptComponentSchema[0].elementType);
-    newElement.setAttribute("class", promptComponentSchema[0].attributes.class);
+  //create category containers
+  groupedTemplate.forEach((category) => {
+    const categoryContainer = createElementFromSchema(categoryContainerSchema);
+    const categoryNameTextArea = categoryContainer.querySelector('.category-textarea');
+    const questionAnswerContainer = categoryContainer.querySelector('[name="question-answer-container"]');
+
+    categoryNameTextArea.value = category.category;
+    const allDetailsElements = categoryContainer.querySelectorAll('details');
+
+    allDetailsElements.forEach(detailElement => {
+      if (category.category === "General") {
+        detailElement.open = true;
+    } else {
+      detailElement.open = false;
+    }
+    detailElement.open = false;
+});
+
+    //if current category is the first category, set it to open, otherwise set it to closed
+
+
+    //console.log(category); // debug line
+    //create question answer html elements
+    category.items.forEach(questionAnswerItem => {
+    const newQuestionAnswerElement = document.createElement(promptComponentSchema[0].elementType);
+    newQuestionAnswerElement.setAttribute("class", promptComponentSchema[0].attributes.class);
     
     // Create children elements (textarea for PromptComponentQuestion and PromptComponentAnswer)
     promptComponentSchema[0].children.forEach((childSchema, index) => {
@@ -242,19 +372,43 @@ function regenerateForm() {
       
       // Set default text or placeholder based on the template
       if (index === 0) { // For PromptComponentQuestion
-        childElement.value = templateItem.PromptComponentQuestion;
+        childElement.value = questionAnswerItem.PromptComponentQuestion;
       } else { // For PromptComponentAnswer
-        childElement.placeholder = templateItem.PromptComponentAnswer.placeholder || "";
-        childElement.value = templateItem.PromptComponentAnswer.defaultText || "";
+        childElement.placeholder = questionAnswerItem.PromptComponentAnswer.placeholder || "";
+        childElement.value = questionAnswerItem.PromptComponentAnswer.defaultText || "";
       }
       
-      newElement.appendChild(childElement);
+      newQuestionAnswerElement.appendChild(childElement);
     });
     
-    // Append to the form container
-    formContainer.appendChild(newElement);
+    questionAnswerContainer.appendChild(newQuestionAnswerElement);
+
+    });
+
+
+
+           // Append to the form container
+        formContainer.appendChild(categoryContainer);
+
   });
+
   updateOutput();
+  applyAutoResizeToAllRelevantTextareas();
+  collapseAllButFirstCategory();
+
+}
+
+function collapseAllButFirstCategory(){
+    // Get all details elements
+const details = document.querySelectorAll('.category-container');
+
+// Loop through them 
+for (let i = 1; i < details.length; i++) {
+
+  // Collapse by setting open attribute to false
+  details[i].open = false; 
+
+}
 }
 
 let prevSelectedValue = document.getElementById("formType").value; // Initialize with the default selected value
@@ -312,8 +466,8 @@ document.getElementById("form-container").addEventListener('input', updateOutput
 updateOutput();
 
 
-
-// Get list of all text areas with autoresizing class
+function applyAutoResizeToAllRelevantTextareas(){
+  // Get list of all text areas with autoresizing class
 var textareas = document.querySelectorAll('.expandable-textarea, .expandable-textarea-nolimit');
 
 // Set a maximum height for 5 lines (this would depend on your specific line-height and padding settings)
@@ -340,6 +494,9 @@ Array.from(textareas).forEach(function(textarea) {
   }, false);
 });
 
+}
+
+applyAutoResizeToAllRelevantTextareas();
 
 
 
