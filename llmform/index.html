@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Subject-Specific LLM Prompt Assistant</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="ai-api.js"></script>
+</head>
+<body>
+
+  <div class="outer-container">
+    <h1 class="title">Subject-Specific LLM Prompt Assistant&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<button id="copy-button" class="copy-button-slim" onClick="copyToClipboard()">Copy to Clipboard</button></h1>     
+    
+    <div class="inner-container">
+      <div style="font-size: 1.1em; line-height: 1.6; color: #333; padding-left: 3px; padding-bottom: 0px">
+        
+            <list style="font-weight: 600;">
+              <li>
+                The first field is completed for you.
+              </li>
+              <li>
+                Fill out as many other fields on the right as you want.
+              </li>
+              <li>
+                Click 'Copy to Clipboard' then paste into your chatbot/LLM of choice.
+              </li>
+            </list>
+            
+        <!--link to info and tips section - remove underline and make link bold not blue-->
+        <p><a href="#info" style="text-decoration: none; color: #333; font-weight: 600;">More Info and Tips</a></p>
+        
+      </div>
+
+  
+  
+<!--dropdown menu to select form type-->
+<!--dropdown label-->
+<label for="formType">Select a form type (warning this will reset the form):</label>
+<select id="formType">
+  <!--options will be populated by javascript-->
+</select>
+
+    </div>
+  </div>
+
+  <div id="form-container">
+    <!-- Target form container -->
+  </div>
+
+  <div id="output-container">
+    <!-- Target output container -->
+    <!-- copy button -->
+<div class="button-container">
+      <button id="copy-button" class="copy-button" onClick="copyToClipboard()">Copy to Clipboard</button>
+    </div>
+    
+    <br>
+    <!-- output text field max width of div, 10 lines high, expands height for new text without limit-->
+    <font color="white" size="+3">Form Output</font><br>
+    <textarea id="output" style="width: 100%; height: 10em; resize: vertical;" class="expandable-textarea-nolimit"></textarea>
+    <br><br>    <div class="button-container">
+      
+      <button id="send-button" class="copy-button" onClick="Send()">Submit to ChatGPT</button>
+    </div><br>
+    <font color="white" size="+3">ChatGPT Output</font><br>
+    <textarea id="llm-output" style="width: 100%; height: 10em; resize: vertical;" class="expandable-textarea-nolimit"></textarea>
+  </div>
+  <br><br>
+  <a name="info"></a>
+  <div class="outer-container">
+    <h2>Info and Tips:</h2>
+    <div class="inner-container">
+      <div style="font-size: 1.1em; line-height: 1.6; color: #333;">
+        <p>
+          Use this tool to create a task-specific prompt for a LLM. Use the dropdown to switch form types. Fill in details about your request.
+          <span style="font-weight: 600;">Copy from the output field at the bottom into your chatbot input.</span>
+        </p>
+        <ul style="margin-top: 20px;">
+          <li>Start by filling out the fields on the right, starting with the second row.</li>
+          <li>The output field will be automatically updated as you fill out the form.</li>
+          <li>If you want to add additional information, add it to the <span style="font-style: italic;">'Notes to Factor In:'</span> field.</li>
+          <li>You may change the fields on the left as well as on the right.</li>
+          <li>Empty fields on the right will be omitted (this includes the left field label).</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+
+  <script defer>
+    
+    //Json schema
+const promptComponentSchema = [
+  {
+    "elementType": "div",
+    "attributes": {
+      "class": "question-answer-div"
+    },
+    "children": [
+    {
+        "elementType": "textarea",
+        "attributes": {
+          "name": "PromptComponentQuestion",
+          "defaultText": "Factor the following into my request: ",
+          "placeholder": "Field for instruction on how to implement the text in the neighboring field",
+          "rows": "2",
+          "class": "left-input expandable-textarea"
+        },
+        "styles": {}
+      },
+      {
+        "elementType": "textarea",
+        "attributes": {
+          "name": "PromptComponentAnswer",
+          "defaultText": "",
+          "placeholder": "",
+          "rows": "2",
+          "class": "right-input expandable-textarea"
+        },
+        "styles": {}
+      },
+      {
+        "elementType": "select",
+        "attributes": {
+          "name": "PromptSuggestionDropdown",
+          "class": "PromptSuggestionDropdown"
+        },
+        "children": [
+          {
+            "elementType": "option",
+            "attributes": {
+              "value": "",
+              "text": "Select Suggestion" 
+            }
+          }
+        ]
+      }
+    ]
+  }
+]
+
+
+const promptCreationFormTemplates = {
+  "Document Creation" : [
+  {
+    "category": "General",
+    "PromptComponentQuestion": "As an experienced professional working for me: ",
+    "PromptComponentAnswer": {
+      "defaultText" : "Act as a writer to create a document",
+      "placeholder": ""
+    }
+  },
+  {
+    "category": "General",
+    "PromptComponentQuestion": "Document Content Description:",
+    "Flags": ["required", "primary"],
+    "PromptComponentAnswer": {
+      "defaultText" : "Letter congratulating a customer on inheriting a nigerian prince's fortune",
+      "placeholder": "outline business contract negotiation best practices, define metrics for customer satisfaction, explain the basics of microsoft excel"
+    }
+  },
+  {
+    "category": "General",
+    "PromptComponentQuestion": "Document Type:",
+    "PromptComponentAnswer": {"placeholder": "apa, email , announcement tweet, project proposal"}
+  },
+  {
+    "category": "General",
+    "PromptComponentQuestion": "Document Tone:",
+    "PromptComponentAnswer": {"placeholder": "formal, informal, professional, intimate"}
+  },
+  {
+    "category": "Source Information",
+    "PromptComponentQuestion": "Notes to Factor In:",
+    "PromptComponentAnswer": {"placeholder": "any relevant definitions, facts, or other information"}
+  },
+  {
+    "category": "Source Information",
+    "PromptComponentQuestion": "Original Document/Draft to Start From:",
+    "PromptComponentAnswer": {"placeholder": "If you're improving an existing document, paste it here"}
+  },
+  {
+    "category": "Source Information",
+    "PromptComponentQuestion": "Example text for style and personality:",
+    "PromptComponentAnswer": {"placeholder": "Insert a sentence or two that has the style and personality you want to emulate"}
+  },
+  {
+    "category": "Goals",
+    "PromptComponentQuestion": "Primary purpose of the document:",
+    "PromptComponentAnswer": {"placeholder": "get a raise, attract new customers, welcome new employees"}
+  },
+  {
+    "category": "Goals",
+    "PromptComponentQuestion": "Points to emphasize:",
+    "PromptComponentAnswer": {"placeholder": "for example: focus on the recent revenue I've generated, highlight my experience in the industry"}
+  }
+],
+"Create Technical Instructions" :[
+  {
+    "category": "General",
+    "PromptComponentQuestion": "As an experienced professional working for me: ",
+    "PromptComponentAnswer": {
+        "defaultText" : "Act as an engineer to create technical instructions",
+        "placeholder": ""
+    }
+  },
+  {
+    "category": "General",
+    "PromptComponentQuestion": "Task to be explained:",
+    "PromptComponentAnswer": {"placeholder": "build a chain link fence, troubleshoot my refrigerator, automate my email response in gmail"}
+  },
+  {
+    "category": "General",
+    "PromptComponentQuestion": "Project Type:",
+    "PromptComponentAnswer": {"placeholder": "Carpentry, electrical engineering, software development"}
+  },
+  {
+    "category": "General",
+    "PromptComponentQuestion": "Level of detail:",
+    "PromptComponentAnswer": {"placeholder": "general concepts, lowest level simple steps, etc"}
+  },
+  {
+    "category": "Source Information",
+    "PromptComponentQuestion": "Notes to Factor In:",
+    "PromptComponentAnswer": {"placeholder": "any relevant definitions, facts, or other information"}
+  },
+  {
+    "category": "Source Information",
+    "PromptComponentQuestion": "Original Document/Draft to Start From:",
+    "PromptComponentAnswer": {"placeholder": "If you're improving an existing document, paste it here"}
+  },
+  {
+    "category": "Source Information",
+    "PromptComponentQuestion": "Example text for style and personality:",
+    "PromptComponentAnswer": {"placeholder": "Insert a sentence or two that has the style and personality you want to emulate"}
+  },
+  {
+    "category": "Goals",
+    "PromptComponentQuestion": "Areas to emphasize:",
+    "PromptComponentAnswer": {"placeholder": "what tools to use, what to avoid, what to do if something goes wrong"}
+  },
+  {
+    "category": "Goals",
+    "PromptComponentQuestion": "Target details to a reader with the following experience and education:",
+    "PromptComponentAnswer": {"placeholder": "have done small home projects like fixing a door hinge, have a degree in computer science"}
+  }
+]
+
+};
+
+const categoryContainerSchema = {
+    "tag": "details",
+    "attributes": {
+      "class": "category-container outer-container",
+      "open": true
+    },
+    "children": [
+      {
+        "tag": "summary",
+        "attributes": {
+          "class": "category-summary"
+        },
+        "children": [
+          {
+            "tag": "textarea",
+            "attributes": {
+              "name": "categoryName",
+              "defaultText": "Category Name",
+              "placeholder": "Edit category name",
+              "rows": "1",
+              "class": "category-textarea"
+            }
+          },          
+          {
+            "tag": "span",
+            "text": "  (click to expand or collapse)",
+            "attributes": {
+              "class": "categoryText"
+            }
+          }
+        ]
+      },
+      {
+        "tag": "div",
+        "attributes": {
+          "name": "question-answer-container"
+        }
+      }
+    ]
+  };
+
+  function createElementFromSchema(schema) {
+  const el = document.createElement(schema.tag);
+
+  if (schema.attributes) {
+    for (const [key, value] of Object.entries(schema.attributes)) {
+      el.setAttribute(key, value);
+    }
+  }
+
+  if (schema.text) {
+    el.textContent = schema.text;
+  }
+  
+  if (schema.children) {
+    schema.children.forEach(c => el.appendChild(createElementFromSchema(c)));
+  }
+
+  return el;
+}
+
+function groupByCategory(singleTemplate) {
+  const grouped = [];
+  const categoryIndexMap = {};
+
+  singleTemplate.forEach((item, index) => {
+    const category = item.category || 'Uncategorized';
+    if (categoryIndexMap[category] === undefined) {
+      categoryIndexMap[category] = grouped.length;
+      grouped.push({ category, items: [] });
+    }
+    grouped[categoryIndexMap[category]].items.push(item);
+  });
+
+  return grouped;
+}
+
+//function to make copy button put output text into clipboard
+function copyToClipboard() {
+  const outputTextArea = document.getElementById("output");
+  outputTextArea.select();
+  document.execCommand('copy');
+}
+
+// Event listener for copy button (where there was just 1)
+//document.getElementById("copy-button").addEventListener("click", copyToClipboard);
+
+// Function to populate dropdown with available form types
+function populateDropdown() {
+  const dropdown = document.getElementById("formType");
+  const formTypes = Object.keys(promptCreationFormTemplates);
+
+  // Clear existing options
+  dropdown.innerHTML = "";
+
+  // Create and append new option elements
+  for (const formType of formTypes) {
+    const option = document.createElement("option");
+    option.value = formType;
+    option.text = formType;
+    dropdown.appendChild(option);
+  }
+}
+
+// Call the function to populate the dropdown
+populateDropdown();
+
+
+
+
+
+// Function to delete and recreate the form based on form type
+function regenerateForm() {
+  const formContainer = document.getElementById("form-container");
+  const selectedFormType = document.getElementById("formType").value;
+  const selectedTemplate = promptCreationFormTemplates[selectedFormType];
+  const groupedTemplate = groupByCategory(selectedTemplate);
+  //test groupedTemplate
+  //console.log(groupedTemplate);
+  //test category container generation
+  //const testCategoryContainer = createElementFromSchema(categoryContainerSchema);
+  //console.log(testCategoryContainer);
+  //add categoryContainer to formContainer to test
+  //formContainer.appendChild(categoryContainer);
+
+
+  // Clear existing form
+  formContainer.innerHTML = '';
+
+  //create category containers
+  groupedTemplate.forEach((category) => {
+    const categoryContainer = createElementFromSchema(categoryContainerSchema);
+    const categoryNameTextArea = categoryContainer.querySelector('.category-textarea');
+    const questionAnswerContainer = categoryContainer.querySelector('[name="question-answer-container"]');
+    
+    categoryNameTextArea.value = category.category;
+    const allDetailsElements = categoryContainer.querySelectorAll('details');
+
+    allDetailsElements.forEach(detailElement => {
+      if (category.category === "General") {
+        detailElement.open = true;
+    } else {
+      detailElement.open = false;
+    }
+    detailElement.open = false;
+});
+
+    //if current category is the first category, set it to open, otherwise set it to closed
+
+
+    //console.log(category); // debug line
+    //create question answer html elements
+    category.items.forEach(questionAnswerItem => {
+    const newQuestionAnswerElement = document.createElement(promptComponentSchema[0].elementType);
+    newQuestionAnswerElement.setAttribute("class", promptComponentSchema[0].attributes.class);
+
+    const placeholderText = questionAnswerItem.PromptComponentAnswer.placeholder || "";
+    const suggestions = placeholderText?.split(',')
+     //console.log(suggestions);
+    
+    // Create children elements (textarea for PromptComponentQuestion and PromptComponentAnswer)
+    promptComponentSchema[0].children.forEach((childSchema, index) => {
+      var childElement = document.createElement(childSchema.elementType);
+      
+      for (const [key, value] of Object.entries(childSchema.attributes)) {
+        childElement.setAttribute(key, value);
+      }
+      
+      // Set default text or placeholder based on the template
+      if (childElement.name === "PromptComponentQuestion") { // For PromptComponentQuestion
+        childElement.value = questionAnswerItem.PromptComponentQuestion;
+      } else if (childElement.name === "PromptComponentAnswer") { // For PromptComponentAnswer
+        childElement.placeholder = placeholderText;
+        childElement.value = questionAnswerItem.PromptComponentAnswer.defaultText || "";
+      } else if (childElement.name == "PromptSuggestionDropdown"){
+        appendNewDropdownOption(childElement, childSchema.children[0].attributes.value || "", childSchema.children[0].attributes.text || "");
+        //create option elements for dropdown        
+        suggestions.forEach((suggestion) => {
+          if (suggestion.trim() != "") 
+            
+          appendNewDropdownOption(childElement, suggestion, suggestion);
+        });
+
+        if (suggestions.length <2) {
+          childElement = null;
+        }
+        else{       
+          //add listener to dropdown => when option selected, add to answer field and reset dropdown
+          childElement.addEventListener("change", function() {    
+              const answerTextArea = this.parentElement.querySelector('.right-input');
+              answerTextArea.value = this.value;
+              this.selectedIndex = 0;
+              updateOutput();            
+          });     
+        }
+
+
+
+      }
+      
+      if (childElement) {
+          newQuestionAnswerElement.appendChild(childElement); 
+        }
+       
+      
+    });
+    
+    //if newquestionanswerelement has a dropdown, create a new div element and move it there, then add both to qa container
+
+    questionAnswerContainer.appendChild(newQuestionAnswerElement);
+    
+
+    });
+
+
+
+           // Append to the form container
+        formContainer.appendChild(categoryContainer);
+        //find first html element in categoryContainer with class 'starting-highlighted-field' and set focus to it then highlight the text if it has any
+        const firstHighlightedField = categoryContainer.querySelector('.starting-highlighted-field');
+        if (firstHighlightedField) {
+          firstHighlightedField.focus();
+          firstHighlightedField.select();
+        }
+
+  });
+
+  updateOutput();
+  applyAutoResizeToAllRelevantTextareas();
+  collapseAllButFirstCategory();
+
+}
+
+function appendNewDropdownOption(dropdownElement, valueText, displayText){
+  const option = document.createElement("option");
+  option.value = valueText;
+  option.text = displayText;
+  dropdownElement.appendChild(option);
+}
+
+function collapseAllButFirstCategory(){
+    // Get all details elements
+const details = document.querySelectorAll('.category-container');
+
+// Loop through them 
+for (let i = 1; i < details.length; i++) {
+
+  // Collapse by setting open attribute to false
+  details[i].open = false; 
+
+}
+}
+
+let prevSelectedValue = document.getElementById("formType").value; // Initialize with the default selected value
+
+// Attach the regenerateForm function to dropdown change event with confirmation
+document.getElementById("formType").addEventListener("change", function() {
+  const userConfirmed = window.confirm("This will clear your form, continue?");
+  if (userConfirmed) {
+    prevSelectedValue = this.value;  // Update to the new value
+    regenerateForm();
+  } else {
+    // Revert the dropdown to its previous value
+    this.value = prevSelectedValue;
+  }
+});
+
+
+// Initialize the form on page load
+regenerateForm();
+
+
+// Function to update the output field based on the current form state
+function updateOutput() {
+  const formContainer = document.getElementById("form-container");
+  const outputTextArea = document.getElementById("output");
+  let outputText = '';
+
+  // Loop through all question-answer-div divs within the form-container
+  Array.from(formContainer.querySelectorAll('.question-answer-div')).forEach((flexContainer) => {
+    const questionTextArea = flexContainer.querySelector('.left-input');
+    const answerTextArea = flexContainer.querySelector('.right-input');
+
+    // Include only if the answer field is not empty
+    if (answerTextArea.value.trim() !== '') {
+      outputText += `${questionTextArea.value}\n${answerTextArea.value}\n\n`;
+    }
+  });
+
+  // Update the output field
+  outputTextArea.value = outputText;
+
+  //trigger the output field resize by sending an input event
+  var event = new Event('input', {
+    'bubbles': true,
+    'cancelable': true
+  });
+  outputTextArea.dispatchEvent(event);
+
+}
+
+// Attach the updateOutput function to input event of form-container
+document.getElementById("form-container").addEventListener('input', updateOutput);
+
+// Call the function once to initialize the output field
+updateOutput();
+
+
+function applyAutoResizeToAllRelevantTextareas(){
+  // Get list of all text areas with autoresizing class
+var textareas = document.querySelectorAll('.expandable-textarea, .expandable-textarea-nolimit');
+
+// Set a maximum height for 5 lines (this would depend on your specific line-height and padding settings)
+var maxHeight = 200; // Replace with the calculated maximum height for 5 lines in pixels
+
+// Add listeners to all text areas
+Array.from(textareas).forEach(function(textarea) {
+  textarea.addEventListener('input', function autoResize() {
+    // Reset height to 'auto' before recalculating scrollHeight
+    this.style.height = 'auto';
+    
+    // Check if textarea has the class 'expandable-textarea-nolimit'
+    if (this.classList.contains('expandable-textarea-nolimit')) {
+      this.style.height = this.scrollHeight + 'px';
+    } else {
+      // Set the new height with a limit
+      if (this.scrollHeight <= maxHeight) {
+        this.style.height = this.scrollHeight + 'px';
+      } else {
+        this.style.height = maxHeight + 'px';
+        this.style.overflowY = 'auto'; // Add scroll if the content exceeds max height
+      }
+    }
+  }, false);
+});
+
+}
+
+applyAutoResizeToAllRelevantTextareas();
+
+
+</script>
+
+
+
+
+
+
+
+</body>
+</html>
