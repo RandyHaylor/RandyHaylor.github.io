@@ -1,5 +1,6 @@
-const OPENAI_API_KEY = "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";
+var OPENAI_API_KEY = "";
 async function fetchGptResponse(gptSendText) {
+  OPENAI_API_KEY = document.getElementById("apiKey").value;
     return new Promise((resolve, reject) => {
       var oHttp = new XMLHttpRequest();
       oHttp.open("POST", "https://api.openai.com/v1/completions");
