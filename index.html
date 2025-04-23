@@ -7,59 +7,112 @@
   <style>
     body {
       margin: 0;
-      font-family: Arial, sans-serif;
-      background-color: #111;
-      color: #eee;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #0d0d0d;
+      color: #eaeaea;
+      padding: 3rem 1.5rem;
       display: flex;
-      flex-direction: column;
-      align-items: center;
+      justify-content: center;
+    }
+
+    .panel {
+      width: 100%;
+      max-width: 1000px;
+      background-color: #141414;
+      border-radius: 16px;
       padding: 2rem;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5);
+      border: 1px solid #222;
+    }
+
+    .header {
+      text-align: left;
+      margin-bottom: 3rem;
+      border-bottom: 1px solid #333;
+      padding-bottom: 1.5rem;
     }
 
     h1 {
-      font-size: 2rem;
-      margin-bottom: 0.5rem;
+      font-size: 2.5rem;
+      margin-bottom: 0.3rem;
+      letter-spacing: 1px;
+    }
+
+    p.subtitle {
+      font-size: 1.1rem;
+      margin-bottom: 1rem;
+      color: #aaa;
+    }
+
+    p.blurb {
+      max-width: 720px;
+      font-size: 1rem;
+      text-align: left;
+      margin: 0;
+      line-height: 1.6;
+      color: #ccc;
+    }
+
+    section {
+      background-color: #1a1a1a;
+      padding: 2rem;
+      margin-bottom: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+      border: 1px solid #222;
     }
 
     h2 {
-      font-size: 1.25rem;
-      margin-top: 2rem;
-      margin-bottom: 0.25rem;
+      font-size: 1.5rem;
+      margin-bottom: 0.75rem;
+      border-bottom: 2px solid #333;
+      padding-bottom: 0.25rem;
+      color: #f0f0f0;
     }
 
-    p {
-      max-width: 600px;
-      text-align: center;
-      margin: 0.5rem 0 1rem;
-      line-height: 1.5;
+    p.description {
+      font-size: 1rem;
+      color: #bbb;
+      margin-bottom: 1rem;
     }
 
     iframe {
+      width: 100%;
       max-width: 100%;
-      width: 560px;
       height: 315px;
       border: none;
-      margin-bottom: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.6);
     }
   </style>
 </head>
 <body>
-  <h1>Randy Haylor</h1>
-  <p>XR, 3D, AI, Full Stack Software Development</p>
+  <div class="panel">
+    <div class="header">
+      <h1>Randy Haylor</h1>
+      <p class="subtitle">XR, 3D, AI, Full Stack Software Development</p>
+      <p class="blurb">Senior developer with a track record in VR, AI, and enterprise integration. Led simulation systems for FAA, pioneered AI-driven XR content, and delivered large-scale applications connecting immersive tech with real-world infrastructure.</p>
+    </div>
 
-  <h2>Racketeer</h2>
-  <p>Physics-based 2D moving paddle predictive multiplayer project, modeling AAA title algorithms like Rocket League and Overwatch</p>
-  <iframe src="https://www.youtube.com/embed/zY9h5cjdk_k" allowfullscreen></iframe>
+    <section>
+      <h2>Racketeer</h2>
+      <p class="description">Physics-based 2D moving paddle predictive multiplayer project, modeling AAA title algorithms like Rocket League and Overwatch</p>
+      <iframe src="https://www.youtube.com/embed/zY9h5cjdk_k" allowfullscreen></iframe>
+      <p class="description">Predictive lag test with one client routed through VPN in Germany from USA</p>
+      <iframe src="https://www.youtube.com/embed/ztGKlZVUhn0" allowfullscreen></iframe>
+    </section>
 
-  <p>Predictive lag test with one client routed through VPN in Germany from USA</p>
-  <iframe src="https://www.youtube.com/embed/ztGKlZVUhn0" allowfullscreen></iframe>
+    <section>
+      <h2>VR Solo Cup Pong</h2>
+      <p class="description">Meta Quest demo project allowing multiplayer interaction in a 3D physics simulation skill game</p>
+      <iframe src="https://www.youtube.com/embed/WDpCddimQp8" allowfullscreen></iframe>
+    </section>
 
-  <h2>VR Solo Cup Pong</h2>
-  <p>Meta Quest demo project allowing multiplayer interaction in a 3D physics simulation skill game</p>
-  <iframe src="https://www.youtube.com/embed/WDpCddimQp8" allowfullscreen></iframe>
-
-  <h2>Unity Assets Gone Free - Demo Game</h2>
-  <p>A simple demo game for the 'Unity Assets Gone Free' Facebook group, integrating many free assets very quickly to demonstrate the assets and how they can be leveraged for fast prototyping</p>
-  <iframe src="https://www.youtube.com/embed/yEH1ITiCxMs" allowfullscreen></iframe>
+    <section>
+      <h2>Unity Assets Gone Free - Demo Game</h2>
+      <p class="description">A simple demo game for the 'Unity Assets Gone Free' Facebook group, integrating many free assets very quickly to demonstrate the assets and how they can be leveraged for fast prototyping</p>
+      <iframe src="https://www.youtube.com/embed/yEH1ITiCxMs" allowfullscreen></iframe>
+    </section>
+  </div>
 </body>
 </html>
