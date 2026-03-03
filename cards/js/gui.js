@@ -350,9 +350,9 @@ btnReady.addEventListener("click", () => {
 
 btnStartGame.addEventListener("click", async () => {
   btnStartGame.disabled = true;
-  const deckResp = await fetch("/data/decks/golden-girls-cards.json");
+  const deckResp = await fetch("https://raw.githubusercontent.com/RandyHaylor/cards-against-what/master/project/data/decks/golden-girls-cards.json");
   const deck = await deckResp.json();
-  const schemaResp = await fetch("/data/game-settings-schema.json");
+  const schemaResp = await fetch("https://raw.githubusercontent.com/RandyHaylor/cards-against-what/master/project/data/game-settings-schema.json");
   const schema = await schemaResp.json();
   bridge.startGame(deck, {}, schema);
 });
