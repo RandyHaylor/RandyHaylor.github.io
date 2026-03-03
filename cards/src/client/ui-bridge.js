@@ -64,7 +64,11 @@ export function createUIBridge(syncController) {
     clientActor = createActor(clientMachine, {
       input: { syncController, lobbyCode, playerId },
     });
-    clientActor.subscribe(() => notify());
+    clientActor.subscribe((snap) => {
+      const doc = snap.context.playerDoc;
+      console.log("[CLIENT]", snap.value, "| phase:", doc?.phase, "| isJudge:", doc?.isJudge);
+      notify();
+    });
     clientActor.start();
   }
 
@@ -91,6 +95,9 @@ export function createUIBridge(syncController) {
         input: { syncController, lobbyCode },
       });
       actor.start();
+      actor.subscribe((snap) => {
+        console.log("[SERVER]", snap.value, "| players:", snap.context.players.map(p => `${p.name}(${p.phase})`).join(", "));
+      });
       syncController.setServerActor(actor);
       serverActor = actor;
 

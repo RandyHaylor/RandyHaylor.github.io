@@ -40,6 +40,7 @@ export function createSyncController(db) {
         (snap) => {
           snap.docChanges().forEach((change) => {
             if (change.type === "added") {
+              console.log("[WATCH] added:", change.doc.id, change.doc.data().name);
               sendBack({
                 type: "PLAYER_JOINED",
                 playerId: change.doc.id,
@@ -48,13 +49,16 @@ export function createSyncController(db) {
             }
             if (change.type === "modified") {
               const data = change.doc.data();
+              console.log("[WATCH] modified:", change.doc.id, "clientUpdates:", JSON.stringify(data.clientUpdates));
               if (data.clientUpdates?.playerReady) {
+                console.log("[WATCH] -> PLAYER_READY", change.doc.id);
                 sendBack({
                   type: "PLAYER_READY",
                   playerId: change.doc.id,
                 });
               }
               if (data.clientUpdates?.submission !== null && data.clientUpdates?.submission !== undefined) {
+                console.log("[WATCH] -> PLAYER_SUBMITTED", change.doc.id);
                 sendBack({
                   type: "PLAYER_SUBMITTED",
                   playerId: change.doc.id,
@@ -63,6 +67,7 @@ export function createSyncController(db) {
                 });
               }
               if (data.clientUpdates?.pickWinner) {
+                console.log("[WATCH] -> PICK_WINNER", change.doc.id, data.clientUpdates.pickWinner);
                 sendBack({
                   type: "PICK_WINNER",
                   playerId: change.doc.id,
@@ -70,6 +75,7 @@ export function createSyncController(db) {
                 });
               }
               if (data.clientUpdates?.nextRound) {
+                console.log("[WATCH] -> NEXT_ROUND from", change.doc.id);
                 sendBack({ type: "NEXT_ROUND" });
               }
             }
@@ -176,7 +182,10 @@ export function createSyncController(db) {
       if (serverActor) {
         const sub = serverActor.subscribe(() => {
           const player = serverActor.getSnapshot().context.players.find((p) => p.id === playerId);
-          if (player) callback(player);
+          if (player) {
+            console.log("[MY-DOC] host via actor:", player.phase, "isJudge:", player.isJudge);
+            callback(player);
+          }
         });
         return () => sub.unsubscribe();
       }
@@ -184,7 +193,9 @@ export function createSyncController(db) {
         doc(db, "lobbies", lobbyCode, "players", playerId),
         (snap) => {
           if (snap.exists()) {
-            callback(snap.data());
+            const data = snap.data();
+            console.log("[MY-DOC] via firestore:", data.phase, "isJudge:", data.isJudge, "clientUpdates:", JSON.stringify(data.clientUpdates));
+            callback(data);
           }
         }
       );
