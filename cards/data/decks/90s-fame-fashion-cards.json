@@ -1,0 +1,2773 @@
+{
+  "deckId": "90s-fame-fashion",
+  "prompts": [
+    {
+      "id": "1",
+      "text": [
+        "Naomi Campbell was forty-five minutes late to the Versace show because she refused to walk the runway without ",
+        "."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "2",
+      "text": [
+        "The real reason Kurt Cobain smashed his guitar on stage was ",
+        "."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "3",
+      "text": [
+        "MTV News broke the story that ",
+        " was found hidden inside Tommy Hilfiger's fall collection."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "4",
+      "text": [
+        "Calvin Klein pulled the ad campaign after the focus group described it as 'basically just ",
+        " but with more denim.'"
+      ],
+      "pick": 1
+    },
+    {
+      "id": "5",
+      "text": [
+        "E! True Hollywood Story revealed that the Spice Girls almost had a sixth member whose entire personality was ",
+        "."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "6",
+      "text": [
+        "Oprah reached under every audience seat and announced, 'Everybody gets ",
+        "!'"
+      ],
+      "pick": 1
+    },
+    {
+      "id": "7",
+      "text": [
+        "The unaired episode of The Real World was shelved because a housemate brought ",
+        " into the confessional booth."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "8",
+      "text": [
+        "According to Page Six, the supermodel's rider demanded a private dressing room, twelve white candles, and ",
+        "."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "9",
+      "text": [
+        "Jerry Springer's final thought: 'At the end of the day, we're all just looking for ",
+        ".'"
+      ],
+      "pick": 1
+    },
+    {
+      "id": "10",
+      "text": [
+        "Gianni Versace's secret muse was not a supermodel. It was ",
+        "."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "11",
+      "text": [
+        "The '97 VMAs went off the rails when ",
+        " appeared on stage during ",
+        "."
+      ],
+      "pick": 2
+    },
+    {
+      "id": "12",
+      "text": [
+        "Blockbuster refused to stock the VHS after the MPAA rated it 'NC-17 for prolonged scenes of ",
+        ".'"
+      ],
+      "pick": 1
+    },
+    {
+      "id": "13",
+      "text": [
+        "The FUBU acronym was almost changed to stand for 'For Us, By Us, Featuring ",
+        ".'"
+      ],
+      "pick": 1
+    },
+    {
+      "id": "14",
+      "text": [
+        "Cosmo's '98 cover story: '25 Ways to Please Your Man Using Only ",
+        ".'"
+      ],
+      "pick": 1
+    },
+    {
+      "id": "15",
+      "text": [
+        "Kate Moss told the paparazzi she achieved her look not through dieting but through a strict regimen of ",
+        "."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "16",
+      "text": [
+        "The Macarena was originally a song about ",
+        ", but the English translation was deemed too disturbing."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "17",
+      "text": [
+        "TLC warned us not to go chasing waterfalls. They never said anything about chasing ",
+        "."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "18",
+      "text": [
+        "You've got mail! And it's ",
+        " from your AOL chat room boyfriend."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "19",
+      "text": [
+        "The Fashion Cafe on Sixth Avenue shut down not because of bankruptcy, but because health inspectors found ",
+        " in the kitchen."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "20",
+      "text": [
+        "Ricki Lake's audience gasped when the DNA results confirmed that the father was actually ",
+        "."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "21",
+      "text": [
+        "The deleted scene from Clueless shows Cher organizing her closet by color, season, and ",
+        "."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "22",
+      "text": [
+        "The unreleased Tupac track was shelved because the label couldn't clear the sample of ",
+        "."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "23",
+      "text": [
+        "Behind every great supermodel is ",
+        " and a publicist willing to lie about it."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "24",
+      "text": [
+        "Before pagers, the only way to reach your dealer was ",
+        ". Before that, it was ",
+        "."
+      ],
+      "pick": 2
+    },
+    {
+      "id": "25",
+      "text": [
+        "Jenny Jones surprised her guest live on air with ",
+        ", which led directly to the lawsuit."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "26",
+      "text": [
+        "The Backstreet Boys' manager told them they'd never make it unless they were willing to incorporate ",
+        " into the choreography."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "27",
+      "text": [
+        "VH1's Behind the Music: 'The band had it all—the fame, the fortune, the groupies. But they couldn't survive ",
+        ".'"
+      ],
+      "pick": 1
+    },
+    {
+      "id": "28",
+      "text": [
+        "The OJ trial took a bizarre turn when the prosecution introduced ",
+        " as Exhibit B."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "29",
+      "text": [
+        "Donna Karan's DKNY campaign was supposed to represent the spirit of New York, but the billboard on Houston Street just looked like ",
+        "."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "30",
+      "text": [
+        "Cindy Crawford's Pepsi commercial was almost pulled when someone noticed ",
+        " reflected in her sunglasses."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "31",
+      "text": [
+        "The National Enquirer paid $200,000 for a blurry photograph of ",
+        " leaving ",
+        "."
+      ],
+      "pick": 2
+    },
+    {
+      "id": "32",
+      "text": [
+        "Grunge is just ",
+        " for people too cool to admit they care."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "33",
+      "text": [
+        "Claudia Schiffer's contract with Chanel had one unusual clause: under no circumstances was she to be photographed near ",
+        "."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "34",
+      "text": [
+        "The Spice Bus from Spice World actually ran on ",
+        "."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "35",
+      "text": [
+        "Tommy Hilfiger denied the rumor on Oprah, but backstage he was seen clutching ",
+        " and weeping."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "36",
+      "text": [
+        "The lost verse of 'Waterfalls' by TLC was about ",
+        ", which the label said was 'too real even for us.'"
+      ],
+      "pick": 1
+    },
+    {
+      "id": "37",
+      "text": [
+        "Princess Diana's revenge dress was originally going to be accessorized with ",
+        ", but the Palace intervened."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "38",
+      "text": [
+        "Your Tamagotchi didn't die of neglect. It died of ",
+        "."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "39",
+      "text": [
+        "Sean 'Puffy' Combs threw a party so exclusive that the only way in was ",
+        " and a reference from ",
+        "."
+      ],
+      "pick": 2
+    },
+    {
+      "id": "40",
+      "text": [
+        "The reason Mariah Carey and Whitney Houston never collaborated was creative differences over ",
+        "."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "41",
+      "text": [
+        "Welcome to the Grammys. Tonight's Lifetime Achievement Award goes to ",
+        "."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "42",
+      "text": [
+        "Mark Wahlberg's Calvin Klein underwear shoot was almost derailed by ",
+        " and a very confused photographer."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "43",
+      "text": [
+        "In 1996, Vogue declared that ",
+        " was the new black."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "44",
+      "text": [
+        "The Notorious B.I.G. had a verse about ",
+        " that was cut because even Death Row Records thought it went too far."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "45",
+      "text": [
+        "Every 90s kid had a shoebox under their bed filled with ",
+        "."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "46",
+      "text": [
+        "Tonya Harding's defense team argued that the attack was actually motivated by ",
+        ", not jealousy."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "47",
+      "text": [
+        "The heroin chic look was easy to achieve: just combine ",
+        ", zero percent body fat, and a complete disregard for ",
+        "."
+      ],
+      "pick": 2
+    },
+    {
+      "id": "48",
+      "text": [
+        "According to a leaked AOL chat log, the celebrity couple split because of irreconcilable differences regarding ",
+        "."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "49",
+      "text": [
+        "The velvet rope at Studio 54's 90s revival parted for three things: fame, beauty, and ",
+        "."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "50",
+      "text": [
+        "Star Magazine's 'Best & Worst Dressed' issue ranked ",
+        " just below a dumpster fire and just above Dennis Rodman."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "51",
+      "text": [
+        "The unauthorized Pamela Anderson biography revealed that her most prized possession was not the sex tape but ",
+        "."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "52",
+      "text": [
+        "Nirvana's original album cover for In Utero featured ",
+        ", which Walmart refused to display."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "53",
+      "text": [
+        "The '90s club kid scene in New York was defined by three things: ecstasy, outrageous outfits, and ",
+        "."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "54",
+      "text": [
+        "Dial-up internet took so long to connect that by the time you were online, ",
+        " had already happened."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "55",
+      "text": [
+        "Anna Wintour fired her assistant on the spot for placing ",
+        " on the September issue mood board."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "56",
+      "text": [
+        "The East Coast/West Coast rivalry was never really about music. It was about ",
+        "."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "57",
+      "text": [
+        "Gwyneth Paltrow accepted the Oscar, tears streaming down her face, and thanked ",
+        " for making it all possible."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "58",
+      "text": [
+        "If you called the number on the bathroom wall at CBGB, you'd get ",
+        " and a coupon for ",
+        "."
+      ],
+      "pick": 2
+    },
+    {
+      "id": "59",
+      "text": [
+        "The '90s supermodel diet consisted of cigarettes, Diet Coke, and ",
+        "."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "60",
+      "text": [
+        "Dennis Rodman showed up to practice in a wedding dress, a nose ring, and ",
+        "."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "61",
+      "text": [
+        "The Real World: Seattle was canceled mid-season after a housemate confused the confessional cam with ",
+        "."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "62",
+      "text": [
+        "Your AIM away message said 'BRB,' but you were really doing ",
+        "."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "63",
+      "text": [
+        "The Wonderbra ads promised to lift and separate. What they didn't mention was ",
+        "."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "64",
+      "text": [
+        "Lil' Kim's purple pasty at the VMAs was supposed to be ",
+        ", but the stylist ran out of time."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "65",
+      "text": [
+        "Fiona Apple's criminal speech at the VMAs was originally going to end with 'This world is bullshit, and also ",
+        ".'"
+      ],
+      "pick": 1
+    },
+    {
+      "id": "66",
+      "text": [
+        "The gap between the rich and the poor in the '90s was best illustrated by ",
+        " on one side and ",
+        " on the other."
+      ],
+      "pick": 2
+    },
+    {
+      "id": "67",
+      "text": [
+        "No one at the Met Gala was prepared when the theme was announced as '",
+        ": A Retrospective.'"
+      ],
+      "pick": 1
+    },
+    {
+      "id": "68",
+      "text": [
+        "The Lillith Fair banned three things from backstage: men, red meat, and ",
+        "."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "69",
+      "text": [
+        "Carson Daly's TRL countdown was interrupted when a fan held up a sign that just said ",
+        "."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "70",
+      "text": [
+        "JFK Jr. was People's Sexiest Man Alive. The runner-up was ",
+        "."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "71",
+      "text": [
+        "The Delia's catalog had everything a teenage girl could want: butterfly clips, platform sneakers, and ",
+        "."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "72",
+      "text": [
+        "Biggie's autopsy revealed two things: seventeen bullet fragments and ",
+        "."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "73",
+      "text": [
+        "The members of Destiny's Child were contractually prohibited from discussing ",
+        " in interviews."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "74",
+      "text": [
+        "At the '95 Source Awards, Suge Knight didn't just diss Puffy. He also took a moment to diss ",
+        "."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "75",
+      "text": [
+        "The real scandal at the White House wasn't the blue dress. It was ",
+        " hidden in the Oval Office desk drawer."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "76",
+      "text": [
+        "The bouncer at Limelight looked you up and down and said, 'You can come in, but ",
+        " stays outside.'"
+      ],
+      "pick": 1
+    },
+    {
+      "id": "77",
+      "text": [
+        "Ja Rule was supposed to appear on the remix, but he was replaced at the last minute by ",
+        "."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "78",
+      "text": [
+        "The Versace mansion had a room that no guest was allowed to enter. Inside was nothing but ",
+        " and a portrait of ",
+        "."
+      ],
+      "pick": 2
+    },
+    {
+      "id": "79",
+      "text": [
+        "The '90s workout video promised abs of steel, buns of steel, and a lifetime supply of ",
+        "."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "80",
+      "text": [
+        "According to the bellhop at the Chateau Marmont, the most common item left behind by celebrities in the '90s was ",
+        "."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "81",
+      "text": [
+        "Aaliyah's 'Age Ain't Nothing But a Number' was originally titled '",
+        " Ain't Nothing But a Number.'"
+      ],
+      "pick": 1
+    },
+    {
+      "id": "82",
+      "text": [
+        "The deleted scene from Wayne's World shows Wayne and Garth discovering ",
+        " backstage at the Alice Cooper concert."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "83",
+      "text": [
+        "Elle Magazine's '97 trend forecast: 'This spring, pair your slip dress with ",
+        " for a look that says I woke up like this.'"
+      ],
+      "pick": 1
+    },
+    {
+      "id": "84",
+      "text": [
+        "Every time a Backstreet Boy told you they wanted it that way, 'that way' referred to ",
+        "."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "85",
+      "text": [
+        "The car phone was a status symbol until people realized it could also be used for ",
+        "."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "86",
+      "text": [
+        "After the Oscars, the gift bag for presenters included a Cartier watch, a spa weekend, and ",
+        "."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "87",
+      "text": [
+        "The reason nobody could tell the Olsen twins apart was ",
+        "."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "88",
+      "text": [
+        "Isaac Mizrahi cornered a supermodel on the red carpet and said, 'Darling, you simply must try ",
+        ".'"
+      ],
+      "pick": 1
+    },
+    {
+      "id": "89",
+      "text": [
+        "In an alternate timeline, 'Seinfeld' was a show about ",
+        ", and it ran for twelve seasons."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "90",
+      "text": [
+        "Martha Stewart's Thanksgiving special took a dark turn when she demonstrated the proper way to garnish with ",
+        "."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "91",
+      "text": [
+        "The first thing downloaded on Napster wasn't an MP3. It was ",
+        "."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "92",
+      "text": [
+        "Jennifer Aniston's hairdresser revealed that 'The Rachel' was inspired by ",
+        " and a misunderstanding about ",
+        "."
+      ],
+      "pick": 2
+    },
+    {
+      "id": "93",
+      "text": [
+        "The Spice Girls' contract required that each member maintain a distinct personality. Scary Spice got leopard print. Sporty Spice got tracksuits. The rejected sixth Spice got ",
+        "."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "94",
+      "text": [
+        "Leonardo DiCaprio's entourage at the Viper Room consisted of three models, a bodyguard, and ",
+        "."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "95",
+      "text": [
+        "The beeper code for 'I love you' was 143. The beeper code for ",
+        " has never been published."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "96",
+      "text": [
+        "RuPaul's advice to aspiring drag queens: 'You better work, and if that doesn't work, try ",
+        ".'"
+      ],
+      "pick": 1
+    },
+    {
+      "id": "97",
+      "text": [
+        "The Hudson Hawk of fashion was when ",
+        " tried to make ",
+        " happen on the runway."
+      ],
+      "pick": 2
+    },
+    {
+      "id": "98",
+      "text": [
+        "Madonna reinvented herself yet again, this time as a leading authority on ",
+        "."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "99",
+      "text": [
+        "The '90s ended not with Y2K but with the quiet realization that ",
+        " had been inside us all along."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "100",
+      "text": [
+        "In the final episode of a decade defined by excess, the credits rolled over a slow-motion shot of ",
+        " falling from a penthouse balcony."
+      ],
+      "pick": 1
+    }
+  ],
+  "answers": [
+    {
+      "id": "1",
+      "text": "Naomi Campbell's Nokia, mid-flight"
+    },
+    {
+      "id": "2",
+      "text": "The flannel shirt Kurt Cobain died in, now at Sotheby's"
+    },
+    {
+      "id": "3",
+      "text": "$14 worth of body glitter"
+    },
+    {
+      "id": "4",
+      "text": "A beeper going off during a funeral"
+    },
+    {
+      "id": "5",
+      "text": "The intern who accidentally aired Sinead O'Connor ripping up the Pope's photo twice"
+    },
+    {
+      "id": "6",
+      "text": "Aggressive accessorizing"
+    },
+    {
+      "id": "7",
+      "text": "JNCOs so wide they had their own zip code"
+    },
+    {
+      "id": "8",
+      "text": "The butterfly clip holding together Kate Moss's entire career"
+    },
+    {
+      "id": "9",
+      "text": "A 'No Autographs' sign at a Denny's in Burbank"
+    },
+    {
+      "id": "10",
+      "text": "Versace and Velveeta"
+    },
+    {
+      "id": "11",
+      "text": "Carson Daly's frosted tips, slowly wilting under studio lights"
+    },
+    {
+      "id": "12",
+      "text": "The only crimping iron that still works after the fire"
+    },
+    {
+      "id": "13",
+      "text": "Platform Crocs"
+    },
+    {
+      "id": "14",
+      "text": "An evening that started at the MTV VMAs and ended at a Waffle House in Secaucus"
+    },
+    {
+      "id": "15",
+      "text": "The sound of dial-up connecting during a romantic moment"
+    },
+    {
+      "id": "16",
+      "text": "Tyra Banks's forehead, rendered in IMAX"
+    },
+    {
+      "id": "17",
+      "text": "A Polaroid that ended three careers"
+    },
+    {
+      "id": "18",
+      "text": "Sensible flats at a runway show"
+    },
+    {
+      "id": "19",
+      "text": "The guy at Hot Topic who takes himself extremely seriously"
+    },
+    {
+      "id": "20",
+      "text": "RuPaul's emergency duct-tape tuck kit"
+    },
+    {
+      "id": "21",
+      "text": "Tommy Hilfiger's entire existence as a concept"
+    },
+    {
+      "id": "22",
+      "text": "The exact pair of Timberlands Biggie was buried in"
+    },
+    {
+      "id": "23",
+      "text": "A metaphorical supermodel"
+    },
+    {
+      "id": "24",
+      "text": "The velvet choker that cut off circulation to Gwen Stefani's brain"
+    },
+    {
+      "id": "25",
+      "text": "An AOL chat room called 'MarkyMarkAbz4Ever'"
+    },
+    {
+      "id": "26",
+      "text": "Twelve pounds of hair gel and a dream"
+    },
+    {
+      "id": "27",
+      "text": "The single bedazzled thong visible above Britney's low-riders"
+    },
+    {
+      "id": "28",
+      "text": "Marc Jacobs getting fired from Perry Ellis for being too grunge"
+    },
+    {
+      "id": "29",
+      "text": "A Jerry Springer chair, DNA-tested and found guilty"
+    },
+    {
+      "id": "30",
+      "text": "FUBU, but for funerals"
+    },
+    {
+      "id": "31",
+      "text": "The slow-motion Baywatch run, but at a PTA meeting"
+    },
+    {
+      "id": "32",
+      "text": "Kate Moss's lunch — a cigarette and a Tic Tac"
+    },
+    {
+      "id": "33",
+      "text": "Hype Williams's fish-eye lens pointed directly at someone's pores"
+    },
+    {
+      "id": "34",
+      "text": "The backing track that exposed everyone at the Grammys"
+    },
+    {
+      "id": "35",
+      "text": "A drawer full of slap bracelets and regret"
+    },
+    {
+      "id": "36",
+      "text": "Cross Colours jeans in a size that could house a family of four"
+    },
+    {
+      "id": "37",
+      "text": "Oprah's wagon of fat"
+    },
+    {
+      "id": "38",
+      "text": "TLC's condom-covered outfits at the 1992 VMAs"
+    },
+    {
+      "id": "39",
+      "text": "Dennis Rodman's wedding dress"
+    },
+    {
+      "id": "40",
+      "text": "The kid in the Hanson 'MMMBop' shirt getting shoved into a locker"
+    },
+    {
+      "id": "41",
+      "text": "Calvin Klein's uncomfortably young billboard on Times Square"
+    },
+    {
+      "id": "42",
+      "text": "A Spice Girls lollipop found behind a radiator in 2024"
+    },
+    {
+      "id": "43",
+      "text": "The only person who actually called the number from the 'Jenny' video"
+    },
+    {
+      "id": "44",
+      "text": "Donna Karan's DKNY fragrance, weaponized"
+    },
+    {
+      "id": "45",
+      "text": "Fiona Apple's entire VMA acceptance speech"
+    },
+    {
+      "id": "46",
+      "text": "A Limited Too crop top on a forty-year-old"
+    },
+    {
+      "id": "47",
+      "text": "Spray-on abs from a Spencer's Gifts catalog"
+    },
+    {
+      "id": "48",
+      "text": "The TRL crowd outside the MTV studio slowly losing the will to live"
+    },
+    {
+      "id": "49",
+      "text": "Gold fronts on a third-grader"
+    },
+    {
+      "id": "50",
+      "text": "Milli Vanilli's other other lip-sync tape"
+    },
+    {
+      "id": "51",
+      "text": "The Rachel haircut on someone it was never meant for"
+    },
+    {
+      "id": "52",
+      "text": "A baby-tee that says 'PORN STAR' at a parent-teacher conference"
+    },
+    {
+      "id": "53",
+      "text": "Strategic grunge layering"
+    },
+    {
+      "id": "54",
+      "text": "The exact moment Mariah Carey decided she was too famous for stairs"
+    },
+    {
+      "id": "55",
+      "text": "A CD-ROM of unauthorized Pamela Anderson photos"
+    },
+    {
+      "id": "56",
+      "text": "Doc Martens held together entirely by duct tape and angst"
+    },
+    {
+      "id": "57",
+      "text": "The personal shopper Donatella Versace sent to rehab"
+    },
+    {
+      "id": "58",
+      "text": "An entire outfit from Delia's catalog, still in the shipping bag"
+    },
+    {
+      "id": "59",
+      "text": "$400 worth of Tommy Hilfiger on a kid who mows lawns"
+    },
+    {
+      "id": "60",
+      "text": "Left Eye's arson lighter, bronzed and on display"
+    },
+    {
+      "id": "61",
+      "text": "A Discman skipping during the most emotional part of the song"
+    },
+    {
+      "id": "62",
+      "text": "Cindy Crawford's mole, insured for more than your house"
+    },
+    {
+      "id": "63",
+      "text": "The collective body odor at Woodstock '99"
+    },
+    {
+      "id": "64",
+      "text": "Leopard print on every available surface"
+    },
+    {
+      "id": "65",
+      "text": "A Skip-It tangled around someone's court-ordered ankle monitor"
+    },
+    {
+      "id": "66",
+      "text": "The boy band member everyone forgot — the fifth one"
+    },
+    {
+      "id": "67",
+      "text": "Puff Daddy's all-white party, but someone wore ecru"
+    },
+    {
+      "id": "68",
+      "text": "A mood ring permanently stuck on 'anxious'"
+    },
+    {
+      "id": "69",
+      "text": "The gap between Lauren Hill's first album and her tax returns"
+    },
+    {
+      "id": "70",
+      "text": "Gianni Versace's guest list, annotated in the margins"
+    },
+    {
+      "id": "71",
+      "text": "An autographed headshot of Kennedy the MTV VJ"
+    },
+    {
+      "id": "72",
+      "text": "Victoria Beckham's one facial expression"
+    },
+    {
+      "id": "73",
+      "text": "Precisely three CK One samples stolen from a department store"
+    },
+    {
+      "id": "74",
+      "text": "The oversized jersey dress that doubled as a parachute"
+    },
+    {
+      "id": "75",
+      "text": "An emergency fanny pack full of scrunchies"
+    },
+    {
+      "id": "76",
+      "text": "Grunge, but make it Kmart"
+    },
+    {
+      "id": "77",
+      "text": "The Macarena performed at a state funeral"
+    },
+    {
+      "id": "78",
+      "text": "A bedazzler that has seen things no bedazzler should see"
+    },
+    {
+      "id": "79",
+      "text": "Skechers with the platform sole that technically counted as a weapon"
+    },
+    {
+      "id": "80",
+      "text": "Jenny Jones's show where the surprise was a little too surprising"
+    },
+    {
+      "id": "81",
+      "text": "Livin' La Vida Loca on a loop in hell's waiting room"
+    },
+    {
+      "id": "82",
+      "text": "Coolio's hair, structurally unsound"
+    },
+    {
+      "id": "83",
+      "text": "A Wonder Bra doing $200 worth of false advertising"
+    },
+    {
+      "id": "84",
+      "text": "The exact shade of brown lipstick that defined 1996"
+    },
+    {
+      "id": "85",
+      "text": "A pager code that means 'I love you' or possibly 'pick up milk'"
+    },
+    {
+      "id": "86",
+      "text": "The chain wallet connecting a Hot Topic employee to their will to live"
+    },
+    {
+      "id": "87",
+      "text": "Matthew McConaughey's bongos at 2 AM"
+    },
+    {
+      "id": "88",
+      "text": "Competitive frosted tipping"
+    },
+    {
+      "id": "89",
+      "text": "A velour tracksuit in a shade Juicy Couture would later regret"
+    },
+    {
+      "id": "90",
+      "text": "The subscription cards falling out of every issue of Vogue"
+    },
+    {
+      "id": "91",
+      "text": "Cindy Crawford's Pepsi commercial viewed frame by frame"
+    },
+    {
+      "id": "92",
+      "text": "A dream journal kept exclusively in gel pen"
+    },
+    {
+      "id": "93",
+      "text": "The backing dancers no one made eye contact with"
+    },
+    {
+      "id": "94",
+      "text": "Karl Lagerfeld's opinion of literally everyone"
+    },
+    {
+      "id": "95",
+      "text": "An entire bottle of Sun-In and a severe miscalculation"
+    },
+    {
+      "id": "96",
+      "text": "Jesse Camp winning the MTV VJ search over actual talent"
+    },
+    {
+      "id": "97",
+      "text": "A trapper keeper full of magazine cutouts of Jonathan Taylor Thomas"
+    },
+    {
+      "id": "98",
+      "text": "The Spice Bus, impounded"
+    },
+    {
+      "id": "99",
+      "text": "The tattoo Pamela Anderson got removed, then got again"
+    },
+    {
+      "id": "100",
+      "text": "A flannel tied around the waist of someone who has never chopped wood"
+    },
+    {
+      "id": "101",
+      "text": "Linda Evangelista refusing to get out of bed for less than $10,000"
+    },
+    {
+      "id": "102",
+      "text": "Unwashed irony"
+    },
+    {
+      "id": "103",
+      "text": "The exact AOL keyword that ruined a marriage"
+    },
+    {
+      "id": "104",
+      "text": "A commemorative Princess Diana Beanie Baby, still in the case"
+    },
+    {
+      "id": "105",
+      "text": "Busta Rhymes's outfit from the 'Put Your Hands Where My Eyes Could See' video"
+    },
+    {
+      "id": "106",
+      "text": "Whoever decided low-rise jeans were empowering"
+    },
+    {
+      "id": "107",
+      "text": "A poster of Mark Wahlberg grabbing his own crotch, hung above a twin bed"
+    },
+    {
+      "id": "108",
+      "text": "The walk-on music for every Jerry Springer guest"
+    },
+    {
+      "id": "109",
+      "text": "A mall kiosk airbrush artist who has seen too much"
+    },
+    {
+      "id": "110",
+      "text": "The entire Fall 1993 Marc Jacobs grunge collection, recalled"
+    },
+    {
+      "id": "111",
+      "text": "Cinematic overplucking"
+    },
+    {
+      "id": "112",
+      "text": "Wu-Tang's financial advisor, if one existed"
+    },
+    {
+      "id": "113",
+      "text": "A Tamagotchi that died of neglect during a Backstreet Boys concert"
+    },
+    {
+      "id": "114",
+      "text": "The rhinestone belt buckle that set off every metal detector at LAX"
+    },
+    {
+      "id": "115",
+      "text": "Tyra Banks smizing before smizing had a name"
+    },
+    {
+      "id": "116",
+      "text": "A subscription to Cosmopolitan that radicalized a generation"
+    },
+    {
+      "id": "117",
+      "text": "The person in the 'Waterfalls' video who thought they could actually chase waterfalls"
+    },
+    {
+      "id": "118",
+      "text": "Ace of Base on repeat in a European hostel"
+    },
+    {
+      "id": "119",
+      "text": "A pair of buffalo platform shoes and a sprained ankle"
+    },
+    {
+      "id": "120",
+      "text": "Kathie Lee Gifford's sweatshop, festively decorated"
+    },
+    {
+      "id": "121",
+      "text": "Heroin chic as a lifestyle choice"
+    },
+    {
+      "id": "122",
+      "text": "The backup dancer in MC Hammer's bankruptcy filing"
+    },
+    {
+      "id": "123",
+      "text": "Delia's catalog dog-eared to the point of disintegration"
+    },
+    {
+      "id": "124",
+      "text": "Precisely one JNCO pocket large enough to shoplift a toaster"
+    },
+    {
+      "id": "125",
+      "text": "The security guard outside TRL who has given up on life"
+    },
+    {
+      "id": "126",
+      "text": "Gianni Versace's shower curtain, on loan to the Met"
+    },
+    {
+      "id": "127",
+      "text": "A navel piercing that has gone septic at Lilith Fair"
+    },
+    {
+      "id": "128",
+      "text": "The unaired episode of Singled Out that got Jenny McCarthy banned from basic cable"
+    },
+    {
+      "id": "129",
+      "text": "N'SYNC ramen noodle hair, shellacked"
+    },
+    {
+      "id": "130",
+      "text": "A bucket hat from a gas station in 1997"
+    },
+    {
+      "id": "131",
+      "text": "The gap between what Sean John costs and what Sean John is worth"
+    },
+    {
+      "id": "132",
+      "text": "Lil' Kim's purple pasty at the 1999 VMAs"
+    },
+    {
+      "id": "133",
+      "text": "A Claire's ear piercing gone horribly, medically wrong"
+    },
+    {
+      "id": "134",
+      "text": "Destiny's Child's matching camo outfits, sewn by Tina Knowles at 3 AM"
+    },
+    {
+      "id": "135",
+      "text": "Alanis Morissette's ex, sweating through 'You Oughta Know'"
+    },
+    {
+      "id": "136",
+      "text": "A frosted-tip consultation that went too far"
+    },
+    {
+      "id": "137",
+      "text": "Aggressive midriff"
+    },
+    {
+      "id": "138",
+      "text": "The VHS tape someone forgot to return to Blockbuster and it's now worth $47 in late fees"
+    },
+    {
+      "id": "139",
+      "text": "A tribal armband tattoo on an accountant"
+    },
+    {
+      "id": "140",
+      "text": "The collective net worth of a 1997 Denny's at 3 AM after the VMAs"
+    },
+    {
+      "id": "141",
+      "text": "Claudia Schiffer stepping over a homeless person in Chanel"
+    },
+    {
+      "id": "142",
+      "text": "One black leather choker and an entire personality"
+    },
+    {
+      "id": "143",
+      "text": "A chain so big it required a chiropractor"
+    },
+    {
+      "id": "144",
+      "text": "The 'Whoomp! There It Is' guy at a funeral"
+    },
+    {
+      "id": "145",
+      "text": "Donatella Versace's dermatologist's yacht"
+    },
+    {
+      "id": "146",
+      "text": "A crop top from Contempo Casuals that constituted a cry for help"
+    },
+    {
+      "id": "147",
+      "text": "The publicist who had to explain Dennis Rodman to Middle America"
+    },
+    {
+      "id": "148",
+      "text": "A pair of Oakley Blades worn indoors, unironically"
+    },
+    {
+      "id": "149",
+      "text": "Missy Elliott's inflatable garbage bag suit"
+    },
+    {
+      "id": "150",
+      "text": "Performative apathy"
+    },
+    {
+      "id": "151",
+      "text": "The sound a Caboodle makes when it opens at 6 AM for school"
+    },
+    {
+      "id": "152",
+      "text": "A Dapper Dan knockoff that got someone both arrested and complimented"
+    },
+    {
+      "id": "153",
+      "text": "The George Michael bathroom incident, reenacted at a corporate retreat"
+    },
+    {
+      "id": "154",
+      "text": "Whoever was in charge of wardrobe on the set of 'Wild Things'"
+    },
+    {
+      "id": "155",
+      "text": "The backstage rider demanding only green M&M's and existential validation"
+    },
+    {
+      "id": "156",
+      "text": "Tommy Hilfiger boxers visible from space"
+    },
+    {
+      "id": "157",
+      "text": "A crimped ponytail that violated the Geneva Convention"
+    },
+    {
+      "id": "158",
+      "text": "The Hype Williams video that cost more than most countries' GDP"
+    },
+    {
+      "id": "159",
+      "text": "Ironic thrift-store shopping"
+    },
+    {
+      "id": "160",
+      "text": "An autographed photo of Joey Fatone that nobody asked for"
+    },
+    {
+      "id": "161",
+      "text": "A transparent backpack that revealed too much about a person's life choices"
+    },
+    {
+      "id": "162",
+      "text": "Sisqo's silver hair during the 'Thong Song' era"
+    },
+    {
+      "id": "163",
+      "text": "The Victoria's Secret catalog hidden inside a National Geographic"
+    },
+    {
+      "id": "164",
+      "text": "Tupac's bandana collection, appraised"
+    },
+    {
+      "id": "165",
+      "text": "A bedazzled pager that only received messages from a parole officer"
+    },
+    {
+      "id": "166",
+      "text": "The one Spice Girl whose platform shoe actually broke on live TV"
+    },
+    {
+      "id": "167",
+      "text": "Gwen Stefani's bindi phase, diplomatically unaddressed"
+    },
+    {
+      "id": "168",
+      "text": "An entire generation's self-esteem, destroyed by a Cosmopolitan quiz"
+    },
+    {
+      "id": "169",
+      "text": "B.I.G.'s Coogi sweater budget, annually"
+    },
+    {
+      "id": "170",
+      "text": "The day grunge died and khakis took over"
+    },
+    {
+      "id": "171",
+      "text": "A scratch-and-sniff sticker that smelled like CK Be"
+    },
+    {
+      "id": "172",
+      "text": "Heidi Klum's Halloween costume budget, which exceeds NATO spending"
+    },
+    {
+      "id": "173",
+      "text": "The casting couch at a Saved by the Bell audition"
+    },
+    {
+      "id": "174",
+      "text": "Two turntables and a crippling student loan"
+    },
+    {
+      "id": "175",
+      "text": "Aggressive layering of tank tops"
+    },
+    {
+      "id": "176",
+      "text": "The first person to wear a backwards baseball cap to a job interview"
+    },
+    {
+      "id": "177",
+      "text": "A Starter jacket that started a fistfight"
+    },
+    {
+      "id": "178",
+      "text": "Elle Macpherson's nickname 'The Body,' taken literally at customs"
+    },
+    {
+      "id": "179",
+      "text": "The dial-up sound that cockblocked an entire generation"
+    },
+    {
+      "id": "180",
+      "text": "Naomi Campbell's community service vest, custom Versace"
+    },
+    {
+      "id": "181",
+      "text": "A Lisa Frank trapper keeper containing classified documents"
+    },
+    {
+      "id": "182",
+      "text": "The 37 bracelets Gwen Stefani wore to seem approachable"
+    },
+    {
+      "id": "183",
+      "text": "A Can of Red Bull before Red Bull had a marketing budget"
+    },
+    {
+      "id": "184",
+      "text": "Every hair extension that fell out on the runway in Milan, 1996"
+    },
+    {
+      "id": "185",
+      "text": "Calculated dishevelment"
+    },
+    {
+      "id": "186",
+      "text": "The Wonderwall guy at every party from 1995 to 1999"
+    },
+    {
+      "id": "187",
+      "text": "A pair of overalls with only one strap fastened, as God intended"
+    },
+    {
+      "id": "188",
+      "text": "The Spice Girls' actual contractual obligation to maintain a personality type"
+    },
+    {
+      "id": "189",
+      "text": "Ja Rule's stylist, three drinks in at Fashion Week"
+    },
+    {
+      "id": "190",
+      "text": "A see-through top at a parent-teacher night"
+    },
+    {
+      "id": "191",
+      "text": "Prince's cease-and-desist letters, perfumed"
+    },
+    {
+      "id": "192",
+      "text": "The exact moment someone realized JNCO jeans don't fit in a Honda Civic"
+    },
+    {
+      "id": "193",
+      "text": "Mandy Moore's candy-themed promotional material, recently declassified"
+    },
+    {
+      "id": "194",
+      "text": "Anna Wintour's sunglasses, hiding what can only be described as contempt"
+    },
+    {
+      "id": "195",
+      "text": "A hemp necklace and a very loose understanding of Buddhism"
+    },
+    {
+      "id": "196",
+      "text": "The body double in every R. Kelly video, now in witness protection"
+    },
+    {
+      "id": "197",
+      "text": "A Kangol hat at a congressional hearing"
+    },
+    {
+      "id": "198",
+      "text": "Janet Jackson's 'Velvet Rope' tour costume, which was mostly rope"
+    },
+    {
+      "id": "199",
+      "text": "Vengeful bedazzling"
+    },
+    {
+      "id": "200",
+      "text": "The AOL Instant Messenger away message that ended a relationship"
+    },
+    {
+      "id": "201",
+      "text": "A pair of white leather boots from a Destiny's Child yard sale"
+    },
+    {
+      "id": "202",
+      "text": "The person who greenlit Vanilla Ice's movie career"
+    },
+    {
+      "id": "203",
+      "text": "MC Hammer's accountant, staring into the middle distance"
+    },
+    {
+      "id": "204",
+      "text": "A Tommy Hilfiger rugby shirt stretched to the knees"
+    },
+    {
+      "id": "205",
+      "text": "The last functioning Caboodle in North America"
+    },
+    {
+      "id": "206",
+      "text": "Shaq Diesel, the rap album, played at Guantanamo"
+    },
+    {
+      "id": "207",
+      "text": "Roberto Cavalli's leopard-print toilet seat"
+    },
+    {
+      "id": "208",
+      "text": "A bowl cut that took courage and a cereal bowl"
+    },
+    {
+      "id": "209",
+      "text": "The sweat stain Marky Mark left on an interview chair"
+    },
+    {
+      "id": "210",
+      "text": "Strategic ripping of denim"
+    },
+    {
+      "id": "211",
+      "text": "The payphone outside the club where every breakup happened"
+    },
+    {
+      "id": "212",
+      "text": "A 900-number psychic who predicted Y2K would end fashion forever"
+    },
+    {
+      "id": "213",
+      "text": "Bjork's swan dress, pecking at Anna Wintour"
+    },
+    {
+      "id": "214",
+      "text": "The smell of Drakkar Noir and poor decisions"
+    },
+    {
+      "id": "215",
+      "text": "A pair of platform sneakers that constituted a civil engineering project"
+    },
+    {
+      "id": "216",
+      "text": "Rebecca Romijn-Stamos's entire body painted blue, standing in line at Starbucks"
+    },
+    {
+      "id": "217",
+      "text": "The rubber bracelet Lance Bass wore before anyone knew why"
+    },
+    {
+      "id": "218",
+      "text": "A Tamagotchi graveyard in every junk drawer in America"
+    },
+    {
+      "id": "219",
+      "text": "Newsboy caps at a nightclub"
+    },
+    {
+      "id": "220",
+      "text": "The producer who told the Backstreet Boys to stand in the rain for every video"
+    },
+    {
+      "id": "221",
+      "text": "A bandana folded precisely wrong for every gang territory"
+    },
+    {
+      "id": "222",
+      "text": "Will Smith's entire Fresh Prince wardrobe, auctioned for charity and confusion"
+    },
+    {
+      "id": "223",
+      "text": "A pencil-thin eyebrow that has never recovered"
+    },
+    {
+      "id": "224",
+      "text": "The personal trainer who made Oprah pull a wagon of fat onstage"
+    },
+    {
+      "id": "225",
+      "text": "Unearned confidence in a mesh shirt"
+    },
+    {
+      "id": "226",
+      "text": "A pair of Sketchers that predicted nothing about the future of fashion"
+    },
+    {
+      "id": "227",
+      "text": "Kurt Cobain's cardigan, sacralized"
+    },
+    {
+      "id": "228",
+      "text": "The exact amount of chest hair visible in a 1997 Calvin Klein ad"
+    },
+    {
+      "id": "229",
+      "text": "A Baby Phat rhinestone logo tramp stamp"
+    },
+    {
+      "id": "230",
+      "text": "The intern who had to steam P. Diddy's velour tracksuit between outfit changes"
+    },
+    {
+      "id": "231",
+      "text": "Posh Spice's smile, reported missing since 1997"
+    },
+    {
+      "id": "232",
+      "text": "A frosted lip liner from MAC that committed several crimes against faces"
+    },
+    {
+      "id": "233",
+      "text": "The sound of a thousand Tamagotchis beeping during a SAT exam"
+    },
+    {
+      "id": "234",
+      "text": "Sporty nihilism"
+    },
+    {
+      "id": "235",
+      "text": "The backstage fight at the 1998 Source Awards that nobody recorded because camera phones didn't exist"
+    },
+    {
+      "id": "236",
+      "text": "A warehouse of unsold No Fear t-shirts"
+    },
+    {
+      "id": "237",
+      "text": "Kate Moss and Johnny Depp's hotel room damage deposit"
+    },
+    {
+      "id": "238",
+      "text": "The emotional damage caused by a single episode of 'The Real World'"
+    },
+    {
+      "id": "239",
+      "text": "Cher's sheer bodysuit at the '99 VMAs, held up by willpower"
+    },
+    {
+      "id": "240",
+      "text": "A Walkman with one working earphone and an Alanis Morissette CD stuck inside"
+    },
+    {
+      "id": "241",
+      "text": "Oasis vs. Blur, but it's about who has worse teeth"
+    },
+    {
+      "id": "242",
+      "text": "A velvet blazer from Structure that has its own restraining order"
+    },
+    {
+      "id": "243",
+      "text": "The audible gasp when someone showed up to prom in a matching denim tuxedo"
+    },
+    {
+      "id": "244",
+      "text": "Russell Simmons's meditation retreat, sponsored by Phat Farm"
+    },
+    {
+      "id": "245",
+      "text": "The bloody glove that didn't fit but somehow still ended a dinner party"
+    },
+    {
+      "id": "246",
+      "text": "O.J.'s low-speed Bronco chase, brought to you by Domino's"
+    },
+    {
+      "id": "247",
+      "text": "Marcia Clark's perm during closing arguments"
+    },
+    {
+      "id": "248",
+      "text": "The jury that deliberated for less time than it takes to microwave a Hot Pocket"
+    },
+    {
+      "id": "249",
+      "text": "Kato Kaelin's entire career trajectory"
+    },
+    {
+      "id": "250",
+      "text": "A Real World confessional that got someone uninvited from Thanksgiving"
+    },
+    {
+      "id": "251",
+      "text": "The one Real World roommate who 'didn't come here to make friends' but absolutely did"
+    },
+    {
+      "id": "252",
+      "text": "Puck from The Real World spitting in someone's peanut butter"
+    },
+    {
+      "id": "253",
+      "text": "Jenny McCarthy eliminating a bachelor on Singled Out using only a whistle"
+    },
+    {
+      "id": "254",
+      "text": "Chris Hardwick pretending Singled Out was a legitimate dating show"
+    },
+    {
+      "id": "255",
+      "text": "Stone Cold Steve Austin stunning his own boss on live television"
+    },
+    {
+      "id": "256",
+      "text": "The Rock's eyebrow doing more acting than most of Hollywood"
+    },
+    {
+      "id": "257",
+      "text": "A steel chair used for conflict resolution"
+    },
+    {
+      "id": "258",
+      "text": "Mankind being thrown off Hell in a Cell and into your living room"
+    },
+    {
+      "id": "259",
+      "text": "The Undertaker's entrance taking longer than most actual wrestling matches"
+    },
+    {
+      "id": "260",
+      "text": "D-Generation X crotch-chopping at a PTA meeting"
+    },
+    {
+      "id": "261",
+      "text": "Goldberg's undefeated streak and questionable acting range"
+    },
+    {
+      "id": "262",
+      "text": "A 'Stone Cold' Steve Austin foam middle finger purchased at a school book fair"
+    },
+    {
+      "id": "263",
+      "text": "The WWF Attitude Era explaining puberty to an entire generation"
+    },
+    {
+      "id": "264",
+      "text": "Val Venis's entrance theme playing at a wedding reception"
+    },
+    {
+      "id": "265",
+      "text": "Leonardo DiCaprio standing on the bow of the Titanic and also every magazine cover simultaneously"
+    },
+    {
+      "id": "266",
+      "text": "Kate Winslet's French girls and the drawing that launched a thousand awkward art classes"
+    },
+    {
+      "id": "267",
+      "text": "The Clueless plaid skirt that became a constitutional right"
+    },
+    {
+      "id": "268",
+      "text": "Alicia Silverstone saying 'As if' with enough force to restructure the English language"
+    },
+    {
+      "id": "269",
+      "text": "John Travolta and Samuel L. Jackson discussing cheeseburgers before committing murder"
+    },
+    {
+      "id": "270",
+      "text": "The Pulp Fiction dance that made every dad think he could move"
+    },
+    {
+      "id": "271",
+      "text": "Uma Thurman's adrenaline needle scene ruining first aid training forever"
+    },
+    {
+      "id": "272",
+      "text": "A young Ben Affleck winning an Oscar and somehow peaking too early"
+    },
+    {
+      "id": "273",
+      "text": "The 'I see dead people' twist that your coworker spoiled in 1999"
+    },
+    {
+      "id": "274",
+      "text": "Keanu Reeves dodging bullets in a trench coat and calling it philosophy"
+    },
+    {
+      "id": "275",
+      "text": "Will Smith punching an alien and saving the Fourth of July"
+    },
+    {
+      "id": "276",
+      "text": "Jim Carrey talking out of his butt and earning $20 million for it"
+    },
+    {
+      "id": "277",
+      "text": "The Tonya Harding knee-whacking incident as an Olympic event"
+    },
+    {
+      "id": "278",
+      "text": "Nancy Kerrigan screaming 'Why?' and accidentally creating a meme twenty years early"
+    },
+    {
+      "id": "279",
+      "text": "Tonya Harding's getaway driver who was also her husband, somehow"
+    },
+    {
+      "id": "280",
+      "text": "A figure skating rivalry that made the Cold War look civilized"
+    },
+    {
+      "id": "281",
+      "text": "Jeff Gillooly's contribution to the sport of figure skating"
+    },
+    {
+      "id": "282",
+      "text": "The home video of Tonya Harding's wedding night, which was somehow a real product you could buy"
+    },
+    {
+      "id": "283",
+      "text": "A judge holding up a 5.2 for the cover-up but a 9.8 for ambition"
+    },
+    {
+      "id": "284",
+      "text": "The Shawshank Redemption losing to Forrest Gump and the world never recovering"
+    },
+    {
+      "id": "285",
+      "text": "Robin Williams in a Mrs. Doubtfire costume clearing airport security"
+    },
+    {
+      "id": "286",
+      "text": "Mike Myers doing Austin Powers at a NATO summit"
+    },
+    {
+      "id": "287",
+      "text": "Adam Sandler yelling incoherently and calling it a movie"
+    },
+    {
+      "id": "288",
+      "text": "Denise Richards playing a nuclear physicist and nobody stopping her"
+    },
+    {
+      "id": "289",
+      "text": "A VHS copy of Titanic that required two tapes and ruined three sleepovers"
+    },
+    {
+      "id": "290",
+      "text": "Chris Farley living in a van down by the river and making it aspirational"
+    },
+    {
+      "id": "291",
+      "text": "Winona Ryder's shoplifting receipt framed as performance art"
+    },
+    {
+      "id": "292",
+      "text": "The casting couch that launched a thousand straight-to-video sequels"
+    },
+    {
+      "id": "293",
+      "text": "Sandra Bullock driving a bus that couldn't slow down, which was somehow a $350 million idea"
+    },
+    {
+      "id": "294",
+      "text": "Matthew McConaughey being legally required to remove his shirt in every film"
+    },
+    {
+      "id": "295",
+      "text": "Vanilla Ice's 'Ice Ice Baby' playing at a funeral and somehow improving the mood"
+    },
+    {
+      "id": "296",
+      "text": "MC Hammer's $30 million mansion with a gold-plated bowling alley"
+    },
+    {
+      "id": "297",
+      "text": "The exact moment MC Hammer went from 'U Can't Touch This' to 'U Can't Afford This'"
+    },
+    {
+      "id": "298",
+      "text": "Hammer pants with enough fabric to shelter a family of four"
+    },
+    {
+      "id": "299",
+      "text": "Chumbawamba getting knocked down and getting up again at a custody hearing"
+    },
+    {
+      "id": "300",
+      "text": "The Macarena replacing actual dancing at every wedding from 1996 to eternity"
+    },
+    {
+      "id": "301",
+      "text": "Lou Bega counting to five women and calling it a music career"
+    },
+    {
+      "id": "302",
+      "text": "Right Said Fred being too sexy for a shirt but not for a one-hit-wonder compilation"
+    },
+    {
+      "id": "303",
+      "text": "Gerardo's 'Rico Suave' on a loop in a dentist's waiting room"
+    },
+    {
+      "id": "304",
+      "text": "Milli Vanilli's Grammy being repossessed like a used Honda Civic"
+    },
+    {
+      "id": "305",
+      "text": "Brad Pitt and Gwyneth Paltrow having matching haircuts and calling it love"
+    },
+    {
+      "id": "306",
+      "text": "The exact moment Brad Pitt's hair decided to leave Gwyneth before he did"
+    },
+    {
+      "id": "307",
+      "text": "Tom Cruise and Nicole Kidman's divorce settlement measured in Scientology credits"
+    },
+    {
+      "id": "308",
+      "text": "Tom and Nicole's publicist earning hazard pay"
+    },
+    {
+      "id": "309",
+      "text": "Dennis Rodman and Carmen Electra's Vegas marriage lasting shorter than a Bulls halftime show"
+    },
+    {
+      "id": "310",
+      "text": "Pamela Anderson's wedding to Tommy Lee, officiated by a jet ski"
+    },
+    {
+      "id": "311",
+      "text": "The Tommy Lee and Pamela Anderson tape that the internet was basically invented to distribute"
+    },
+    {
+      "id": "312",
+      "text": "Whitney and Bobby's reality show proving love is, in fact, not enough"
+    },
+    {
+      "id": "313",
+      "text": "Lisa Marie Presley marrying Michael Jackson and everyone just pretending that was normal"
+    },
+    {
+      "id": "314",
+      "text": "Liam Gallagher throwing a tambourine at his brother and calling it artistic differences"
+    },
+    {
+      "id": "315",
+      "text": "JNCO jeans wide enough to smuggle a small television"
+    },
+    {
+      "id": "316",
+      "text": "Platform shoes adding four inches of height and subtracting all dignity"
+    },
+    {
+      "id": "317",
+      "text": "Frosted tips on a grown man earning a six-figure salary"
+    },
+    {
+      "id": "318",
+      "text": "A butterfly clip holding together an entire middle school's social hierarchy"
+    },
+    {
+      "id": "319",
+      "text": "The choker necklace that said 'I'm edgy' but also 'I shop at Claire's'"
+    },
+    {
+      "id": "320",
+      "text": "Hypercolor shirts revealing your armpit sweat to the entire cafeteria"
+    },
+    {
+      "id": "321",
+      "text": "A wallet chain long enough to double as a jump rope"
+    },
+    {
+      "id": "322",
+      "text": "Baggy cargo shorts with seventeen pockets and nothing worth carrying"
+    },
+    {
+      "id": "323",
+      "text": "Wearing your backpack on one shoulder and developing scoliosis for fashion"
+    },
+    {
+      "id": "324",
+      "text": "Tae Bo with Billy Blanks and the false belief you could now fight anyone"
+    },
+    {
+      "id": "325",
+      "text": "A Buns of Steel VHS tape hidden behind the family's copy of The Lion King"
+    },
+    {
+      "id": "326",
+      "text": "Suzanne Somers' ThighMaster infomercial playing at 3 AM and changing someone's life trajectory"
+    },
+    {
+      "id": "327",
+      "text": "Richard Simmons showing up uninvited and making you cry about your childhood"
+    },
+    {
+      "id": "328",
+      "text": "Sweatin' to the Oldies as a form of court-mandated therapy"
+    },
+    {
+      "id": "329",
+      "text": "The Ab Roller gathering dust next to a half-eaten pizza"
+    },
+    {
+      "id": "330",
+      "text": "A Thighmaster used exclusively as a doorstop since 1994"
+    },
+    {
+      "id": "331",
+      "text": "Eight Minute Abs losing to Seven Minute Abs in the great fitness war of '97"
+    },
+    {
+      "id": "332",
+      "text": "Jane Fonda's leotard collection outlasting most NATO alliances"
+    },
+    {
+      "id": "333",
+      "text": "A step aerobics class that was really just group therapy with leg warmers"
+    },
+    {
+      "id": "334",
+      "text": "The Soloflex poster guy making every garage feel inadequate"
+    },
+    {
+      "id": "335",
+      "text": "Someone's mom doing Tae Bo in the living room and accidentally kicking the dog"
+    },
+    {
+      "id": "336",
+      "text": "Denim on denim at the 1998 American Music Awards"
+    },
+    {
+      "id": "337",
+      "text": "A fur coat at a PETA event worn 'ironically'"
+    },
+    {
+      "id": "338",
+      "text": "The bedazzled everything phase of 1997"
+    },
+    {
+      "id": "339",
+      "text": "Tommy Hilfiger's logo getting larger with each passing season"
+    },
+    {
+      "id": "340",
+      "text": "A bucket hat worn without a trace of irony or self-awareness"
+    },
+    {
+      "id": "341",
+      "text": "Steve Madden platforms that were technically a liability waiver"
+    },
+    {
+      "id": "342",
+      "text": "Wearing sunglasses indoors and calling it a personal brand"
+    },
+    {
+      "id": "343",
+      "text": "The Von Dutch trucker hat appearing three years too early at a Hollywood party"
+    },
+    {
+      "id": "344",
+      "text": "A Ronco Showtime Rotisserie purchased at 2 AM during an emotional crisis"
+    },
+    {
+      "id": "345",
+      "text": "The Magic Bullet infomercial couple whose marriage was clearly in trouble"
+    },
+    {
+      "id": "346",
+      "text": "Ron Popeil's hair-in-a-can solving problems nobody actually had"
+    },
+    {
+      "id": "347",
+      "text": "George Foreman lending his name to a grill and outearning his boxing career"
+    },
+    {
+      "id": "348",
+      "text": "Three easy payments of $19.99 and one difficult payment"
+    },
+    {
+      "id": "349",
+      "text": "A Chia Pet given as a gift by someone who has given up on the relationship"
+    },
+    {
+      "id": "350",
+      "text": "The Flowbee combining a vacuum cleaner and a haircut into one terrible idea"
+    },
+    {
+      "id": "351",
+      "text": "Miss Cleo predicting your future for $4.99 a minute and somehow not predicting her own fraud charges"
+    },
+    {
+      "id": "352",
+      "text": "A QVC host holding a cubic zirconia like it personally saved her marriage"
+    },
+    {
+      "id": "353",
+      "text": "The Ginsu knife that could cut through a tin can and also your will to live"
+    },
+    {
+      "id": "354",
+      "text": "But wait, there's more"
+    },
+    {
+      "id": "355",
+      "text": "A Beanie Baby collection valued at $47,000 in 1997 and $11 in 2002"
+    },
+    {
+      "id": "356",
+      "text": "Princess Diana's memorial Beanie Baby stored in a fireproof safe next to the birth certificates"
+    },
+    {
+      "id": "357",
+      "text": "A Beanie Baby tag protector more secure than Fort Knox"
+    },
+    {
+      "id": "358",
+      "text": "The couple who divided their Beanie Baby collection on the courtroom floor during a divorce"
+    },
+    {
+      "id": "359",
+      "text": "A Tamagotchi that died during algebra class and caused actual grief"
+    },
+    {
+      "id": "360",
+      "text": "Slap bracelets being banned from school like they were concealed weapons"
+    },
+    {
+      "id": "361",
+      "text": "A Pog slammer made of solid brass that gave a kid a concussion"
+    },
+    {
+      "id": "362",
+      "text": "The Skip-It counter reaching numbers that could never be verified"
+    },
+    {
+      "id": "363",
+      "text": "A Furby waking up at 3 AM and speaking in tongues"
+    },
+    {
+      "id": "364",
+      "text": "Gak making a sound that got you sent to the principal's office"
+    },
+    {
+      "id": "365",
+      "text": "The noble art of collecting Pogs without understanding what Pogs were for"
+    },
+    {
+      "id": "366",
+      "text": "A Beanie Baby McHappy Meal toy worth more than the restaurant franchise"
+    },
+    {
+      "id": "367",
+      "text": "Tickle Me Elmo causing a fistfight between two grown women at a Walmart"
+    },
+    {
+      "id": "368",
+      "text": "Moon Shoes that promised low gravity and delivered sprained ankles"
+    },
+    {
+      "id": "369",
+      "text": "Y2K bunker supplies including 400 cans of SpaghettiOs and a shotgun"
+    },
+    {
+      "id": "370",
+      "text": "A Y2K survival guide written by someone who also sold timeshares"
+    },
+    {
+      "id": "371",
+      "text": "The IT guy who got a raise on December 31, 1999 and got fired on January 2, 2000"
+    },
+    {
+      "id": "372",
+      "text": "Midnight on January 1, 2000, when absolutely nothing happened"
+    },
+    {
+      "id": "373",
+      "text": "A generator purchased for Y2K and used exclusively for tailgating"
+    },
+    {
+      "id": "374",
+      "text": "Y2K panic converting a suburban dad into a doomsday prepper for exactly one fiscal quarter"
+    },
+    {
+      "id": "375",
+      "text": "The Y2K compliance sticker that saved Western civilization"
+    },
+    {
+      "id": "376",
+      "text": "Someone's grandfather withdrawing his entire savings in cash on December 30, 1999"
+    },
+    {
+      "id": "377",
+      "text": "A bunker full of bottled water and a profound sense of disappointment"
+    },
+    {
+      "id": "378",
+      "text": "Elizabeth Taylor's White Diamonds, the official scent of your grandmother's Cadillac"
+    },
+    {
+      "id": "379",
+      "text": "Exclamation! by Coty, for the woman who wants to smell like a statement"
+    },
+    {
+      "id": "380",
+      "text": "CK One, the gender-neutral fragrance for people who were also gender-neutral about showering"
+    },
+    {
+      "id": "381",
+      "text": "Vanilla Fields making every girl in seventh grade smell identical"
+    },
+    {
+      "id": "382",
+      "text": "Navy by Cover Girl, for the woman who wanted to smell like she had a boat"
+    },
+    {
+      "id": "383",
+      "text": "Biggie and Tupac on opposite coasts and opposite sides of a magazine rack"
+    },
+    {
+      "id": "384",
+      "text": "The East Coast-West Coast rivalry settling nothing but selling everything"
+    },
+    {
+      "id": "385",
+      "text": "Suge Knight holding Vanilla Ice over a balcony as a negotiation tactic"
+    },
+    {
+      "id": "386",
+      "text": "Death Row Records' business model being exactly what it sounds like"
+    },
+    {
+      "id": "387",
+      "text": "Bad Boy Records vs. Death Row Records: a feud measured in platinum albums and actual casualties"
+    },
+    {
+      "id": "388",
+      "text": "The Notorious B.I.G.'s crown photo being the most expensive Polaroid in hip-hop history"
+    },
+    {
+      "id": "389",
+      "text": "A Source Awards acceptance speech that doubled as a declaration of war"
+    },
+    {
+      "id": "390",
+      "text": "Snoop Dogg's murder trial somehow being the second most dramatic thing in his week"
+    },
+    {
+      "id": "391",
+      "text": "The Vibe magazine issue that required a security detail at the newsstand"
+    },
+    {
+      "id": "392",
+      "text": "Puff Daddy sampling every song ever recorded and calling it innovation"
+    },
+    {
+      "id": "393",
+      "text": "The Rachel haircut requiring more maintenance than most marriages"
+    },
+    {
+      "id": "394",
+      "text": "Ross and Rachel's 'we were on a break' argument settling nothing for an entire generation"
+    },
+    {
+      "id": "395",
+      "text": "Seinfeld's finale disappointing more people than most presidential elections"
+    },
+    {
+      "id": "396",
+      "text": "George Costanza's wallet exploding in a Seinfeld episode and in real life at every dad's chiropractor"
+    },
+    {
+      "id": "397",
+      "text": "Kramer sliding through a door and into the American psyche"
+    },
+    {
+      "id": "398",
+      "text": "The Seinfeld gang going to prison for not helping someone, which was somehow the moral of the story"
+    },
+    {
+      "id": "399",
+      "text": "A Festivus pole and the airing of grievances that followed"
+    },
+    {
+      "id": "400",
+      "text": "Carlton Banks doing the Carlton to 'It's Not Unusual' at a state funeral"
+    },
+    {
+      "id": "401",
+      "text": "The Fresh Prince's wardrobe budget exceeding the GDP of several small nations"
+    },
+    {
+      "id": "402",
+      "text": "Uncle Phil throwing Jazz out of the house for the 900th time"
+    },
+    {
+      "id": "403",
+      "text": "Dylan McKay's sideburns on Beverly Hills 90210 having their own fan club"
+    },
+    {
+      "id": "404",
+      "text": "Tori Spelling getting cast on her dad's show and nobody being allowed to mention it"
+    },
+    {
+      "id": "405",
+      "text": "The Peach Pit being the only diner in Beverly Hills where models ate cheeseburgers"
+    },
+    {
+      "id": "406",
+      "text": "Amanda Woodward slapping someone on Melrose Place as a form of greeting"
+    },
+    {
+      "id": "407",
+      "text": "Heather Locklear's hair on Melrose Place defying both gravity and narrative logic"
+    },
+    {
+      "id": "408",
+      "text": "Joey Tribbiani's acting career being the longest-running joke on Friends"
+    },
+    {
+      "id": "409",
+      "text": "The Central Perk couch that was always inexplicably available in Manhattan"
+    },
+    {
+      "id": "410",
+      "text": "Chandler Bing's job that literally nobody could identify"
+    },
+    {
+      "id": "411",
+      "text": "The 'Smelly Cat' performance that somehow wasn't the low point of Phoebe's career"
+    },
+    {
+      "id": "412",
+      "text": "Elaine Benes's dancing clearing a room faster than a fire alarm"
+    },
+    {
+      "id": "413",
+      "text": "A Demi Moore Vanity Fair cover inspiring a thousand awkward recreations"
+    },
+    {
+      "id": "414",
+      "text": "The Rolling Stone cover that ended one career and started another"
+    },
+    {
+      "id": "415",
+      "text": "Annie Leibovitz making everyone look important, even the ones who weren't"
+    },
+    {
+      "id": "416",
+      "text": "A Cosmo cover promising '47 New Ways to Please Your Man' for the 47th consecutive month"
+    },
+    {
+      "id": "417",
+      "text": "The Sports Illustrated swimsuit issue hidden between two National Geographics"
+    },
+    {
+      "id": "418",
+      "text": "Cindy Crawford on the cover of everything, simultaneously"
+    },
+    {
+      "id": "419",
+      "text": "George Clooney's People Magazine 'Sexiest Man Alive' issue being used as legal tender"
+    },
+    {
+      "id": "420",
+      "text": "A magazine subscription card falling out of every publication like confetti at a parade nobody asked for"
+    },
+    {
+      "id": "421",
+      "text": "The TV Guide Fall Preview issue being treated like scripture"
+    },
+    {
+      "id": "422",
+      "text": "An Entertainment Weekly ranking that ruined someone's Thanksgiving"
+    },
+    {
+      "id": "423",
+      "text": "Bottle service at a club that cost more than a semester of community college"
+    },
+    {
+      "id": "424",
+      "text": "A VIP room that was just a regular room with a velvet rope and a 400% markup"
+    },
+    {
+      "id": "425",
+      "text": "The Studio 54 of 1991, which was just a warehouse with a bouncer and ambition"
+    },
+    {
+      "id": "426",
+      "text": "A nightclub bathroom attendant who had seen things that would end careers"
+    },
+    {
+      "id": "427",
+      "text": "Getting past the velvet rope and realizing the other side was just more standing"
+    },
+    {
+      "id": "428",
+      "text": "A club promoter handing out flyers like they were distributing the Dead Sea Scrolls"
+    },
+    {
+      "id": "429",
+      "text": "Princess Diana's revenge dress shutting down an entire news cycle"
+    },
+    {
+      "id": "430",
+      "text": "Princess Diana shaking hands with an AIDS patient and changing the entire conversation"
+    },
+    {
+      "id": "431",
+      "text": "The paparazzi's flashbulbs following Diana like a second sun"
+    },
+    {
+      "id": "432",
+      "text": "Diana's Panorama interview mascara becoming the official mascara of emotional devastation"
+    },
+    {
+      "id": "433",
+      "text": "The entire world stopping on August 31, 1997"
+    },
+    {
+      "id": "434",
+      "text": "Elton John rewriting 'Candle in the Wind' in an afternoon and making the planet weep"
+    },
+    {
+      "id": "435",
+      "text": "A cardboard memorial outside Kensington Palace taller than the actual palace"
+    },
+    {
+      "id": "436",
+      "text": "Diana's landmine walk making a stronger political statement than most UN sessions"
+    },
+    {
+      "id": "437",
+      "text": "The sapphire engagement ring that would outlast the monarchy's approval rating"
+    },
+    {
+      "id": "438",
+      "text": "A paparazzo's telephoto lens that could read a menu from three continents away"
+    },
+    {
+      "id": "439",
+      "text": "Princess Diana on a yacht being photographed from a helicopter and calling it privacy"
+    },
+    {
+      "id": "440",
+      "text": "TMZ before TMZ existed, which was just a man with a camera and no boundaries"
+    },
+    {
+      "id": "441",
+      "text": "A tabloid photographer hiding in a dumpster for six hours to get one shot"
+    },
+    {
+      "id": "442",
+      "text": "The flashbulb that launched a thousand lawsuits"
+    },
+    {
+      "id": "443",
+      "text": "A 'Where Are They Now?' special that answered a question nobody was asking"
+    },
+    {
+      "id": "444",
+      "text": "The 'E! True Hollywood Story' narrator's voice implying that everyone was about to die"
+    },
+    {
+      "id": "445",
+      "text": "A behind-the-music descent into madness scored by a bassoon"
+    },
+    {
+      "id": "446",
+      "text": "The Access Hollywood tape that wasn't about politics yet"
+    },
+    {
+      "id": "447",
+      "text": "Entertainment Tonight's theme song announcing bad news with jazz hands"
+    },
+    {
+      "id": "448",
+      "text": "A pre-nup longer than the actual marriage"
+    },
+    {
+      "id": "449",
+      "text": "A celebrity autobiography ghostwritten by someone who clearly hated the celebrity"
+    },
+    {
+      "id": "450",
+      "text": "An autograph on a napkin from someone who turned out to be nobody"
+    },
+    {
+      "id": "451",
+      "text": "The last VHS tape Blockbuster ever rented, returned three years late"
+    },
+    {
+      "id": "452",
+      "text": "A 1-800 number for a product that solved a problem you didn't know you had"
+    },
+    {
+      "id": "453",
+      "text": "Spray-on hair for men who refused to accept what the mirror was telling them"
+    },
+    {
+      "id": "454",
+      "text": "A leopard-print everything phase that lasted exactly one holiday season"
+    },
+    {
+      "id": "455",
+      "text": "The jean jacket that survived grunge, survived rave culture, and survived your parents' divorce"
+    },
+    {
+      "id": "456",
+      "text": "A belly button ring getting infected at summer camp"
+    },
+    {
+      "id": "457",
+      "text": "Tribal tattoos on someone who belonged to no tribe"
+    },
+    {
+      "id": "458",
+      "text": "A tongue piercing that made ordering at drive-throughs a medical event"
+    },
+    {
+      "id": "459",
+      "text": "Doc Martens worn to a formal event because the 90s said that was fine"
+    },
+    {
+      "id": "460",
+      "text": "A mood ring confirming what everyone already knew: you were stressed"
+    },
+    {
+      "id": "461",
+      "text": "The Skip-It bruise on every child's ankle in 1995"
+    },
+    {
+      "id": "462",
+      "text": "A gel pen that wrote in glitter ink and was worth more than currency in fourth grade"
+    },
+    {
+      "id": "463",
+      "text": "The AOL free trial CD being used as a coaster, a frisbee, and occasionally a mirror"
+    },
+    {
+      "id": "464",
+      "text": "56k modem sounds as the unofficial anthem of waiting"
+    },
+    {
+      "id": "465",
+      "text": "A chain email threatening seven years of bad luck if you didn't forward it to ten friends"
+    },
+    {
+      "id": "466",
+      "text": "Emotional whiplash"
+    },
+    {
+      "id": "467",
+      "text": "A disposable camera from spring break with three usable photos and twelve regrets"
+    },
+    {
+      "id": "468",
+      "text": "The Spice Girls forcing every friend group to assign themselves a spice"
+    },
+    {
+      "id": "469",
+      "text": "A Limited Too shopping bag that was basically a status symbol"
+    },
+    {
+      "id": "470",
+      "text": "A 'Baby on Board' sign providing zero actual protection"
+    },
+    {
+      "id": "471",
+      "text": "The Maury Povich paternity test results envelope"
+    },
+    {
+      "id": "472",
+      "text": "Jerry Springer's final thought being the only thoughtful thing on the show"
+    },
+    {
+      "id": "473",
+      "text": "A cordless phone taken into the closet for privacy during a three-way call"
+    },
+    {
+      "id": "474",
+      "text": "Call waiting interrupting a breakup to announce that your mom needed milk"
+    },
+    {
+      "id": "475",
+      "text": "The three-way call used exclusively for espionage and betrayal"
+    },
+    {
+      "id": "476",
+      "text": "A Lunchables pizza kit that technically qualified as Italian cuisine"
+    },
+    {
+      "id": "477",
+      "text": "Dunkaroos frosting-to-cookie ratio negotiations at the lunch table"
+    },
+    {
+      "id": "478",
+      "text": "Surge soda giving an entire generation their first heart palpitation"
+    },
+    {
+      "id": "479",
+      "text": "The 'Got Milk?' mustache on someone who was clearly lactose intolerant"
+    },
+    {
+      "id": "480",
+      "text": "A trapper keeper that organized nothing but contained everything"
+    },
+    {
+      "id": "481",
+      "text": "The exact Discman skip pattern of a school bus going over a speed bump"
+    },
+    {
+      "id": "482",
+      "text": "A Book It! personal pan pizza earned through competitive literacy"
+    },
+    {
+      "id": "483",
+      "text": "The Columbia House 12-CDs-for-a-penny scam that taught an entire generation about debt"
+    },
+    {
+      "id": "484",
+      "text": "A burned CD with 'JAMS' written in Sharpie and zero actual jams"
+    },
+    {
+      "id": "485",
+      "text": "The sound of a VHS tape being rewound at Blockbuster, which was the sound of a civilization ending"
+    },
+    {
+      "id": "486",
+      "text": "Strategic cleavage"
+    },
+    {
+      "id": "487",
+      "text": "Performative grief"
+    },
+    {
+      "id": "488",
+      "text": "Competitive parenting"
+    },
+    {
+      "id": "489",
+      "text": "Reluctant fame"
+    }
+  ]
+}

@@ -39,6 +39,8 @@ const inputCode = $("input-code");
 const btnCreate = $("btn-create");
 const btnJoin = $("btn-join");
 const landingError = $("landing-error");
+const newGameBtn = $("new-game-btn");
+const deckSelect = $("deck-select");
 
 const viewLobby = $("view-lobby");
 const hostWarning = $("host-warning");
@@ -368,9 +370,14 @@ btnReady.addEventListener("click", () => {
   btnReady.disabled = true;
 });
 
+const deckUrls = {
+  "golden-girls": "https://raw.githubusercontent.com/RandyHaylor/cards-against-what/master/project/data/decks/golden-girls-cards.json",
+  "90s-fame-fashion": "https://raw.githubusercontent.com/RandyHaylor/cards-against-what/master/project/data/decks/90s-fame-fashion-cards.json",
+};
+
 btnStartGame.addEventListener("click", async () => {
   btnStartGame.disabled = true;
-  const deckResp = await fetch("https://raw.githubusercontent.com/RandyHaylor/cards-against-what/master/project/data/decks/golden-girls-cards.json");
+  const deckResp = await fetch(deckUrls[deckSelect.value]);
   const deck = await deckResp.json();
   const schemaResp = await fetch("https://raw.githubusercontent.com/RandyHaylor/cards-against-what/master/project/data/game-settings-schema.json");
   const schema = await schemaResp.json();
@@ -474,6 +481,12 @@ copyCodeBtn.addEventListener("click", () => {
 copyLinkBtn.addEventListener("click", () => {
   const url = location.origin + location.pathname + "?code=" + bridge.getLobbyCode();
   navigator.clipboard.writeText(url);
+});
+
+newGameBtn.addEventListener("click", () => {
+  showConfirm("Go to Start page in a new tab? You can continue here as well, or close this tab to leave this game. If a game is still going and you are not the game host, you can retrieve a reconnection link from the player who initiated the game.", () => {
+    window.open(location.origin + location.pathname, "_blank");
+  });
 });
 
 // Confirm dialog

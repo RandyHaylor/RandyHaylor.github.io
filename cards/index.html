@@ -16,6 +16,7 @@
       <button id="lobby-code-btn" class="lobby-code"></button>
       <button id="copy-code-btn" class="top-bar-btn">Copy Lobby Code</button>
       <button id="copy-link-btn" class="top-bar-btn">Copy Link</button>
+      <button id="new-game-btn" class="top-bar-btn">New Game</button>
     </div>
     <div id="player-icons"></div>
   </header>
@@ -48,7 +49,12 @@
   <main id="content">
     <!-- Landing -->
     <section id="view-landing">
-      <h1>Cards Against What</h1>
+      <h1>Cards Against
+        <select id="deck-select" class="title-dropdown">
+          <option value="golden-girls" selected>The Golden Girls</option>
+          <option value="90s-fame-fashion">90s Fame &amp; Fashion</option>
+        </select>
+      </h1>
       <div class="landing-form">
         <label class="field-label" for="input-name">Your Name</label>
         <input id="input-name" type="text" placeholder="Your name" maxlength="20">

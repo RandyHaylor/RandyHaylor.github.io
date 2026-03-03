@@ -1,0 +1,8 @@
+{
+  "deckId": "90s-fame-fashion",
+  "displayName": "90s Fame & Fashion",
+  "description": "Supermodels, MTV, grunge, boy bands, and Y2K panic. Frosted tips included.",
+  "cardsUrl": "https://raw.githubusercontent.com/RandyHaylor/cards-against-what/master/project/data/decks/90s-fame-fashion-cards.json",
+  "promptCount": 100,
+  "answerCount": 489
+}
