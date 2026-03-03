@@ -146,6 +146,11 @@ export const clientMachine = setup({
       on: {
         SERVER_UPDATE: [
           {
+            guard: "isGameStarted",
+            target: "picking",
+            actions: "storePlayerDoc",
+          },
+          {
             guard: "isJudgingAsPlayer",
             target: "judgingWaiting",
             actions: "storePlayerDoc",
@@ -167,6 +172,11 @@ export const clientMachine = setup({
       },
       on: {
         SERVER_UPDATE: [
+          {
+            guard: "isGameStarted",
+            target: "picking",
+            actions: "storePlayerDoc",
+          },
           {
             guard: "isResultsReceived",
             target: "postJudging",
@@ -190,6 +200,11 @@ export const clientMachine = setup({
       on: {
         WINNER_PICKED: "postJudging",
         SERVER_UPDATE: [
+          {
+            guard: "isGameStarted",
+            target: "picking",
+            actions: "storePlayerDoc",
+          },
           {
             guard: "isResultsReceived",
             target: "postJudging",

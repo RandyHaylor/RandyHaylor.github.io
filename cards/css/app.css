@@ -35,6 +35,21 @@ header {
   gap: 8px;
 }
 
+.hamburger-btn {
+  background: none;
+  border: 1px solid rgba(233, 69, 96, 0.5);
+  border-radius: 6px;
+  color: #e94560;
+  font-size: 20px;
+  padding: 4px 10px;
+  cursor: pointer;
+  line-height: 1;
+  transition: all 0.2s;
+}
+.hamburger-btn:hover {
+  background: rgba(233, 69, 96, 0.1);
+}
+
 .lobby-code {
   font-family: "JetBrains Mono", "Fira Code", monospace;
   font-size: 16px;
@@ -42,18 +57,9 @@ header {
   color: #e94560;
   background: none;
   border: none;
-  cursor: pointer;
+  cursor: default;
   padding: 6px 10px;
   letter-spacing: 1px;
-}
-
-.lobby-code.host-menu-btn {
-  border: 1px solid rgba(233, 69, 96, 0.5);
-  border-radius: 6px;
-  transition: all 0.2s;
-}
-.lobby-code.host-menu-btn:hover {
-  background: rgba(233, 69, 96, 0.1);
 }
 
 .top-bar-btn {
@@ -193,6 +199,20 @@ header {
   transition: all 0.2s;
 }
 .admin-player-row button:hover { border-color: #888; color: #e8e8f0; }
+
+.admin-btn-group {
+  display: flex;
+  gap: 6px;
+}
+
+.kick-btn {
+  border-color: rgba(233, 69, 96, 0.5) !important;
+  color: #e94560 !important;
+}
+.kick-btn:hover {
+  background: rgba(233, 69, 96, 0.15) !important;
+  border-color: #e94560 !important;
+}
 
 /* Main content */
 main {
@@ -457,6 +477,11 @@ main > section {
   border-color: #e94560;
   background: rgba(233, 69, 96, 0.08);
   box-shadow: 0 0 0 1px rgba(233, 69, 96, 0.2);
+}
+
+.pick-order {
+  color: #e94560;
+  font-weight: 800;
 }
 .hand-card.discard {
   border-color: rgba(233, 69, 96, 0.4);

@@ -17,6 +17,7 @@ const bridge = createUIBridge(createSyncController(db));
 const $ = (id) => document.getElementById(id);
 
 const topBar = $("top-bar");
+const hostMenuBtn = $("host-menu-btn");
 const lobbyCodeBtn = $("lobby-code-btn");
 const copyCodeBtn = $("copy-code-btn");
 const copyLinkBtn = $("copy-link-btn");
@@ -91,7 +92,7 @@ const finalScores = $("final-scores");
 const allViews = [viewLanding, viewLobby, viewPicking, viewSubmitted, viewJudgingWaiting, viewJudgingActive, viewPostJudging, viewNextRound, viewGameOver];
 
 // -- State --
-let selectedCard = null;
+let selectedCards = [];
 let discardCards = new Set();
 let menuOpen = false;
 let subIndex = 0;
@@ -135,11 +136,7 @@ function render(view) {
   } else {
     topBar.classList.remove("hidden");
     lobbyCodeBtn.textContent = view.lobbyCode || "";
-    if (view.isHost) {
-      lobbyCodeBtn.classList.add("host-menu-btn");
-    } else {
-      lobbyCodeBtn.classList.remove("host-menu-btn");
-    }
+    hostMenuBtn.classList.toggle("hidden", !view.isHost);
 
     // Host menu visibility
     menuStartNext.classList.toggle("hidden", view.state === "lobby");
@@ -236,6 +233,7 @@ function renderLobby(view) {
 
 function renderPicking(view) {
   promptDisplay.textContent = formatPrompt(view.currentPrompt);
+  const pick = view.currentPrompt?.pick || 1;
 
   if (view.isJudge) {
     handDisplay.innerHTML = "<p style='color:#888; text-align:center;'>You are the judge this round. Wait for submissions.</p>";
@@ -250,19 +248,29 @@ function renderPicking(view) {
     const row = document.createElement("div");
     row.className = "hand-row";
 
+    const selIndex = selectedCards.indexOf(card.id);
+    const isSelected = selIndex >= 0;
+
     const el = document.createElement("div");
     el.className = "hand-card";
-    if (selectedCard === card.id) el.classList.add("selected");
+    if (isSelected) el.classList.add("selected");
     if (discardCards.has(card.id)) el.classList.add("discard");
-    el.textContent = card.text;
     el.dataset.cardId = card.id;
+
+    if (isSelected && pick > 1) {
+      const badge = document.createElement("span");
+      badge.className = "pick-order";
+      badge.textContent = `(${selIndex + 1}) `;
+      el.appendChild(badge);
+    }
+    el.appendChild(document.createTextNode(card.text));
 
     el.addEventListener("click", () => {
       if (discardCards.has(card.id)) return;
-      if (selectedCard === card.id) {
-        selectedCard = null;
-      } else {
-        selectedCard = card.id;
+      if (isSelected) {
+        selectedCards = selectedCards.filter((id) => id !== card.id);
+      } else if (selectedCards.length < pick) {
+        selectedCards = [...selectedCards, card.id];
       }
       renderPicking(view);
     });
@@ -274,7 +282,7 @@ function renderPicking(view) {
       if (discardCards.has(card.id)) {
         discardCards.delete(card.id);
       } else {
-        if (selectedCard === card.id) selectedCard = null;
+        selectedCards = selectedCards.filter((id) => id !== card.id);
         discardCards.add(card.id);
       }
       renderPicking(view);
@@ -285,8 +293,14 @@ function renderPicking(view) {
     handDisplay.appendChild(row);
   });
 
-  discardInfo.textContent = discardCards.size > 0 ? `Discarding ${discardCards.size} card(s)` : "Tap a card to select. Tap another to flag for discard.";
-  btnSubmitAnswer.disabled = selectedCard === null;
+  if (pick > 1) {
+    discardInfo.textContent = discardCards.size > 0
+      ? `Discarding ${discardCards.size} card(s) — Pick ${selectedCards.length} / ${pick}`
+      : `Pick ${selectedCards.length} / ${pick} cards in order`;
+  } else {
+    discardInfo.textContent = discardCards.size > 0 ? `Discarding ${discardCards.size} card(s)` : "Tap a card to select. Tap X to flag for discard.";
+  }
+  btnSubmitAnswer.disabled = selectedCards.length !== pick;
 }
 
 function renderJudging(view) {
@@ -385,9 +399,9 @@ btnStartGame.addEventListener("click", async () => {
 });
 
 btnSubmitAnswer.addEventListener("click", () => {
-  if (!selectedCard) return;
-  bridge.submitAnswer(selectedCard, [...discardCards]);
-  selectedCard = null;
+  if (selectedCards.length === 0) return;
+  bridge.submitAnswer(selectedCards, [...discardCards]);
+  selectedCards = [];
   discardCards.clear();
 });
 
@@ -414,7 +428,7 @@ nrPrev.addEventListener("click", () => { if (nrIndex > 0) { nrIndex--; renderRes
 nrNext.addEventListener("click", () => { if (nrIndex < lastSubmissions.length - 1) { nrIndex++; renderResults(bridge.getView(), nextRoundMsg, nrCard, nrCounter, "nr"); } });
 btnJoinRound.addEventListener("click", () => {
   isReady = false;
-  selectedCard = null;
+  selectedCards = [];
   discardCards.clear();
   resIndex = 0;
   nrIndex = 0;
@@ -422,14 +436,13 @@ btnJoinRound.addEventListener("click", () => {
 });
 
 // Host menu
-lobbyCodeBtn.addEventListener("click", () => {
-  if (!bridge.isPlayerHost()) return;
+hostMenuBtn.addEventListener("click", () => {
   menuOpen = !menuOpen;
   hostMenu.classList.toggle("hidden", !menuOpen);
 });
 
 document.addEventListener("click", (e) => {
-  if (menuOpen && !hostMenu.contains(e.target) && e.target !== lobbyCodeBtn) {
+  if (menuOpen && !hostMenu.contains(e.target) && e.target !== hostMenuBtn) {
     menuOpen = false;
     hostMenu.classList.add("hidden");
   }
@@ -438,7 +451,9 @@ document.addEventListener("click", (e) => {
 menuStartNext.addEventListener("click", () => {
   menuOpen = false;
   hostMenu.classList.add("hidden");
-  bridge.startNextRound();
+  showConfirm("Force start the next round? This skips the current round.", () => {
+    bridge.forceNextRound();
+  });
 });
 
 menuEndGame.addEventListener("click", () => {
@@ -459,12 +474,32 @@ menuPlayerAdmin.addEventListener("click", () => {
     const row = document.createElement("div");
     row.className = "admin-player-row";
     const url = location.origin + location.pathname + "?code=" + view.lobbyCode + "&playerId=" + p.id;
-    row.innerHTML = `
-      <span>${p.name}${p.isHost ? " (host)" : ""}</span>
-      <div>
-        <button onclick="navigator.clipboard.writeText('${url}')">Copy Rejoin Link</button>
-      </div>
-    `;
+    const rejoinBtn = document.createElement("button");
+    rejoinBtn.textContent = "Copy Rejoin Link";
+    rejoinBtn.addEventListener("click", () => navigator.clipboard.writeText(url));
+
+    const btnGroup = document.createElement("div");
+    btnGroup.className = "admin-btn-group";
+    btnGroup.appendChild(rejoinBtn);
+
+    if (!p.isHost) {
+      const kickBtn = document.createElement("button");
+      kickBtn.className = "kick-btn";
+      kickBtn.textContent = "Kick";
+      kickBtn.addEventListener("click", () => {
+        playerAdminOverlay.classList.add("hidden");
+        showConfirm(`Kick ${p.name} from the game?`, () => {
+          bridge.kickPlayer(p.id);
+        });
+      });
+      btnGroup.appendChild(kickBtn);
+    }
+
+    const nameSpan = document.createElement("span");
+    nameSpan.textContent = p.name + (p.isHost ? " (host)" : "");
+
+    row.appendChild(nameSpan);
+    row.appendChild(btnGroup);
     adminPlayerList.appendChild(row);
   });
   playerAdminOverlay.classList.remove("hidden");

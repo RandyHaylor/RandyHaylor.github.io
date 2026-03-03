@@ -184,7 +184,8 @@ export function processSubmissions(players) {
     if (p.isJudge) return p;
     const submission = p.clientUpdates.submission;
     if (submission === null) return p;
-    const hand = p.hand.filter((card) => card.id !== submission);
+    const ids = Array.isArray(submission) ? submission : [submission];
+    const hand = p.hand.filter((card) => !ids.includes(card.id));
     return { ...p, hand };
   });
 }
@@ -206,12 +207,16 @@ export function assembleSubmissions(players) {
   const submissions = players
     .filter((p) => !p.isJudge && p.clientUpdates.submission !== null)
     .map((p) => {
-      const cardId = p.clientUpdates.submission;
-      const card = p.hand.find((c) => c.id === cardId);
+      const sub = p.clientUpdates.submission;
+      const ids = Array.isArray(sub) ? sub : [sub];
+      const texts = ids.map((id) => {
+        const card = p.hand.find((c) => c.id === id);
+        return card ? card.text : id;
+      });
       return {
         playerId: p.id,
         playerName: p.name,
-        card: card ? card.text : cardId,
+        card: texts.join(" + "),
       };
     });
   return shuffleArray(submissions);
@@ -255,4 +260,22 @@ export function hasPlayerWon(players, scoreToWin) {
 
 export function rotateJudgeIndex(judgeIndex, playerCount) {
   return (judgeIndex + 1) % playerCount;
+}
+
+// -- Player removal --
+
+export function removePlayer(players, playerId) {
+  const filtered = players.filter((p) => p.id !== playerId);
+  const playerList = buildPlayerList(filtered);
+  return filtered.map((p) => ({ ...p, players: playerList }));
+}
+
+export function adjustJudgeIndex(judgeIndex, players, kickedPlayerId) {
+  const kickedIndex = players.findIndex((p) => p.id === kickedPlayerId);
+  if (kickedIndex < 0) return judgeIndex;
+  const newCount = players.length - 1;
+  if (newCount === 0) return 0;
+  if (kickedIndex < judgeIndex) return judgeIndex - 1;
+  if (kickedIndex === judgeIndex) return judgeIndex % newCount;
+  return judgeIndex;
 }

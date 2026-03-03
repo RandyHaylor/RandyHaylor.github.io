@@ -8,6 +8,7 @@ import {
   pickWinner,
   startNextRound,
 } from "../player/actions.js";
+import { collectDeviceInfo } from "../deviceInfo.js";
 
 export function createUIBridge(syncController) {
   let clientActor = null;
@@ -95,6 +96,13 @@ export function createUIBridge(syncController) {
 
       actor.send({ type: "ADD_PLAYER", playerId: "1", name, isHost: true });
       syncController.writeHostPlayerDoc(lobbyCode, name);
+      syncController.createGameHistory(lobbyCode, {
+        playerId: "1",
+        name,
+        isHost: true,
+        joinedAt: Date.now(),
+        deviceInfo: collectDeviceInfo(),
+      });
 
       startClientActor();
       clientActor.send({ type: "LOBBY_CREATED", lobbyCode, playerId });
@@ -110,6 +118,14 @@ export function createUIBridge(syncController) {
       if (result.error) return result;
 
       playerId = result.playerId;
+      syncController.logPlayerMetadata(lobbyCode, {
+        playerId,
+        name: playerName,
+        isHost: false,
+        joinedAt: Date.now(),
+        deviceInfo: collectDeviceInfo(),
+      });
+
       startClientActor();
       clientActor.send({ type: "LOBBY_JOINED", lobbyCode, playerId });
       return { ok: true, playerId };
@@ -150,6 +166,16 @@ export function createUIBridge(syncController) {
 
     startNextRound() {
       startNextRound(syncController, lobbyCode, playerId);
+    },
+
+    kickPlayer(targetPlayerId) {
+      if (!serverActor) return;
+      serverActor.send({ type: "KICK_PLAYER", playerId: targetPlayerId });
+    },
+
+    forceNextRound() {
+      if (!serverActor) return;
+      serverActor.send({ type: "FORCE_NEXT_ROUND" });
     },
 
     joinNextRound() {

@@ -4,9 +4,11 @@ import {
   getDoc,
   getDocs,
   updateDoc,
+  deleteDoc,
   writeBatch,
   collection,
   onSnapshot,
+  arrayUnion,
 } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
 
 export function createSyncController(db) {
@@ -75,6 +77,31 @@ export function createSyncController(db) {
         }
       );
       return () => unsub();
+    },
+
+    createGameHistory(lobbyCode, playerMetadata) {
+      return setDoc(doc(db, "gamehistory", lobbyCode), {
+        lobbyCode,
+        createdAt: Date.now(),
+        players: [playerMetadata],
+        rounds: [],
+      });
+    },
+
+    logPlayerMetadata(lobbyCode, playerMetadata) {
+      return updateDoc(doc(db, "gamehistory", lobbyCode), {
+        players: arrayUnion(playerMetadata),
+      });
+    },
+
+    logRound(lobbyCode, roundData) {
+      return updateDoc(doc(db, "gamehistory", lobbyCode), {
+        rounds: arrayUnion(roundData),
+      });
+    },
+
+    deletePlayerDoc(lobbyCode, playerId) {
+      return deleteDoc(doc(db, "lobbies", lobbyCode, "players", playerId));
     },
 
     syncPlayerDocs(lobbyCode, players) {

@@ -22,6 +22,8 @@ import {
   setJudgedPhase,
   hasPlayerWon,
   rotateJudgeIndex,
+  removePlayer,
+  adjustJudgeIndex,
 } from "./actions.js";
 
 // TODO: Once live, any new game created also looks at existing lobby docs,
@@ -149,6 +151,37 @@ export const serverMachine = setup({
     syncPlayerDocs: ({ context }) => {
       syncAllPlayerDocs(context.syncController, context.lobbyCode, context.players);
     },
+    removePlayerFromContext: assign(({ context, event }) => ({
+      players: removePlayer(context.players, event.playerId),
+      judgeIndex: adjustJudgeIndex(context.judgeIndex, context.players, event.playerId),
+    })),
+    deleteKickedPlayerDoc: ({ context, event }) => {
+      context.syncController.deletePlayerDoc(context.lobbyCode, event.playerId);
+    },
+    incrementRoundNumber: assign({
+      roundNumber: ({ context }) => context.roundNumber + 1,
+    }),
+    logRoundToHistory: ({ context, event }) => {
+      const judge = context.players.find((p) => p.isJudge);
+      const prompt = context.players[0]?.currentPrompt || null;
+      context.syncController.logRound(context.lobbyCode, {
+        roundNumber: context.roundNumber,
+        timestamp: Date.now(),
+        prompt,
+        judgeName: judge?.name || "",
+        submissions: context.submissions.map((s) => ({
+          playerName: s.playerName,
+          playerId: s.playerId,
+          answer: s.card,
+          isWinner: s.playerId === event.winnerId,
+          selectedBy: s.playerId === event.winnerId ? (judge?.name || "") : null,
+        })),
+        scoresAfterRound: context.players.map((p) => ({
+          name: p.name,
+          score: p.score,
+        })),
+      });
+    },
   },
 }).createMachine({
   id: "server",
@@ -162,6 +195,7 @@ export const serverMachine = setup({
     deck: null,
     judgeIndex: 0,
     promptIndex: 0,
+    roundNumber: 0,
     submissions: [],
   }),
   states: {
@@ -189,7 +223,10 @@ export const serverMachine = setup({
         START_GAME: {
           guard: "allPlayersReady",
           target: "roundActive",
-          actions: ["storeSettings", "storeDeck", "dealHands", "assignJudge", "drawPromptAndStartRound", "syncPlayerDocs"],
+          actions: ["storeSettings", "storeDeck", "dealHands", "assignJudge", "incrementRoundNumber", "drawPromptAndStartRound", "syncPlayerDocs"],
+        },
+        KICK_PLAYER: {
+          actions: ["removePlayerFromContext", "deleteKickedPlayerDoc", "syncPlayerDocs"],
         },
       },
     },
@@ -212,6 +249,13 @@ export const serverMachine = setup({
             actions: ["recordSubmission", "syncPlayerDocs"],
           },
         ],
+        KICK_PLAYER: {
+          actions: ["removePlayerFromContext", "deleteKickedPlayerDoc", "syncPlayerDocs"],
+        },
+        FORCE_NEXT_ROUND: {
+          target: "roundActive",
+          actions: ["rotateJudge", "assignJudge", "incrementRoundNumber", "drawPromptAndStartRound", "syncPlayerDocs"],
+        },
       },
     },
     judging: {
@@ -225,7 +269,14 @@ export const serverMachine = setup({
       on: {
         PICK_WINNER: {
           target: "judged",
-          actions: ["awardPoint", "setJudgedPhase", "syncPlayerDocs"],
+          actions: ["awardPoint", "logRoundToHistory", "setJudgedPhase", "syncPlayerDocs"],
+        },
+        KICK_PLAYER: {
+          actions: ["removePlayerFromContext", "deleteKickedPlayerDoc", "syncPlayerDocs"],
+        },
+        FORCE_NEXT_ROUND: {
+          target: "roundActive",
+          actions: ["rotateJudge", "assignJudge", "incrementRoundNumber", "drawPromptAndStartRound", "syncPlayerDocs"],
         },
       },
     },
@@ -246,7 +297,21 @@ export const serverMachine = setup({
           },
           {
             target: "roundActive",
-            actions: ["rotateJudge", "assignJudge", "drawPromptAndStartRound", "syncPlayerDocs"],
+            actions: ["rotateJudge", "assignJudge", "incrementRoundNumber", "drawPromptAndStartRound", "syncPlayerDocs"],
+          },
+        ],
+        KICK_PLAYER: {
+          actions: ["removePlayerFromContext", "deleteKickedPlayerDoc", "syncPlayerDocs"],
+        },
+        FORCE_NEXT_ROUND: [
+          {
+            guard: "hasPlayerWon",
+            target: "gameOver",
+            actions: ["setGameOverPhase", "syncPlayerDocs"],
+          },
+          {
+            target: "roundActive",
+            actions: ["rotateJudge", "assignJudge", "incrementRoundNumber", "drawPromptAndStartRound", "syncPlayerDocs"],
           },
         ],
       },
