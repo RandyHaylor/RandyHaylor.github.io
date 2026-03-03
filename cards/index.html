@@ -4,6 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Cards Against What</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/app.css">
 </head>
 <body>
@@ -65,6 +68,7 @@
 
     <!-- Lobby -->
     <section id="view-lobby" class="hidden">
+      <div id="host-warning" class="host-warning hidden">You are the game host. Do not refresh or close this page — it will end the game for everyone!</div>
       <h2>Waiting for players...</h2>
       <div id="lobby-player-list"></div>
       <button id="btn-ready" class="action-btn">Ready</button>

@@ -101,14 +101,24 @@ export function createUIBridge(syncController) {
       return { ok: true, lobbyCode };
     },
 
-    async joinLobby(code, id, name) {
+    async joinLobby(code, name) {
       lobbyCode = code;
-      playerId = id;
       playerName = name;
       isHost = false;
 
-      const result = await joinLobby(syncController, code, id, name);
+      const result = await joinLobby(syncController, code, null, name);
       if (result.error) return result;
+
+      playerId = result.playerId;
+      startClientActor();
+      clientActor.send({ type: "LOBBY_JOINED", lobbyCode, playerId });
+      return { ok: true, playerId };
+    },
+
+    rejoinLobby(code, id) {
+      lobbyCode = code;
+      playerId = id;
+      isHost = false;
 
       startClientActor();
       clientActor.send({ type: "LOBBY_JOINED", lobbyCode, playerId });

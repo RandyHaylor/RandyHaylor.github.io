@@ -94,12 +94,14 @@ export function createSyncController(db) {
       if (!lobbySnap.exists()) {
         return { error: "Lobby not found" };
       }
-      const names = await this.getNamesForLobby(lobbyCode);
+      const playersSnap = await getDocs(collection(db, "lobbies", lobbyCode, "players"));
+      const names = playersSnap.docs.map((d) => d.data().name || "");
       if (names.some((n) => n.toLowerCase() === name.toLowerCase())) {
         return { error: "Name already taken" };
       }
-      await setDoc(doc(db, "lobbies", lobbyCode, "players", playerId), { name });
-      return { ok: true };
+      const newId = String(playersSnap.docs.length + 1);
+      await setDoc(doc(db, "lobbies", lobbyCode, "players", newId), { name });
+      return { ok: true, playerId: newId };
     },
 
     setPlayerReady(lobbyCode, playerId) {

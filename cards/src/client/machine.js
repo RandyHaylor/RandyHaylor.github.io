@@ -4,26 +4,24 @@ import { interpretServerState, buildClientView } from "./actions.js";
 export const clientMachine = setup({
   actors: {
     watchPlayerDoc: fromCallback(({ input, sendBack }) => {
-      let previousPhase = null;
       return input.syncController.watchMyDoc(input.lobbyCode, input.playerId, (doc) => {
-        sendBack({ type: "SERVER_UPDATE", playerDoc: doc, previousPhase });
-        previousPhase = doc.phase;
+        sendBack({ type: "SERVER_UPDATE", playerDoc: doc });
       });
     }),
   },
   guards: {
     isGameStarted: ({ event }) =>
-      interpretServerState(event.playerDoc, event.previousPhase).event === "GAME_STARTED",
+      interpretServerState(event.playerDoc).event === "GAME_STARTED",
     isJudgingAsJudge: ({ event }) =>
-      interpretServerState(event.playerDoc, event.previousPhase).event === "ROUND_CLOSED_AS_JUDGE",
+      interpretServerState(event.playerDoc).event === "ROUND_CLOSED_AS_JUDGE",
     isJudgingAsPlayer: ({ event }) =>
-      interpretServerState(event.playerDoc, event.previousPhase).event === "JUDGING_STARTED",
+      interpretServerState(event.playerDoc).event === "JUDGING_STARTED",
     isResultsReceived: ({ event }) =>
-      interpretServerState(event.playerDoc, event.previousPhase).event === "RESULTS_RECEIVED",
+      interpretServerState(event.playerDoc).event === "RESULTS_RECEIVED",
     isGameOver: ({ event }) =>
-      interpretServerState(event.playerDoc, event.previousPhase).event === "GAME_OVER",
+      interpretServerState(event.playerDoc).event === "GAME_OVER",
     isNewRound: ({ event }) =>
-      interpretServerState(event.playerDoc, event.previousPhase).event === "GAME_STARTED",
+      interpretServerState(event.playerDoc).event === "GAME_STARTED",
   },
   actions: {
     storePlayerDoc: assign({
@@ -77,6 +75,26 @@ export const clientMachine = setup({
       },
       on: {
         SERVER_UPDATE: [
+          {
+            guard: "isGameOver",
+            target: "gameOver",
+            actions: "storePlayerDoc",
+          },
+          {
+            guard: "isResultsReceived",
+            target: "postJudging",
+            actions: "storePlayerDoc",
+          },
+          {
+            guard: "isJudgingAsJudge",
+            target: "judgingActive",
+            actions: "storePlayerDoc",
+          },
+          {
+            guard: "isJudgingAsPlayer",
+            target: "judgingWaiting",
+            actions: "storePlayerDoc",
+          },
           {
             guard: "isGameStarted",
             target: "picking",

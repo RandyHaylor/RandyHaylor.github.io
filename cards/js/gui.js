@@ -41,6 +41,7 @@ const btnJoin = $("btn-join");
 const landingError = $("landing-error");
 
 const viewLobby = $("view-lobby");
+const hostWarning = $("host-warning");
 const lobbyPlayerList = $("lobby-player-list");
 const btnReady = $("btn-ready");
 const btnStartGame = $("btn-start-game");
@@ -123,10 +124,6 @@ function hideConfirm() {
   confirmAction = null;
 }
 
-function generatePlayerId() {
-  return "p" + Math.random().toString(36).substring(2, 8);
-}
-
 // -- Render --
 
 function render(view) {
@@ -149,7 +146,8 @@ function render(view) {
     playerIcons.innerHTML = "";
     view.players.forEach((p) => {
       const icon = document.createElement("div");
-      icon.className = "player-icon" + (p.ready ? " ready" : "") + (p.isHost ? " host" : "");
+      const isMe = p.name === view.playerName;
+      icon.className = "player-icon" + (p.ready ? " ready" : "") + (p.isHost ? " host" : "") + (isMe ? " me" : "");
       icon.textContent = p.score > 0 ? `${p.name} | ${p.score}` : p.name;
       icon.title = `${p.name}: ${p.score || 0} pts`;
       playerIcons.appendChild(icon);
@@ -211,6 +209,7 @@ function render(view) {
 }
 
 function renderLobby(view) {
+  hostWarning.classList.toggle("hidden", !view.isHost);
   lobbyPlayerList.innerHTML = "";
   view.players.forEach((p) => {
     const row = document.createElement("div");
@@ -337,6 +336,10 @@ btnCreate.addEventListener("click", async () => {
   if (result.error) {
     landingError.textContent = result.error;
     btnCreate.disabled = false;
+  } else {
+    window.addEventListener("beforeunload", (e) => {
+      e.preventDefault();
+    });
   }
 });
 
@@ -348,8 +351,10 @@ btnJoin.addEventListener("click", async () => {
   landingError.textContent = "";
   btnJoin.disabled = true;
 
-  const id = generatePlayerId();
-  const result = await bridge.joinLobby(code, id, name);
+  const result = await bridge.joinLobby(code, name);
+  if (!result.error) {
+    history.replaceState(null, "", "?code=" + code + "&playerId=" + result.playerId);
+  }
   if (result.error) {
     landingError.textContent = result.error;
     btnJoin.disabled = false;
@@ -446,7 +451,7 @@ menuPlayerAdmin.addEventListener("click", () => {
   view.players.forEach((p) => {
     const row = document.createElement("div");
     row.className = "admin-player-row";
-    const url = location.origin + location.pathname + "?code=" + view.lobbyCode;
+    const url = location.origin + location.pathname + "?code=" + view.lobbyCode + "&playerId=" + p.id;
     row.innerHTML = `
       <span>${p.name}${p.isHost ? " (host)" : ""}</span>
       <div>
@@ -485,9 +490,12 @@ inputCode.addEventListener("input", () => {
 // -- Bridge subscription --
 bridge.onViewChange(render);
 
-// -- URL params (auto-fill code) --
+// -- URL params --
 const params = new URLSearchParams(location.search);
-if (params.get("code")) {
+if (params.get("code") && params.get("playerId")) {
+  // Rejoin — skip landing, go straight into the game
+  bridge.rejoinLobby(params.get("code"), params.get("playerId"));
+} else if (params.get("code")) {
   inputCode.value = params.get("code");
   btnCreate.disabled = true;
   btnCreate.textContent = "Create Lobby (clear lobby code first)";

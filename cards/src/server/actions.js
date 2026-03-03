@@ -58,6 +58,7 @@ export function buildPlayerState(id, name, isHost) {
 
 export function buildPlayerList(players) {
   return players.map((p) => ({
+    id: p.id,
     name: p.name,
     score: p.score,
     ready: p.clientUpdates.playerReady,
