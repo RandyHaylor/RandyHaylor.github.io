@@ -11,8 +11,8 @@
   <header id="top-bar" class="hidden">
     <div id="lobby-info">
       <button id="lobby-code-btn" class="lobby-code"></button>
-      <button id="copy-code-btn" title="Copy code">📋</button>
-      <button id="copy-link-btn" title="Copy link">🔗</button>
+      <button id="copy-code-btn" class="top-bar-btn">Copy Lobby Code</button>
+      <button id="copy-link-btn" class="top-bar-btn">Copy Link</button>
     </div>
     <div id="player-icons"></div>
   </header>
@@ -47,15 +47,20 @@
     <section id="view-landing">
       <h1>Cards Against What</h1>
       <div class="landing-form">
+        <label class="field-label" for="input-name">Your Name</label>
         <input id="input-name" type="text" placeholder="Your name" maxlength="20">
         <hr class="landing-divider">
         <hr class="landing-divider">
         <button id="btn-create">Create Lobby</button>
         <hr class="landing-divider">
+        <label class="field-label" for="input-code">Lobby Code</label>
         <input id="input-code" type="text" placeholder="Lobby code" maxlength="4">
         <button id="btn-join">Join Lobby</button>
       </div>
       <p id="landing-error" class="error"></p>
+      <div class="instructions">
+        <p>Enter your name, then create a new lobby or join an existing one with a code. Share the lobby code with friends so they can join. Needs 2+ players.</p>
+      </div>
     </section>
 
     <!-- Lobby -->
@@ -64,6 +69,9 @@
       <div id="lobby-player-list"></div>
       <button id="btn-ready" class="action-btn">Ready</button>
       <button id="btn-start-game" class="action-btn hidden">Start Game</button>
+      <div class="instructions">
+        <p>Each round, one player is the judge. Everyone else picks an answer card. The judge picks their favorite. First to the target score wins!</p>
+      </div>
     </section>
 
     <!-- Picking -->

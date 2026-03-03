@@ -45,7 +45,7 @@ export const serverMachine = setup({
   },
   guards: {
     nameNotTaken: ({ context, event }) => !isNameTaken(context.players, event.name),
-    allPlayersReady: ({ context }) => allPlayersReady(context.players),
+    allPlayersReady: ({ context }) => context.players.length >= 2 && allPlayersReady(context.players),
     allNonJudgeSubmitted: ({ context, event }) => {
       const updated = recordSubmission(
         context.players, event.playerId, event.submission, event.discardRequests

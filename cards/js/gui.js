@@ -226,7 +226,7 @@ function renderLobby(view) {
   btnReady.disabled = isReady;
 
   if (view.isHost) {
-    const allReady = view.players.length > 0 && view.players.every((p) => p.ready);
+    const allReady = view.players.length >= 2 && view.players.every((p) => p.ready);
     btnStartGame.classList.toggle("hidden", !allReady);
   } else {
     btnStartGame.classList.add("hidden");
@@ -246,6 +246,9 @@ function renderPicking(view) {
   btnSubmitAnswer.classList.remove("hidden");
   handDisplay.innerHTML = "";
   view.hand.forEach((card) => {
+    const row = document.createElement("div");
+    row.className = "hand-row";
+
     const el = document.createElement("div");
     el.className = "hand-card";
     if (selectedCard === card.id) el.classList.add("selected");
@@ -254,19 +257,31 @@ function renderPicking(view) {
     el.dataset.cardId = card.id;
 
     el.addEventListener("click", () => {
+      if (discardCards.has(card.id)) return;
+      if (selectedCard === card.id) {
+        selectedCard = null;
+      } else {
+        selectedCard = card.id;
+      }
+      renderPicking(view);
+    });
+
+    const xBtn = document.createElement("button");
+    xBtn.className = "discard-btn" + (discardCards.has(card.id) ? " active" : "");
+    xBtn.textContent = "X";
+    xBtn.addEventListener("click", () => {
       if (discardCards.has(card.id)) {
         discardCards.delete(card.id);
-      } else if (selectedCard === card.id) {
-        selectedCard = null;
-      } else if (selectedCard === null) {
-        selectedCard = card.id;
       } else {
+        if (selectedCard === card.id) selectedCard = null;
         discardCards.add(card.id);
       }
       renderPicking(view);
     });
 
-    handDisplay.appendChild(el);
+    row.appendChild(el);
+    row.appendChild(xBtn);
+    handDisplay.appendChild(row);
   });
 
   discardInfo.textContent = discardCards.size > 0 ? `Discarding ${discardCards.size} card(s)` : "Tap a card to select. Tap another to flag for discard.";
@@ -460,6 +475,13 @@ copyLinkBtn.addEventListener("click", () => {
 confirmYes.addEventListener("click", () => { if (confirmAction) confirmAction(); hideConfirm(); });
 confirmNo.addEventListener("click", hideConfirm);
 
+// -- Local UI rules --
+inputCode.addEventListener("input", () => {
+  const hasCode = inputCode.value.trim().length > 0;
+  btnCreate.disabled = hasCode;
+  btnCreate.textContent = hasCode ? "Create Lobby (clear lobby code first)" : "Create Lobby";
+});
+
 // -- Bridge subscription --
 bridge.onViewChange(render);
 
@@ -467,4 +489,6 @@ bridge.onViewChange(render);
 const params = new URLSearchParams(location.search);
 if (params.get("code")) {
   inputCode.value = params.get("code");
+  btnCreate.disabled = true;
+  btnCreate.textContent = "Create Lobby (clear lobby code first)";
 }

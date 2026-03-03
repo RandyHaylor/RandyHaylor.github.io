@@ -139,9 +139,7 @@ export function createUIBridge(syncController) {
     },
 
     startNextRound() {
-      if (serverActor) {
-        startNextRound(syncController, lobbyCode, playerId);
-      }
+      startNextRound(syncController, lobbyCode, playerId);
     },
 
     joinNextRound() {
