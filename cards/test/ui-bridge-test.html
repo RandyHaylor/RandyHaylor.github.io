@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<script type="module">
+  import { createUIBridge } from "../src/client/ui-bridge.js";
+  import { createSyncController } from "../src/playerSyncController.js";
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
+  import {
+    getFirestore,
+    doc,
+    deleteDoc,
+  } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
+
+  const app = initializeApp({
+    projectId: "cardsagainstwhat",
+    appId: "1:808328792842:web:59b83499d1323cf1ff88f3",
+    apiKey: "AIzaSyBBqeRGVH08LhGl6NnTvX-J0Qr6iCnOOig",
+    authDomain: "cardsagainstwhat.firebaseapp.com",
+  });
+  const db = getFirestore(app);
+
+  let pass = 0;
+  let fail = 0;
+  function check(label, actual, expected) {
+    const a = JSON.stringify(actual);
+    const e = JSON.stringify(expected);
+    if (a === e) {
+      console.log("PASS:", label);
+      pass++;
+    } else {
+      console.log("FAIL:", label, "— got", a, "expected", e);
+      fail++;
+    }
+  }
+
+  function waitUntil(conditionFn, timeout = 5000) {
+    return new Promise((resolve, reject) => {
+      const start = Date.now();
+      const poll = async () => {
+        if (await conditionFn()) return resolve();
+        if (Date.now() - start > timeout) return reject(new Error("waitUntil timed out"));
+        setTimeout(poll, 100);
+      };
+      poll();
+    });
+  }
+
+  const deckResponse = await fetch("/data/decks/golden-girls-cards.json");
+  const testDeck = await deckResponse.json();
+  const schemaResponse = await fetch("/data/game-settings-schema.json");
+  const testSchema = await schemaResponse.json();
+
+  // === TEST 1: Host creates lobby, player joins, full game through bridge ===
+
+  const lobbyCode = "tubr";
+  await deleteDoc(doc(db, "lobbies", lobbyCode, "players", "1")).catch(() => {});
+  await deleteDoc(doc(db, "lobbies", lobbyCode, "players", "2")).catch(() => {});
+  await deleteDoc(doc(db, "lobbies", lobbyCode)).catch(() => {});
+
+  // Host creates lobby via bridge
+  const hostBridge = createUIBridge(createSyncController(db));
+  let hostViews = [];
+  hostBridge.onViewChange((view) => hostViews.push(view));
+
+  const initialView = hostBridge.getView();
+  check("initial view is landing", initialView.state, "landing");
+  check("initial view has no lobby code", initialView.lobbyCode, null);
+
+  const createResult = await hostBridge.createLobby("Dorothy", lobbyCode);
+  check("create lobby succeeds", createResult.ok, true);
+  check("host is in lobby", hostBridge.getView().state, "lobby");
+  check("host isHost", hostBridge.isPlayerHost(), true);
+  check("host lobby code", hostBridge.getLobbyCode(), lobbyCode);
+  check("host view has lobby code", hostBridge.getView().lobbyCode, lobbyCode);
+  check("host view has player name", hostBridge.getView().playerName, "Dorothy");
+
+  // Player joins via bridge
+  const playerBridge = createUIBridge(createSyncController(db));
+  let playerViews = [];
+  playerBridge.onViewChange((view) => playerViews.push(view));
+
+  const joinResult = await playerBridge.joinLobby(lobbyCode, "2", "Blanche");
+  check("join succeeds", joinResult.ok, true);
+  check("player is in lobby", playerBridge.getView().state, "lobby");
+  check("player is not host", playerBridge.isPlayerHost(), false);
+
+  // Bad code
+  const badBridge = createUIBridge(createSyncController(db));
+  const badResult = await badBridge.joinLobby("zzzz", "99", "Phil");
+  check("bad code returns error", badResult.error, "Lobby not found");
+
+  // Wait for both to see 2 players
+  await waitUntil(() => playerBridge.getView().players.length === 2);
+  check("player sees 2 players", playerBridge.getView().players.length, 2);
+
+  // Ready up via bridge
+  hostBridge.readyUp();
+  playerBridge.readyUp();
+  await waitUntil(() => {
+    const v = playerBridge.getView();
+    return v.players.length === 2 && v.players.every((p) => p.ready);
+  });
+  check("both players ready", playerBridge.getView().players.every((p) => p.ready), true);
+
+  // Start game via bridge (host only)
+  const testSettings = { handSize: 5, scoreToWin: 1 };
+  hostBridge.startGame(testDeck, testSettings, testSchema);
+
+  await waitUntil(() => playerBridge.getView().state === "picking");
+  check("player in picking", playerBridge.getView().state, "picking");
+  check("player has hand", playerBridge.getView().hand.length, 5);
+  check("player has prompt", playerBridge.getView().currentPrompt !== null, true);
+  check("player is not judge", playerBridge.getView().isJudge, false);
+
+  // Player submits via bridge
+  const hand = playerBridge.getView().hand;
+  playerBridge.submitAnswer(hand[0].id, []);
+  check("player in submitted", playerBridge.getView().state, "submitted");
+
+  // Round completes (only non-judge)
+  await waitUntil(() => playerBridge.getView().state === "judgingWaiting");
+  check("player in judgingWaiting", playerBridge.getView().state, "judgingWaiting");
+  check("player sees judge message", playerBridge.getView().message, "Dorothy is reviewing submissions.");
+
+  // Host picks winner via bridge
+  hostBridge.pickWinner("2");
+
+  await waitUntil(() => playerBridge.getView().state === "postJudging");
+  check("player in postJudging", playerBridge.getView().state, "postJudging");
+  check("player sees winner", playerBridge.getView().message, "Blanche wins this round!");
+
+  // Host starts next round — scoreToWin 1, Blanche has 1 → game over
+  hostBridge.startNextRound();
+
+  await waitUntil(() => playerBridge.getView().state === "gameOver");
+  check("player in gameOver", playerBridge.getView().state, "gameOver");
+  check("player sees game over", playerBridge.getView().message, "Blanche wins the game!");
+
+  // Verify onChange was called
+  check("host onChange fired", hostViews.length > 0, true);
+  check("player onChange fired", playerViews.length > 0, true);
+
+  hostBridge.stop();
+  playerBridge.stop();
+
+  // === TEST 2: Judge path — host as non-judge player ===
+
+  const jCode = "tubj";
+  await deleteDoc(doc(db, "lobbies", jCode, "players", "1")).catch(() => {});
+  await deleteDoc(doc(db, "lobbies", jCode, "players", "2")).catch(() => {});
+  await deleteDoc(doc(db, "lobbies", jCode)).catch(() => {});
+
+  const judgeBridge = createUIBridge(createSyncController(db));
+  await judgeBridge.createLobby("Dorothy", jCode);
+
+  const p2Bridge = createUIBridge(createSyncController(db));
+  await p2Bridge.joinLobby(jCode, "2", "Blanche");
+  await waitUntil(() => p2Bridge.getView().players.length === 2);
+
+  judgeBridge.readyUp();
+  p2Bridge.readyUp();
+  await waitUntil(() => {
+    const v = p2Bridge.getView();
+    return v.players.length === 2 && v.players.every((p) => p.ready);
+  });
+
+  judgeBridge.startGame(testDeck, { handSize: 5, scoreToWin: 2 }, testSchema);
+
+  // Round 1: Dorothy is judge, Blanche submits
+  await waitUntil(() => p2Bridge.getView().state === "picking");
+  const jHand1 = p2Bridge.getView().hand;
+  p2Bridge.submitAnswer(jHand1[0].id, []);
+
+  await waitUntil(() => p2Bridge.getView().state === "judgingWaiting");
+  judgeBridge.pickWinner("2");
+  await waitUntil(() => p2Bridge.getView().state === "postJudging");
+
+  // Round 2: Blanche is judge (rotated)
+  judgeBridge.startNextRound();
+  await waitUntil(() => p2Bridge.getView().state === "nextRoundReady");
+  check("judge path: player in nextRoundReady", p2Bridge.getView().state, "nextRoundReady");
+
+  p2Bridge.joinNextRound();
+  check("judge path: player in picking as judge", p2Bridge.getView().state, "picking");
+  check("judge path: player is judge", p2Bridge.getView().isJudge, true);
+
+  // Dorothy submits (host sends directly)
+  const dHand = judgeBridge.getServerActor().getSnapshot().context.players[0].hand;
+  judgeBridge.getServerActor().send({ type: "PLAYER_SUBMITTED", playerId: "1", submission: dHand[0].id, discardRequests: [] });
+
+  await waitUntil(() => p2Bridge.getView().state === "judgingActive");
+  check("judge path: player in judgingActive", p2Bridge.getView().state, "judgingActive");
+
+  // Blanche picks Dorothy as winner via bridge
+  p2Bridge.pickWinner("1");
+  check("judge path: player in postJudging", p2Bridge.getView().state, "postJudging");
+
+  await waitUntil(() => p2Bridge.getView().message === "Dorothy wins this round!");
+  check("judge path: sees winner", p2Bridge.getView().message, "Dorothy wins this round!");
+
+  judgeBridge.stop();
+  p2Bridge.stop();
+
+  console.log("=== Results:", pass, "passed,", fail, "failed ===");
+  if (fail === 0) console.log("ALL TESTS PASSED");
+</script>

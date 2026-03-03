@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cards Against What</title>
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+  <!-- Top bar -->
+  <header id="top-bar" class="hidden">
+    <div id="lobby-info">
+      <button id="lobby-code-btn" class="lobby-code"></button>
+      <button id="copy-code-btn" title="Copy code">📋</button>
+      <button id="copy-link-btn" title="Copy link">🔗</button>
+    </div>
+    <div id="player-icons"></div>
+  </header>
+
+  <!-- Host menu (hidden by default) -->
+  <div id="host-menu" class="hidden">
+    <button id="menu-start-next">Start Next Round</button>
+    <button id="menu-player-admin">Player Admin</button>
+    <button id="menu-end-game">End Game</button>
+  </div>
+
+  <!-- Host menu overlays -->
+  <div id="confirm-overlay" class="overlay hidden">
+    <div class="overlay-box">
+      <p id="confirm-message"></p>
+      <button id="confirm-yes">Yes</button>
+      <button id="confirm-no">No</button>
+    </div>
+  </div>
+
+  <div id="player-admin-overlay" class="overlay hidden">
+    <div class="overlay-box">
+      <h3>Player Admin</h3>
+      <div id="admin-player-list"></div>
+      <button id="admin-close">Close</button>
+    </div>
+  </div>
+
+  <!-- Main content area -->
+  <main id="content">
+    <!-- Landing -->
+    <section id="view-landing">
+      <h1>Cards Against What</h1>
+      <div class="landing-form">
+        <input id="input-name" type="text" placeholder="Your name" maxlength="20">
+        <hr class="landing-divider">
+        <hr class="landing-divider">
+        <button id="btn-create">Create Lobby</button>
+        <hr class="landing-divider">
+        <input id="input-code" type="text" placeholder="Lobby code" maxlength="4">
+        <button id="btn-join">Join Lobby</button>
+      </div>
+      <p id="landing-error" class="error"></p>
+    </section>
+
+    <!-- Lobby -->
+    <section id="view-lobby" class="hidden">
+      <h2>Waiting for players...</h2>
+      <div id="lobby-player-list"></div>
+      <button id="btn-ready" class="action-btn">Ready</button>
+      <button id="btn-start-game" class="action-btn hidden">Start Game</button>
+    </section>
+
+    <!-- Picking -->
+    <section id="view-picking" class="hidden">
+      <div id="prompt-display" class="prompt-card"></div>
+      <div id="hand-display" class="hand"></div>
+      <div id="discard-info"></div>
+      <button id="btn-submit-answer" class="action-btn" disabled>Submit</button>
+    </section>
+
+    <!-- Submitted -->
+    <section id="view-submitted" class="hidden">
+      <p class="waiting-msg">Waiting for other players...</p>
+    </section>
+
+    <!-- Judging Waiting -->
+    <section id="view-judging-waiting" class="hidden">
+      <p id="judge-waiting-msg" class="waiting-msg"></p>
+    </section>
+
+    <!-- Judging Active (judge view) -->
+    <section id="view-judging-active" class="hidden">
+      <div id="prompt-judging" class="prompt-card"></div>
+      <div id="submission-viewer">
+        <button id="sub-prev" class="nav-btn">&lt;</button>
+        <div id="sub-card" class="answer-card"></div>
+        <button id="sub-next" class="nav-btn">&gt;</button>
+      </div>
+      <p id="sub-counter"></p>
+      <button id="btn-pick-winner" class="action-btn">Pick This One</button>
+    </section>
+
+    <!-- Post Judging -->
+    <section id="view-post-judging" class="hidden">
+      <div id="prompt-result" class="prompt-card"></div>
+      <p id="result-message" class="result-msg"></p>
+      <div id="result-viewer">
+        <button id="res-prev" class="nav-btn">&lt;</button>
+        <div id="res-card" class="answer-card"></div>
+        <button id="res-next" class="nav-btn">&gt;</button>
+      </div>
+      <p id="res-counter"></p>
+      <button id="btn-next-round" class="action-btn hidden">Next Round</button>
+    </section>
+
+    <!-- Next Round Ready -->
+    <section id="view-next-round" class="hidden">
+      <div id="prompt-next-round" class="prompt-card"></div>
+      <p id="next-round-msg" class="result-msg"></p>
+      <div id="next-round-viewer">
+        <button id="nr-prev" class="nav-btn">&lt;</button>
+        <div id="nr-card" class="answer-card"></div>
+        <button id="nr-next" class="nav-btn">&gt;</button>
+      </div>
+      <p id="nr-counter"></p>
+      <button id="btn-join-round" class="action-btn">Join Next Round</button>
+    </section>
+
+    <!-- Game Over -->
+    <section id="view-game-over" class="hidden">
+      <h2 id="game-over-msg"></h2>
+      <div id="final-scores"></div>
+    </section>
+  </main>
+
+  <script type="module" src="js/gui.js"></script>
+</body>
+</html>

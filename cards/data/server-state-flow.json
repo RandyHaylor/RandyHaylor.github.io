@@ -1,0 +1,30 @@
+{
+  "id": "server",
+  "initial": "lobby",
+  "states": {
+    "lobby": {
+      "on": {
+        "GAME_STARTED": "roundActive"
+      }
+    },
+    "roundActive": {
+      "on": {
+        "ALL_SUBMITTED": "judging",
+        "ROUND_TIMER_EXPIRED": "judging"
+      }
+    },
+    "judging": {
+      "on": {
+        "WINNER_PICKED": "judged",
+        "JUDGING_TIMER_EXPIRED": "judged"
+      }
+    },
+    "judged": {
+      "on": {
+        "NEXT_ROUND": "roundActive",
+        "SCORE_REACHED": "gameOver"
+      }
+    },
+    "gameOver": {}
+  }
+}

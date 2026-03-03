@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
+  import {
+    getFirestore,
+    doc,
+    getDoc,
+    getDocs,
+    collection,
+  } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
+
+  const app = initializeApp({
+    projectId: "cardsagainstwhat",
+    appId: "1:808328792842:web:59b83499d1323cf1ff88f3",
+    apiKey: "AIzaSyBBqeRGVH08LhGl6NnTvX-J0Qr6iCnOOig",
+    authDomain: "cardsagainstwhat.firebaseapp.com",
+  });
+  const db = getFirestore(app);
+
+  const code = new URLSearchParams(location.search).get("code");
+  if (!code) {
+    console.log("Usage: inspect-lobby.html?code=XXXX");
+  } else {
+    const lobbySnap = await getDoc(doc(db, "lobbies", code));
+    console.log("=== Lobby:", code, "===");
+    console.log("Exists:", lobbySnap.exists());
+    if (lobbySnap.exists()) console.log("Data:", JSON.stringify(lobbySnap.data()));
+
+    const playersSnap = await getDocs(collection(db, "lobbies", code, "players"));
+    console.log("=== Players:", playersSnap.size, "===");
+    playersSnap.forEach((d) => {
+      console.log("Player", d.id + ":", JSON.stringify(d.data()));
+    });
+  }
+  console.log("=== Results: done ===");
+</script>

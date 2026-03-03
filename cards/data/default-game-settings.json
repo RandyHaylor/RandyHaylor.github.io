@@ -1,0 +1,10 @@
+{
+  "gameSettings": {
+    "judgeMode": "rotating",
+    "handSize": 10,
+    "scoreToWin": 7,
+    "roundTimerMin": 0,
+    "judgingTimerMin": 0,
+    "freeDiscardsPerRound": 2
+  }
+}

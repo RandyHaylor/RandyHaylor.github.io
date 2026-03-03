@@ -1,0 +1,42 @@
+{
+  "gameSettings": {
+    "judgeMode": {
+      "type": "string",
+      "default": "rotating",
+      "enum": ["rotating"]
+    },
+    "handSize": {
+      "type": "integer",
+      "default": 10,
+      "min": 1,
+      "max": 30
+    },
+    "scoreToWin": {
+      "type": "integer",
+      "default": 7,
+      "min": 1,
+      "max": 1000
+    },
+    "roundTimerMin": {
+      "type": "number",
+      "default": 0,
+      "min": 0,
+      "max": 60,
+      "description": "Minutes for players to submit. 0 = no timer."
+    },
+    "judgingTimerMin": {
+      "type": "number",
+      "default": 0,
+      "min": 0,
+      "max": 60,
+      "description": "Minutes for judge to pick winner. 0 = no timer."
+    },
+    "freeDiscardsPerRound": {
+      "type": "integer",
+      "default": 2,
+      "min": 0,
+      "max": 30,
+      "description": "Cards a player may discard and redraw per round at no cost."
+    }
+  }
+}

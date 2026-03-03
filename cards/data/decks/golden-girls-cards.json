@@ -1,0 +1,2797 @@
+{
+  "deckId": "golden-girls",
+  "prompts": [
+    {
+      "id": "1",
+      "text": [
+        "Picture it: Sicily, 1922. A young peasant girl discovers",
+        "."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "2",
+      "text": [
+        "Blanche's latest gentleman caller brought her",
+        "and she hasn't been the same since."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "3",
+      "text": [
+        "Back in St. Olaf, they have an annual festival celebrating",
+        "."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "4",
+      "text": [
+        "Dorothy finally snapped and threatened Sophia with",
+        "instead of Shady Pines."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "5",
+      "text": [
+        "Late one night, the girls found",
+        "in the refrigerator next to the cheesecake."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "6",
+      "text": [
+        "Blanche says she treats her body like a temple, but Dorothy says it's more like",
+        "."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "7",
+      "text": [
+        "The real reason Stan keeps coming back is",
+        "."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "8",
+      "text": [
+        "Rose confused everyone at the grief counseling center when she recommended",
+        "for healing."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "9",
+      "text": [
+        "Sophia's purse has been known to contain",
+        "."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "10",
+      "text": [
+        "The new neighbor moved in and immediately asked the girls about",
+        "."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "11",
+      "text": [
+        "Blanche's diary entry for last Tuesday: \"Dear Diary, you won't BELIEVE",
+        ".\""
+      ],
+      "pick": 1
+    },
+    {
+      "id": "12",
+      "text": [
+        "In St. Olaf,",
+        "is considered a sign of good luck."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "13",
+      "text": [
+        "Dorothy's substitute teaching career hit a low point when she had to explain",
+        "to a room full of teenagers."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "14",
+      "text": [
+        "At the Shady Pines talent show, Sophia won first place for",
+        "."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "15",
+      "text": [
+        "Blanche was kicked out of the country club for",
+        "."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "16",
+      "text": [
+        "Rose's St. Olaf story about",
+        "was so long that Dorothy fell asleep twice."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "17",
+      "text": [
+        "The girls' garage sale went sideways when someone tried to buy",
+        "."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "18",
+      "text": [
+        "Sophia said the secret to a long life is",
+        "and plenty of it."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "19",
+      "text": [
+        "On their trip to the Bahamas, the girls accidentally got involved in",
+        "."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "20",
+      "text": [
+        "The real reason Blanche lies about her age is",
+        "."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "21",
+      "text": [
+        "After three glasses of wine, Dorothy always starts talking about",
+        "."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "22",
+      "text": [
+        "",
+        "is what finally got Rose banned from the St. Olaf Ladies' Auxiliary."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "23",
+      "text": [
+        "Miles took Rose to a fancy restaurant, but the evening was ruined by",
+        "."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "24",
+      "text": [
+        "Sophia's \"Picture it, Sicily\" story this time was about",
+        "and nobody believed her."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "25",
+      "text": [
+        "Blanche wore",
+        "to the charity gala and stopped traffic on Collins Avenue."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "26",
+      "text": [
+        "The plumber found",
+        "lodged in the pipes and the girls all pointed at each other."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "27",
+      "text": [
+        "Stan's latest get-rich-quick scheme involves selling",
+        "door to door."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "28",
+      "text": [
+        "According to Sophia, the worst thing about getting old is",
+        "."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "29",
+      "text": [
+        "The girls entered a talent competition and performed",
+        "."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "30",
+      "text": [
+        "Dorothy caught Sophia sneaking",
+        "into the house at 2 AM."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "31",
+      "text": [
+        "In the Golden Girls household,",
+        "is always followed by cheesecake."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "32",
+      "text": [
+        "Rose thought",
+        "was a compliment."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "33",
+      "text": [
+        "Blanche has a drawer in her nightstand dedicated entirely to",
+        "."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "34",
+      "text": [
+        "The homeowners' association sent the girls a formal complaint about",
+        "."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "35",
+      "text": [
+        "What Sophia really thinks about when she says she's \"praying the rosary\":",
+        "."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "36",
+      "text": [
+        "Dorothy's online dating profile describes her as \"a tall woman who enjoys",
+        ".\""
+      ],
+      "pick": 1
+    },
+    {
+      "id": "37",
+      "text": [
+        "On the lanai, the girls discovered that",
+        "pairs surprisingly well with iced tea."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "38",
+      "text": [
+        "The reason Blanche goes through men so fast:",
+        "."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "39",
+      "text": [
+        "Rose's cousin Sven is famous in St. Olaf for",
+        "."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "40",
+      "text": [
+        "Sophia told the priest at confession about",
+        "and he needed a moment."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "41",
+      "text": [
+        "When the girls play Trivial Pursuit, things always devolve into an argument about",
+        "."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "42",
+      "text": [
+        "Blanche's idea of \"a quiet evening at home\" involves",
+        "."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "43",
+      "text": [
+        "The worst gift Dorothy ever received from Stan:",
+        "."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "44",
+      "text": [
+        "",
+        "is what they found when they cleaned under Sophia's bed."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "45",
+      "text": [
+        "In lieu of flowers, Sophia has requested",
+        "at her funeral."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "46",
+      "text": [
+        "The Miami Herald ran a story about the girls and",
+        "."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "47",
+      "text": [
+        "Rose innocently asked, \"What's",
+        "?\" and the room went silent."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "48",
+      "text": [
+        "Blanche's favorite thing about Miami:",
+        "."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "49",
+      "text": [
+        "Dorothy's deepest, darkest secret: she actually enjoys",
+        "."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "50",
+      "text": [
+        "The last time the girls had a slumber party, things got weird when someone suggested",
+        "."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "51",
+      "text": [
+        "What does Blanche keep in the bottom of her closet?"
+      ],
+      "pick": 1
+    },
+    {
+      "id": "52",
+      "text": [
+        "What really happened at the Shady Pines bingo night?"
+      ],
+      "pick": 1
+    },
+    {
+      "id": "53",
+      "text": [
+        "Why did Sophia get kicked out of the grocery store?"
+      ],
+      "pick": 1
+    },
+    {
+      "id": "54",
+      "text": [
+        "What keeps Dorothy up at night?"
+      ],
+      "pick": 1
+    },
+    {
+      "id": "55",
+      "text": [
+        "What did Rose bring back from her last trip to St. Olaf?"
+      ],
+      "pick": 1
+    },
+    {
+      "id": "56",
+      "text": [
+        "What's Blanche's safe word?"
+      ],
+      "pick": 1
+    },
+    {
+      "id": "57",
+      "text": [
+        "What did the girls find in Blanche's medicine cabinet?"
+      ],
+      "pick": 1
+    },
+    {
+      "id": "58",
+      "text": [
+        "Why was Stan crying in the driveway again?"
+      ],
+      "pick": 1
+    },
+    {
+      "id": "59",
+      "text": [
+        "What's the one thing that will make Sophia stop talking?"
+      ],
+      "pick": 1
+    },
+    {
+      "id": "60",
+      "text": [
+        "What did Dorothy confiscate from her students this week?"
+      ],
+      "pick": 1
+    },
+    {
+      "id": "61",
+      "text": [
+        "The cable guy came to fix the TV and left with",
+        "."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "62",
+      "text": [
+        "Blanche described her ideal man as \"tall, Southern, and full of",
+        ".\""
+      ],
+      "pick": 1
+    },
+    {
+      "id": "63",
+      "text": [
+        "Rose's award-winning St. Olaf casserole contains",
+        "and nobody asks questions."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "64",
+      "text": [
+        "Sophia cornered the mailman and told him all about",
+        "."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "65",
+      "text": [
+        "",
+        "is why the girls are no longer welcome at the Rusty Anchor."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "66",
+      "text": [
+        "For her birthday, Blanche only wants two things: a man and",
+        "."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "67",
+      "text": [
+        "Dorothy graded papers all night and accidentally wrote \"",
+        "\" on a student's essay."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "68",
+      "text": [
+        "The girls tried couples counseling, and the therapist quit because of",
+        "."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "69",
+      "text": [
+        "In St. Olaf, children learn about",
+        "before they learn to read."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "70",
+      "text": [
+        "Sophia's recipe for marinara sauce calls for a pinch of",
+        "."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "71",
+      "text": [
+        "The last time Blanche wore white,",
+        "happened."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "72",
+      "text": [
+        "Rose thought",
+        "was a type of fish."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "73",
+      "text": [
+        "The girls' book club fell apart over a heated debate about",
+        "."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "74",
+      "text": [
+        "",
+        "is Blanche's go-to move on a second date."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "75",
+      "text": [
+        "Sophia claims that back in Sicily,",
+        "was perfectly normal."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "76",
+      "text": [
+        "Dorothy's therapist says her biggest problem is",
+        "."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "77",
+      "text": [
+        "The girls pooled their money and invested in",
+        "."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "78",
+      "text": [
+        "When Blanche says \"I have a headache,\" she actually means",
+        "."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "79",
+      "text": [
+        "Stan showed up at the door wearing",
+        "and a hopeful expression."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "80",
+      "text": [
+        "The thing Rose misses most about Charlie:",
+        "."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "81",
+      "text": [
+        "Sophia's advice for a broken heart: \"Have some",
+        "and get over it.\""
+      ],
+      "pick": 1
+    },
+    {
+      "id": "82",
+      "text": [
+        "At the neighborhood watch meeting, the girls reported suspicious",
+        "."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "83",
+      "text": [
+        "The girls accidentally walked into",
+        "and Blanche wanted to stay."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "84",
+      "text": [
+        "Dorothy's idea of a wild Friday night:",
+        "."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "85",
+      "text": [
+        "What Blanche whispers to herself in the mirror every morning: \"",
+        ".\""
+      ],
+      "pick": 1
+    },
+    {
+      "id": "86",
+      "text": [
+        "Rose's pen pal from St. Olaf sent her",
+        "for Christmas."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "87",
+      "text": [
+        "The exterminator refused to come back after finding",
+        "in the attic."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "88",
+      "text": [
+        "Sophia bet fifty dollars that she could",
+        "faster than any of them."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "89",
+      "text": [
+        "",
+        "is what finally made Dorothy agree to a date with that weird podiatrist."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "90",
+      "text": [
+        "The girls' trip to Disney World was cut short due to",
+        "."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "91",
+      "text": [
+        "Blanche once dated a man who collected",
+        "and she looked the other way."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "92",
+      "text": [
+        "According to Rose,",
+        "is the leading cause of divorce in St. Olaf."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "93",
+      "text": [
+        "Sophia keeps",
+        "hidden inside her wicker purse."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "94",
+      "text": [
+        "The pharmacy called to say that Blanche's prescription for",
+        "was ready."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "95",
+      "text": [
+        "Dorothy found out that Stan named",
+        "as the beneficiary on his life insurance."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "96",
+      "text": [
+        "",
+        "is the reason Rose still sleeps with the lights on."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "97",
+      "text": [
+        "Blanche organized a charity auction and accidentally put",
+        "up for bidding."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "98",
+      "text": [
+        "The girls learned the hard way that",
+        "and cheesecake don't mix."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "99",
+      "text": [
+        "Sophia's dying wish is to see",
+        "one last time."
+      ],
+      "pick": 1
+    },
+    {
+      "id": "100",
+      "text": [
+        "After seven years of living together, the one thing they all agree on:",
+        "."
+      ],
+      "pick": 1
+    }
+  ],
+  "answers": [
+    {
+      "id": "1",
+      "text": "Stan's toupee"
+    },
+    {
+      "id": "2",
+      "text": "A gentleman caller with questionable intentions"
+    },
+    {
+      "id": "3",
+      "text": "Blanche's entire little black book"
+    },
+    {
+      "id": "4",
+      "text": "The ghost of Charlie Nylund"
+    },
+    {
+      "id": "5",
+      "text": "Rose's cousin Sven"
+    },
+    {
+      "id": "6",
+      "text": "Three sailors and a misunderstanding"
+    },
+    {
+      "id": "7",
+      "text": "Sophia in a mumu doing the tango"
+    },
+    {
+      "id": "8",
+      "text": "A handsome but deeply confused podiatrist"
+    },
+    {
+      "id": "9",
+      "text": "Big Daddy's disapproval"
+    },
+    {
+      "id": "10",
+      "text": "Dorothy in a backless dress"
+    },
+    {
+      "id": "11",
+      "text": "Miles in witness protection"
+    },
+    {
+      "id": "12",
+      "text": "Blanche's aerobics instructor Dirk"
+    },
+    {
+      "id": "13",
+      "text": "A young Sicilian peasant girl with ambition"
+    },
+    {
+      "id": "14",
+      "text": "Stan on his knees begging"
+    },
+    {
+      "id": "15",
+      "text": "The entire St. Olaf Men's Choir"
+    },
+    {
+      "id": "16",
+      "text": "A very forward pool boy"
+    },
+    {
+      "id": "17",
+      "text": "Sophia's friend Esther Weinstock, may she rest in peace"
+    },
+    {
+      "id": "18",
+      "text": "Dorothy's students who don't do their homework"
+    },
+    {
+      "id": "19",
+      "text": "A Southern gentleman with sweaty palms"
+    },
+    {
+      "id": "20",
+      "text": "Rose's imaginary friend from childhood"
+    },
+    {
+      "id": "21",
+      "text": "Clayton and his fiancé being fabulous"
+    },
+    {
+      "id": "22",
+      "text": "A Shady Pines orderly who means well"
+    },
+    {
+      "id": "23",
+      "text": "The priest who's heard too much"
+    },
+    {
+      "id": "24",
+      "text": "Stan's second wife, poor thing"
+    },
+    {
+      "id": "25",
+      "text": "A widow with no intention of staying one"
+    },
+    {
+      "id": "26",
+      "text": "Blanche's rival at the country club"
+    },
+    {
+      "id": "27",
+      "text": "The mailman who knows too much"
+    },
+    {
+      "id": "28",
+      "text": "Sophia's sister Angela starting trouble"
+    },
+    {
+      "id": "29",
+      "text": "Dorothy doing an impression of Sophia"
+    },
+    {
+      "id": "30",
+      "text": "That man Blanche met at the supermarket produce section"
+    },
+    {
+      "id": "31",
+      "text": "A Norwegian farmer with surprisingly soft hands"
+    },
+    {
+      "id": "32",
+      "text": "The cable repairman who never came back"
+    },
+    {
+      "id": "33",
+      "text": "Three golden girls and a bag of prunes"
+    },
+    {
+      "id": "34",
+      "text": "An auditor who fell for Blanche's Southern charm"
+    },
+    {
+      "id": "35",
+      "text": "Rose explaining intimacy to strangers"
+    },
+    {
+      "id": "36",
+      "text": "A man who claims he dated Rose in high school"
+    },
+    {
+      "id": "37",
+      "text": "Sophia threatening someone with her purse"
+    },
+    {
+      "id": "38",
+      "text": "Big Daddy after too much bourbon"
+    },
+    {
+      "id": "39",
+      "text": "Blanche pretending to be thirty-nine again"
+    },
+    {
+      "id": "40",
+      "text": "Dorothy's ex-student who became a senator"
+    },
+    {
+      "id": "41",
+      "text": "A very confused census taker"
+    },
+    {
+      "id": "42",
+      "text": "Stan's business partner, who is somehow worse"
+    },
+    {
+      "id": "43",
+      "text": "The pharmacist who recognizes Blanche by name"
+    },
+    {
+      "id": "44",
+      "text": "A group of nuns Sophia plays cards with"
+    },
+    {
+      "id": "45",
+      "text": "Rose at a cocktail party trying to tell a St. Olaf story"
+    },
+    {
+      "id": "46",
+      "text": "Dorothy stress-eating at midnight"
+    },
+    {
+      "id": "47",
+      "text": "An inappropriately young boyfriend"
+    },
+    {
+      "id": "48",
+      "text": "The neighbors who filed a noise complaint"
+    },
+    {
+      "id": "49",
+      "text": "Sophia's bookie"
+    },
+    {
+      "id": "50",
+      "text": "A devastatingly beautiful woman of a certain age"
+    },
+    {
+      "id": "51",
+      "text": "The lanai at sunset"
+    },
+    {
+      "id": "52",
+      "text": "Shady Pines after dark"
+    },
+    {
+      "id": "53",
+      "text": "Blanche's bedroom, which has a revolving door"
+    },
+    {
+      "id": "54",
+      "text": "The kitchen at 3 AM with half a cheesecake"
+    },
+    {
+      "id": "55",
+      "text": "A St. Olaf barn during mating season"
+    },
+    {
+      "id": "56",
+      "text": "The backseat of a 1978 Cadillac"
+    },
+    {
+      "id": "57",
+      "text": "A confessional booth that's heard everything"
+    },
+    {
+      "id": "58",
+      "text": "The Rusty Anchor on dollar beer night"
+    },
+    {
+      "id": "59",
+      "text": "A nudist colony in the Bahamas"
+    },
+    {
+      "id": "60",
+      "text": "Sicily, approximately 1922"
+    },
+    {
+      "id": "61",
+      "text": "The Shady Pines broom closet"
+    },
+    {
+      "id": "62",
+      "text": "A Miami Beach hotel room with a view"
+    },
+    {
+      "id": "63",
+      "text": "Blanche's walk-in closet, which tells a story"
+    },
+    {
+      "id": "64",
+      "text": "The produce aisle at Publix"
+    },
+    {
+      "id": "65",
+      "text": "A jacuzzi built for two but used by one"
+    },
+    {
+      "id": "66",
+      "text": "The back row of a church"
+    },
+    {
+      "id": "67",
+      "text": "A rest stop off I-95"
+    },
+    {
+      "id": "68",
+      "text": "A cruise ship buffet where dignity goes to die"
+    },
+    {
+      "id": "69",
+      "text": "Rose's childhood bedroom in St. Olaf"
+    },
+    {
+      "id": "70",
+      "text": "A Florida retirement community with too many secrets"
+    },
+    {
+      "id": "71",
+      "text": "The DMV, which is somehow more exciting than Dorothy's love life"
+    },
+    {
+      "id": "72",
+      "text": "A hospital waiting room where Sophia's holding court"
+    },
+    {
+      "id": "73",
+      "text": "The girls' bathroom, which has one working toilet"
+    },
+    {
+      "id": "74",
+      "text": "A Denny's parking lot at 11 PM"
+    },
+    {
+      "id": "75",
+      "text": "Blanche's porch swing, which has seen things"
+    },
+    {
+      "id": "76",
+      "text": "A bingo hall with very competitive seniors"
+    },
+    {
+      "id": "77",
+      "text": "The Miami Herald newsroom during a slow news day"
+    },
+    {
+      "id": "78",
+      "text": "A beauty parlor where gossip flows like peroxide"
+    },
+    {
+      "id": "79",
+      "text": "The unemployment office where Dorothy met her last date"
+    },
+    {
+      "id": "80",
+      "text": "Stan's one-bedroom apartment that smells like regret"
+    },
+    {
+      "id": "81",
+      "text": "A Tupperware party that went off the rails"
+    },
+    {
+      "id": "82",
+      "text": "The back pew of a church during a very long sermon"
+    },
+    {
+      "id": "83",
+      "text": "A Miami nightclub that shouldn't let in seniors but does"
+    },
+    {
+      "id": "84",
+      "text": "The check-out line at the pharmacy"
+    },
+    {
+      "id": "85",
+      "text": "An all-you-can-eat buffet in Boca Raton"
+    },
+    {
+      "id": "86",
+      "text": "A voting booth in Dade County"
+    },
+    {
+      "id": "87",
+      "text": "Sophia's secret garden, which is just a tomato plant"
+    },
+    {
+      "id": "88",
+      "text": "The garage, where Stan hides"
+    },
+    {
+      "id": "89",
+      "text": "A senior singles mixer"
+    },
+    {
+      "id": "90",
+      "text": "The emergency room, again"
+    },
+    {
+      "id": "91",
+      "text": "Industrial-strength girdle"
+    },
+    {
+      "id": "92",
+      "text": "A suspicious casserole"
+    },
+    {
+      "id": "93",
+      "text": "Cheesecake with a side of denial"
+    },
+    {
+      "id": "94",
+      "text": "Sophia's wicker purse full of surprises"
+    },
+    {
+      "id": "95",
+      "text": "A toupee that's fooling nobody"
+    },
+    {
+      "id": "96",
+      "text": "Orthopedic shoes that double as weapons"
+    },
+    {
+      "id": "97",
+      "text": "An extra-long back scratcher"
+    },
+    {
+      "id": "98",
+      "text": "A nightgown that leaves nothing to the imagination"
+    },
+    {
+      "id": "99",
+      "text": "One-ply toilet paper and broken dreams"
+    },
+    {
+      "id": "100",
+      "text": "Prune juice cocktails"
+    },
+    {
+      "id": "101",
+      "text": "A well-worn copy of Lady Chatterley's Lover"
+    },
+    {
+      "id": "102",
+      "text": "Enough perfume to fumigate a bus"
+    },
+    {
+      "id": "103",
+      "text": "Fiber supplements"
+    },
+    {
+      "id": "104",
+      "text": "Blanche's little black book (volume three)"
+    },
+    {
+      "id": "105",
+      "text": "A suspiciously large cucumber from the farmers' market"
+    },
+    {
+      "id": "106",
+      "text": "Sensible underwear"
+    },
+    {
+      "id": "107",
+      "text": "A lifetime supply of cold cream"
+    },
+    {
+      "id": "108",
+      "text": "A heating pad in a place you wouldn't expect"
+    },
+    {
+      "id": "109",
+      "text": "Stan's novelty potato opener, the Zbornie"
+    },
+    {
+      "id": "110",
+      "text": "A vigorous game of canasta that got out of hand"
+    },
+    {
+      "id": "111",
+      "text": "A St. Olaf herring that's been in the mail for a week"
+    },
+    {
+      "id": "112",
+      "text": "Sophia's homemade grappa"
+    },
+    {
+      "id": "113",
+      "text": "Denture adhesive and poor decisions"
+    },
+    {
+      "id": "114",
+      "text": "A waterbed and a hip replacement"
+    },
+    {
+      "id": "115",
+      "text": "An anonymous love letter slipped under the door"
+    },
+    {
+      "id": "116",
+      "text": "Blanche's push-up bra, doing the Lord's work"
+    },
+    {
+      "id": "117",
+      "text": "Three bottles of wine and no regrets"
+    },
+    {
+      "id": "118",
+      "text": "A sympathy card from Stan"
+    },
+    {
+      "id": "119",
+      "text": "Support hose and a sense of purpose"
+    },
+    {
+      "id": "120",
+      "text": "An expired coupon for romance"
+    },
+    {
+      "id": "121",
+      "text": "Too much rouge and not enough shame"
+    },
+    {
+      "id": "122",
+      "text": "A mystery stain on the sofa"
+    },
+    {
+      "id": "123",
+      "text": "Rose's prize-winning St. Olaf butter sculpture"
+    },
+    {
+      "id": "124",
+      "text": "Sophia's collection of funeral programs"
+    },
+    {
+      "id": "125",
+      "text": "A jar of Vicks VapoRub used recreationally"
+    },
+    {
+      "id": "126",
+      "text": "Birth control pills that expired in 1974"
+    },
+    {
+      "id": "127",
+      "text": "An enormous floral arrangement from an unknown admirer"
+    },
+    {
+      "id": "128",
+      "text": "Dorothy's lesson plans, covered in red ink and tears"
+    },
+    {
+      "id": "129",
+      "text": "Matching track suits and bad attitudes"
+    },
+    {
+      "id": "130",
+      "text": "A hot flash at the worst possible moment"
+    },
+    {
+      "id": "131",
+      "text": "Sensible shoes and surprising stamina"
+    },
+    {
+      "id": "132",
+      "text": "A fondue set and lowered expectations"
+    },
+    {
+      "id": "133",
+      "text": "Blanche's silk robe, barely tied"
+    },
+    {
+      "id": "134",
+      "text": "A strongly worded letter to the editor"
+    },
+    {
+      "id": "135",
+      "text": "A magnifying glass and a personal ad"
+    },
+    {
+      "id": "136",
+      "text": "That thing in the back of the freezer no one will claim"
+    },
+    {
+      "id": "137",
+      "text": "A subscription to a magazine nobody admits to reading"
+    },
+    {
+      "id": "138",
+      "text": "A bag of frozen peas applied strategically"
+    },
+    {
+      "id": "139",
+      "text": "Dorothy's reading glasses on a chain"
+    },
+    {
+      "id": "140",
+      "text": "Something vibrating in Blanche's nightstand"
+    },
+    {
+      "id": "141",
+      "text": "An economy-sized box of condoms that Rose bought by accident"
+    },
+    {
+      "id": "142",
+      "text": "Sophia's lucky rosary, which has seen some things"
+    },
+    {
+      "id": "143",
+      "text": "A tube top that's lost the battle with gravity"
+    },
+    {
+      "id": "144",
+      "text": "An early-bird dinner special and quiet desperation"
+    },
+    {
+      "id": "145",
+      "text": "Enough hairspray to violate the Geneva Convention"
+    },
+    {
+      "id": "146",
+      "text": "A library card that's been used as ID at a bar"
+    },
+    {
+      "id": "147",
+      "text": "Rose's herring-scented hand lotion"
+    },
+    {
+      "id": "148",
+      "text": "A juicy piece of gossip and absolutely no self-control"
+    },
+    {
+      "id": "149",
+      "text": "A second mortgage on the house"
+    },
+    {
+      "id": "150",
+      "text": "The last slice of cheesecake, and the friendship it destroyed"
+    },
+    {
+      "id": "151",
+      "text": "Stan's leisure suit from 1977"
+    },
+    {
+      "id": "152",
+      "text": "A heart-shaped box with something unexpected inside"
+    },
+    {
+      "id": "153",
+      "text": "An old photograph Sophia uses for blackmail"
+    },
+    {
+      "id": "154",
+      "text": "A get-well card with passive-aggressive undertones"
+    },
+    {
+      "id": "155",
+      "text": "Blanche's monogrammed satin pillowcases"
+    },
+    {
+      "id": "156",
+      "text": "A back brace and a can-do attitude"
+    },
+    {
+      "id": "157",
+      "text": "Pepto-Bismol and a prayer"
+    },
+    {
+      "id": "158",
+      "text": "An all-night pharmacy run of shame"
+    },
+    {
+      "id": "159",
+      "text": "Rose's hand-knitted something-or-other that nobody wants"
+    },
+    {
+      "id": "160",
+      "text": "A compromising Polaroid"
+    },
+    {
+      "id": "161",
+      "text": "Dorothy's collection of rejection letters"
+    },
+    {
+      "id": "162",
+      "text": "An alarmingly personal question at the dinner table"
+    },
+    {
+      "id": "163",
+      "text": "Sophia's emergency cannoli"
+    },
+    {
+      "id": "164",
+      "text": "A man's watch found between the couch cushions"
+    },
+    {
+      "id": "165",
+      "text": "Two-for-one coupons for the early-bird buffet"
+    },
+    {
+      "id": "166",
+      "text": "Blanche's \"vitamins\" that she takes with wine"
+    },
+    {
+      "id": "167",
+      "text": "A pamphlet about your changing body (for seniors)"
+    },
+    {
+      "id": "168",
+      "text": "Rose's St. Olaf cookbook, featuring lutefisk everything"
+    },
+    {
+      "id": "169",
+      "text": "A cane used for purposes other than walking"
+    },
+    {
+      "id": "170",
+      "text": "The security deposit they're never getting back"
+    },
+    {
+      "id": "171",
+      "text": "Sophia's stash of cash hidden in the toilet tank"
+    },
+    {
+      "id": "172",
+      "text": "A bedazzled fanny pack"
+    },
+    {
+      "id": "173",
+      "text": "Dorothy's biting sarcasm, which she considers a love language"
+    },
+    {
+      "id": "174",
+      "text": "A church bulletin used as a fan at a scandalous moment"
+    },
+    {
+      "id": "175",
+      "text": "An AARP card with someone else's birthdate"
+    },
+    {
+      "id": "176",
+      "text": "A doily covering something nobody wants to see"
+    },
+    {
+      "id": "177",
+      "text": "A mysterious prescription with no name on the bottle"
+    },
+    {
+      "id": "178",
+      "text": "Rose's collection of participation trophies"
+    },
+    {
+      "id": "179",
+      "text": "An inappropriately sheer negligee"
+    },
+    {
+      "id": "180",
+      "text": "A gravy boat full of secrets"
+    },
+    {
+      "id": "181",
+      "text": "Sneaking out to meet a man after bedtime"
+    },
+    {
+      "id": "182",
+      "text": "Lying about your age at a bar"
+    },
+    {
+      "id": "183",
+      "text": "Eating an entire cheesecake alone in the dark"
+    },
+    {
+      "id": "184",
+      "text": "Accidentally walking in on someone in the bathroom"
+    },
+    {
+      "id": "185",
+      "text": "Telling a St. Olaf story so boring it clears a room"
+    },
+    {
+      "id": "186",
+      "text": "Getting into a fistfight at a bake sale"
+    },
+    {
+      "id": "187",
+      "text": "Flirting with the doctor during a physical exam"
+    },
+    {
+      "id": "188",
+      "text": "Faking a headache to avoid book club"
+    },
+    {
+      "id": "189",
+      "text": "Accidentally sending a love letter to the wrong person"
+    },
+    {
+      "id": "190",
+      "text": "Having a hot flash during church"
+    },
+    {
+      "id": "191",
+      "text": "Waking up next to someone whose name you forgot"
+    },
+    {
+      "id": "192",
+      "text": "Getting competitive at water aerobics"
+    },
+    {
+      "id": "193",
+      "text": "Hiding the good cheesecake from Sophia"
+    },
+    {
+      "id": "194",
+      "text": "Crying in the produce section"
+    },
+    {
+      "id": "195",
+      "text": "Slow-dancing alone in the kitchen"
+    },
+    {
+      "id": "196",
+      "text": "Explaining the birds and the bees to Rose, again"
+    },
+    {
+      "id": "197",
+      "text": "Skinny-dipping at a public beach past midnight"
+    },
+    {
+      "id": "198",
+      "text": "Threatening someone with Shady Pines"
+    },
+    {
+      "id": "199",
+      "text": "Pretending to be asleep when the phone rings"
+    },
+    {
+      "id": "200",
+      "text": "Being escorted out of an all-you-can-eat buffet"
+    },
+    {
+      "id": "201",
+      "text": "Loudly discussing your love life in a waiting room"
+    },
+    {
+      "id": "202",
+      "text": "Using a senior discount on a date"
+    },
+    {
+      "id": "203",
+      "text": "Accidentally setting something on fire during a dinner party"
+    },
+    {
+      "id": "204",
+      "text": "Shoplifting a lipstick because you felt underappreciated"
+    },
+    {
+      "id": "205",
+      "text": "Telling a priest something that made him blush"
+    },
+    {
+      "id": "206",
+      "text": "Starting a rumor at the beauty parlor"
+    },
+    {
+      "id": "207",
+      "text": "Wearing something inappropriate to a funeral"
+    },
+    {
+      "id": "208",
+      "text": "Getting catfished at a senior singles event"
+    },
+    {
+      "id": "209",
+      "text": "Taking a bath so long the water goes cold twice"
+    },
+    {
+      "id": "210",
+      "text": "Aggressively flirting with the bag boy at Publix"
+    },
+    {
+      "id": "211",
+      "text": "Forging a doctor's note"
+    },
+    {
+      "id": "212",
+      "text": "Winning a dance contest out of spite"
+    },
+    {
+      "id": "213",
+      "text": "Sobbing over a soap opera and calling it \"research\""
+    },
+    {
+      "id": "214",
+      "text": "Locking yourself out while wearing only a towel"
+    },
+    {
+      "id": "215",
+      "text": "Teaching a class while deeply hungover"
+    },
+    {
+      "id": "216",
+      "text": "Falling asleep during your own story"
+    },
+    {
+      "id": "217",
+      "text": "Accidentally proposing to someone"
+    },
+    {
+      "id": "218",
+      "text": "Getting banned from a bingo hall"
+    },
+    {
+      "id": "219",
+      "text": "Bringing a date to someone else's wedding"
+    },
+    {
+      "id": "220",
+      "text": "Being mistaken for a professional escort"
+    },
+    {
+      "id": "221",
+      "text": "Organizing your medications by mood"
+    },
+    {
+      "id": "222",
+      "text": "Dramatically fainting to win an argument"
+    },
+    {
+      "id": "223",
+      "text": "Keeping a journal that should never be read aloud"
+    },
+    {
+      "id": "224",
+      "text": "Getting a tattoo after two margaritas"
+    },
+    {
+      "id": "225",
+      "text": "Gossiping about yourself to throw people off"
+    },
+    {
+      "id": "226",
+      "text": "Rearranging Blanche's furniture out of passive aggression"
+    },
+    {
+      "id": "227",
+      "text": "Challenging a stranger to arm-wrestle at brunch"
+    },
+    {
+      "id": "228",
+      "text": "Stealing the covers and blaming ghosts"
+    },
+    {
+      "id": "229",
+      "text": "Drinking directly from the wine bottle"
+    },
+    {
+      "id": "230",
+      "text": "Arguing with a mannequin because it was wearing your dress"
+    },
+    {
+      "id": "231",
+      "text": "Spending the rent money on something fabulous"
+    },
+    {
+      "id": "232",
+      "text": "Pretending you don't speak English to avoid small talk"
+    },
+    {
+      "id": "233",
+      "text": "Having a loud personal phone call in a public restroom"
+    },
+    {
+      "id": "234",
+      "text": "Accidentally showing up to the same party as your ex's new wife"
+    },
+    {
+      "id": "235",
+      "text": "Smuggling snacks into a movie theater in your girdle"
+    },
+    {
+      "id": "236",
+      "text": "Telling someone's fortune and making them cry"
+    },
+    {
+      "id": "237",
+      "text": "Seducing the competition at a charity auction"
+    },
+    {
+      "id": "238",
+      "text": "Misquoting the Bible to win an argument"
+    },
+    {
+      "id": "239",
+      "text": "Getting stuck in a bathtub and needing the fire department"
+    },
+    {
+      "id": "240",
+      "text": "Dramatically ripping up a man's phone number, then taping it back together"
+    },
+    {
+      "id": "241",
+      "text": "Practicing your acceptance speech in the mirror"
+    },
+    {
+      "id": "242",
+      "text": "Running into your gynecologist at a restaurant"
+    },
+    {
+      "id": "243",
+      "text": "Leaving a strongly worded voicemail you immediately regret"
+    },
+    {
+      "id": "244",
+      "text": "Having opinions about other people's casseroles"
+    },
+    {
+      "id": "245",
+      "text": "Hosting a séance that goes wrong"
+    },
+    {
+      "id": "246",
+      "text": "Accidentally joining a protest march"
+    },
+    {
+      "id": "247",
+      "text": "Referring to yourself in the third person during an argument"
+    },
+    {
+      "id": "248",
+      "text": "Trying on wigs at the department store with no intention of buying"
+    },
+    {
+      "id": "249",
+      "text": "Using your medical alert bracelet as a conversation starter"
+    },
+    {
+      "id": "250",
+      "text": "Getting emotionally attached to a game show host"
+    },
+    {
+      "id": "251",
+      "text": "Intercepting someone else's flower delivery"
+    },
+    {
+      "id": "252",
+      "text": "Making eye contact across a crowded pharmacy"
+    },
+    {
+      "id": "253",
+      "text": "Throwing a surprise party for yourself"
+    },
+    {
+      "id": "254",
+      "text": "Getting pulled over in a golf cart"
+    },
+    {
+      "id": "255",
+      "text": "Pretending you've read a book to impress a professor"
+    },
+    {
+      "id": "256",
+      "text": "Showing up uninvited and acting surprised"
+    },
+    {
+      "id": "257",
+      "text": "Entering a wet T-shirt contest at age seventy"
+    },
+    {
+      "id": "258",
+      "text": "Confusing a stranger's baby for a different stranger's baby"
+    },
+    {
+      "id": "259",
+      "text": "Getting locked in a department store after closing"
+    },
+    {
+      "id": "260",
+      "text": "Writing a complaint letter that becomes a love letter by paragraph three"
+    },
+    {
+      "id": "261",
+      "text": "Taking too many free samples and getting asked to leave"
+    },
+    {
+      "id": "262",
+      "text": "Accidentally becoming the president of a condo board"
+    },
+    {
+      "id": "263",
+      "text": "Having a very public meltdown at the post office"
+    },
+    {
+      "id": "264",
+      "text": "Giving unsolicited life advice to the checkout clerk"
+    },
+    {
+      "id": "265",
+      "text": "Ugly-crying during a commercial for long-distance phone plans"
+    },
+    {
+      "id": "266",
+      "text": "Sneaking a flask into church"
+    },
+    {
+      "id": "267",
+      "text": "Starting a conga line at a wake"
+    },
+    {
+      "id": "268",
+      "text": "Returning a man like a defective appliance"
+    },
+    {
+      "id": "269",
+      "text": "Doing the walk of shame in orthopedic sandals"
+    },
+    {
+      "id": "270",
+      "text": "Getting romantically competitive with your own daughter"
+    },
+    {
+      "id": "271",
+      "text": "Making a scene at a restaurant over an undercooked shrimp"
+    },
+    {
+      "id": "272",
+      "text": "Forgetting your own lie and telling the truth by accident"
+    },
+    {
+      "id": "273",
+      "text": "Having a staring contest with a cat and losing"
+    },
+    {
+      "id": "274",
+      "text": "Passive-aggressively re-folding someone else's laundry"
+    },
+    {
+      "id": "275",
+      "text": "Insisting you're fine while clearly not being fine"
+    },
+    {
+      "id": "276",
+      "text": "Leaving lipstick on a glass you'll never claim"
+    },
+    {
+      "id": "277",
+      "text": "Arguing over the thermostat for the nine hundredth time"
+    },
+    {
+      "id": "278",
+      "text": "Waking the whole house with a midnight snack"
+    },
+    {
+      "id": "279",
+      "text": "Befriending a stranger at the bus stop and knowing their whole life by the time the bus arrives"
+    },
+    {
+      "id": "280",
+      "text": "Tearing up at a grocery store display of oranges because it reminds you of Sicily"
+    },
+    {
+      "id": "281",
+      "text": "Slamming a door so hard a picture falls off the wall"
+    },
+    {
+      "id": "282",
+      "text": "Pretending to know about football to impress a man"
+    },
+    {
+      "id": "283",
+      "text": "Ordering dessert first and daring someone to comment"
+    },
+    {
+      "id": "284",
+      "text": "Starting a book club just to drink wine and judge people"
+    },
+    {
+      "id": "285",
+      "text": "Telling your daughter exactly what you think of her husband"
+    },
+    {
+      "id": "286",
+      "text": "Getting deeply invested in a neighbor's marriage problems"
+    },
+    {
+      "id": "287",
+      "text": "Clipping coupons with the intensity of a military strategist"
+    },
+    {
+      "id": "288",
+      "text": "Dancing in the living room like nobody's watching, except they are"
+    },
+    {
+      "id": "289",
+      "text": "Having a deeply inappropriate crush on a much younger man"
+    },
+    {
+      "id": "290",
+      "text": "Leaving a tip so big the waiter thinks it's a mistake"
+    },
+    {
+      "id": "291",
+      "text": "Making a casserole nobody asked for"
+    },
+    {
+      "id": "292",
+      "text": "Insisting on driving despite everyone's objections"
+    },
+    {
+      "id": "293",
+      "text": "Treating the remote control like a sacred artifact"
+    },
+    {
+      "id": "294",
+      "text": "Taking a nap that was supposed to be five minutes and waking up in a different era"
+    },
+    {
+      "id": "295",
+      "text": "Answering the door in curlers and not caring one bit"
+    },
+    {
+      "id": "296",
+      "text": "Giving a toast that veers wildly off topic"
+    },
+    {
+      "id": "297",
+      "text": "Making passive-aggressive comments about someone's cooking"
+    },
+    {
+      "id": "298",
+      "text": "Calling everyone \"honey\" because you've forgotten their actual names"
+    },
+    {
+      "id": "299",
+      "text": "Having a vivid memory that definitely didn't happen"
+    },
+    {
+      "id": "300",
+      "text": "Clutching your pearls, literally"
+    },
+    {
+      "id": "301",
+      "text": "Southern hospitality with ulterior motives"
+    },
+    {
+      "id": "302",
+      "text": "Dignity, and where it goes after midnight"
+    },
+    {
+      "id": "303",
+      "text": "A woman's prerogative to change her mind, body, and address"
+    },
+    {
+      "id": "304",
+      "text": "Plausible deniability in a silk bathrobe"
+    },
+    {
+      "id": "305",
+      "text": "The fine line between confident and delusional"
+    },
+    {
+      "id": "306",
+      "text": "A medical condition that's actually just loneliness"
+    },
+    {
+      "id": "307",
+      "text": "\"Borrowing\" a recipe and winning the bake-off"
+    },
+    {
+      "id": "308",
+      "text": "The awkward silence after someone says the wrong name in bed"
+    },
+    {
+      "id": "309",
+      "text": "Aging gracefully, but only from certain angles"
+    },
+    {
+      "id": "310",
+      "text": "What God intended when he invented the lanai"
+    },
+    {
+      "id": "311",
+      "text": "Unrealistic expectations and a push-up bra"
+    },
+    {
+      "id": "312",
+      "text": "Two words: Stan's toupee"
+    },
+    {
+      "id": "313",
+      "text": "Miami heat and bad decisions"
+    },
+    {
+      "id": "314",
+      "text": "Weaponized Southern charm"
+    },
+    {
+      "id": "315",
+      "text": "The unspoken cheesecake treaty"
+    },
+    {
+      "id": "316",
+      "text": "Being \"just friends\" with a man who has a boat"
+    },
+    {
+      "id": "317",
+      "text": "What really goes on at the senior center after dark"
+    },
+    {
+      "id": "318",
+      "text": "A love triangle where all three sides need hip replacements"
+    },
+    {
+      "id": "319",
+      "text": "Everything Rose doesn't understand about innuendo"
+    },
+    {
+      "id": "320",
+      "text": "The therapeutic power of a sarcastic remark"
+    },
+    {
+      "id": "321",
+      "text": "Being too old to care and too young to quit"
+    },
+    {
+      "id": "322",
+      "text": "A hot date with a cold compress"
+    },
+    {
+      "id": "323",
+      "text": "Emotional baggage that requires its own room"
+    },
+    {
+      "id": "324",
+      "text": "Running out of excuses and into your ex-husband"
+    },
+    {
+      "id": "325",
+      "text": "Something Sophia learned from the nuns that she shouldn't have"
+    },
+    {
+      "id": "326",
+      "text": "Dorothy's unshakable belief that she deserves better"
+    },
+    {
+      "id": "327",
+      "text": "The inappropriate thought Sophia had at mass"
+    },
+    {
+      "id": "328",
+      "text": "Rose's dangerously literal interpretation of a figure of speech"
+    },
+    {
+      "id": "329",
+      "text": "That one summer in the Catskills that nobody talks about"
+    },
+    {
+      "id": "330",
+      "text": "Dignity lost at a yard sale"
+    },
+    {
+      "id": "331",
+      "text": "A lifetime of regret and a very full wine glass"
+    },
+    {
+      "id": "332",
+      "text": "Being the last one standing at the buffet"
+    },
+    {
+      "id": "333",
+      "text": "The unspoken agreement to never mention what happened in the Bahamas"
+    },
+    {
+      "id": "334",
+      "text": "A Southern accent that thickens with every cocktail"
+    },
+    {
+      "id": "335",
+      "text": "The difference between a nightgown and a statement"
+    },
+    {
+      "id": "336",
+      "text": "Selective hearing as a lifestyle choice"
+    },
+    {
+      "id": "337",
+      "text": "A second chance at love with someone else's husband"
+    },
+    {
+      "id": "338",
+      "text": "The courage it takes to eat carbs after sixty"
+    },
+    {
+      "id": "339",
+      "text": "Sophia's iron will and iron stomach"
+    },
+    {
+      "id": "340",
+      "text": "Unrequited love and a restraining order"
+    },
+    {
+      "id": "341",
+      "text": "A very specific type of loneliness that only cheesecake cures"
+    },
+    {
+      "id": "342",
+      "text": "Accidentally becoming a cougar before the term existed"
+    },
+    {
+      "id": "343",
+      "text": "A polite Southern way to say something deeply savage"
+    },
+    {
+      "id": "344",
+      "text": "The haunting memory of a bad perm"
+    },
+    {
+      "id": "345",
+      "text": "A moment of weakness in the greeting card aisle"
+    },
+    {
+      "id": "346",
+      "text": "The terrible power of an Italian mother's guilt trip"
+    },
+    {
+      "id": "347",
+      "text": "Common sense (something Rose has never encountered)"
+    },
+    {
+      "id": "348",
+      "text": "A St. Olaf tradition that violates several health codes"
+    },
+    {
+      "id": "349",
+      "text": "The satisfaction of saying \"I told you so\" to your ex-husband"
+    },
+    {
+      "id": "350",
+      "text": "An unhealthy relationship with bread"
+    },
+    {
+      "id": "351",
+      "text": "Blanche's unshakable belief in her own magnetism"
+    },
+    {
+      "id": "352",
+      "text": "A secret so juicy it could power a gossip column for a month"
+    },
+    {
+      "id": "353",
+      "text": "The look Dorothy gives when she's done with your nonsense"
+    },
+    {
+      "id": "354",
+      "text": "A good man, theoretically"
+    },
+    {
+      "id": "355",
+      "text": "Sophia's moral flexibility"
+    },
+    {
+      "id": "356",
+      "text": "Flirting as a contact sport"
+    },
+    {
+      "id": "357",
+      "text": "The gap between expectation and reality on a first date"
+    },
+    {
+      "id": "358",
+      "text": "A compliment that's actually an insult"
+    },
+    {
+      "id": "359",
+      "text": "The audacity of showing up without cheesecake"
+    },
+    {
+      "id": "360",
+      "text": "Something only a best friend would tell you, loudly, in public"
+    },
+    {
+      "id": "361",
+      "text": "An apology that starts strong and veers into blame"
+    },
+    {
+      "id": "362",
+      "text": "The quiet rage of being put on hold"
+    },
+    {
+      "id": "363",
+      "text": "A reputation that arrives before you do"
+    },
+    {
+      "id": "364",
+      "text": "The uncomfortable truth at the bottom of a wine bottle"
+    },
+    {
+      "id": "365",
+      "text": "An evening that started with dinner and ended with bail money"
+    },
+    {
+      "id": "366",
+      "text": "Nostalgia for a version of yourself that may not have existed"
+    },
+    {
+      "id": "367",
+      "text": "Sophia's unfiltered opinion, which nobody asked for"
+    },
+    {
+      "id": "368",
+      "text": "A medical bill that costs more than Blanche's last date"
+    },
+    {
+      "id": "369",
+      "text": "The sweet release of elastic waistbands"
+    },
+    {
+      "id": "370",
+      "text": "Advice from a woman who's been married four times"
+    },
+    {
+      "id": "371",
+      "text": "A slow burn that started at the pharmacy and ended at the chapel"
+    },
+    {
+      "id": "372",
+      "text": "Being overdressed for every occasion as a personal philosophy"
+    },
+    {
+      "id": "373",
+      "text": "The passive aggression of a perfectly folded napkin"
+    },
+    {
+      "id": "374",
+      "text": "The exact wrong thing to say at Thanksgiving dinner"
+    },
+    {
+      "id": "375",
+      "text": "A friendship forged in late-night cheesecake and mutual trauma"
+    },
+    {
+      "id": "376",
+      "text": "What happens when four women share one bathroom"
+    },
+    {
+      "id": "377",
+      "text": "Rose's deeply concerning definition of \"normal\""
+    },
+    {
+      "id": "378",
+      "text": "An Italian curse word Sophia taught the grandchildren"
+    },
+    {
+      "id": "379",
+      "text": "The heartbreak of finding out your date is younger than your lipstick"
+    },
+    {
+      "id": "380",
+      "text": "Making lemonade when life gives you lemons, arthritis, and a deadbeat ex"
+    },
+    {
+      "id": "381",
+      "text": "False modesty and a plunging neckline"
+    },
+    {
+      "id": "382",
+      "text": "A retirement plan that consists entirely of hope"
+    },
+    {
+      "id": "383",
+      "text": "Something you'd only admit to your hairdresser"
+    },
+    {
+      "id": "384",
+      "text": "The emotional devastation of a discontinued shade of lipstick"
+    },
+    {
+      "id": "385",
+      "text": "A grudge held so long it has its own Social Security number"
+    },
+    {
+      "id": "386",
+      "text": "The unforgivable sin of eating the last piece of cheesecake"
+    },
+    {
+      "id": "387",
+      "text": "Sophia's recipe that includes a secret ingredient she'll take to the grave"
+    },
+    {
+      "id": "388",
+      "text": "An evening that started with intention and ended with antacids"
+    },
+    {
+      "id": "389",
+      "text": "The distinct sound of Sophia rummaging through her purse at 3 AM"
+    },
+    {
+      "id": "390",
+      "text": "Something the girls swore they'd never speak of again"
+    },
+    {
+      "id": "391",
+      "text": "A double entendre that went completely over Rose's head"
+    },
+    {
+      "id": "392",
+      "text": "The staggering confidence of a woman who's wrong about everything"
+    },
+    {
+      "id": "393",
+      "text": "Dorothy's withering stare, which has ended careers"
+    },
+    {
+      "id": "394",
+      "text": "A Southern belle's version of a threat"
+    },
+    {
+      "id": "395",
+      "text": "The fine print on a prenuptial agreement"
+    },
+    {
+      "id": "396",
+      "text": "Something Blanche learned in finishing school that she uses differently now"
+    },
+    {
+      "id": "397",
+      "text": "An annulment and a really good story"
+    },
+    {
+      "id": "398",
+      "text": "The sweet spot between classy and scandalous"
+    },
+    {
+      "id": "399",
+      "text": "A woman who has seen it all and refuses to be shocked"
+    },
+    {
+      "id": "400",
+      "text": "A coping mechanism that involves carbohydrates"
+    },
+    {
+      "id": "401",
+      "text": "The Great Herring War of 1919"
+    },
+    {
+      "id": "402",
+      "text": "St. Olaf's only traffic light, which is a suggestion"
+    },
+    {
+      "id": "403",
+      "text": "Cousin Ingmar's bird imitations, if you know what I mean"
+    },
+    {
+      "id": "404",
+      "text": "The annual St. Olaf Butter Queen pageant"
+    },
+    {
+      "id": "405",
+      "text": "A Viking funeral for a household appliance"
+    },
+    {
+      "id": "406",
+      "text": "The Lindstroms and the Johannsens and whatever they were fighting about"
+    },
+    {
+      "id": "407",
+      "text": "Lutefisk prepared the way God intended: poorly"
+    },
+    {
+      "id": "408",
+      "text": "A Norwegian proverb that makes absolutely no sense"
+    },
+    {
+      "id": "409",
+      "text": "That one time the entire town got quarantined because of a cheese incident"
+    },
+    {
+      "id": "410",
+      "text": "St. Sigmund's Day without the headless boy"
+    },
+    {
+      "id": "411",
+      "text": "The volunteer fire department, which is just one man and a bucket"
+    },
+    {
+      "id": "412",
+      "text": "A herring so old it has legal standing"
+    },
+    {
+      "id": "413",
+      "text": "St. Olaf's leading export: confusion"
+    },
+    {
+      "id": "414",
+      "text": "The year the town voted to outlaw Tuesdays"
+    },
+    {
+      "id": "415",
+      "text": "A barn dance that ended in three proposals and a livestock dispute"
+    },
+    {
+      "id": "416",
+      "text": "Sven's \"special\" egg salad"
+    },
+    {
+      "id": "417",
+      "text": "The St. Olaf phone tree, which is an actual tree with a phone nailed to it"
+    },
+    {
+      "id": "418",
+      "text": "Rose's high school yearbook quote, which was in a language no one speaks"
+    },
+    {
+      "id": "419",
+      "text": "The Scandinavian custom of screaming at cheese"
+    },
+    {
+      "id": "420",
+      "text": "A cow with a better social life than Dorothy"
+    },
+    {
+      "id": "421",
+      "text": "A Sicilian widow's revenge, served cold with pasta"
+    },
+    {
+      "id": "422",
+      "text": "The evil eye from a woman who means business"
+    },
+    {
+      "id": "423",
+      "text": "An old-world remedy involving garlic and questionable judgment"
+    },
+    {
+      "id": "424",
+      "text": "Sophia's village, where everybody knew whose husband was whose"
+    },
+    {
+      "id": "425",
+      "text": "A curse so powerful it skips a generation"
+    },
+    {
+      "id": "426",
+      "text": "The time Sophia's mother chased a man with a rolling pin"
+    },
+    {
+      "id": "427",
+      "text": "Communion wine and the woman who drank too much of it"
+    },
+    {
+      "id": "428",
+      "text": "A Sicilian donkey with more manners than Stan"
+    },
+    {
+      "id": "429",
+      "text": "Old-country justice, which is just a wooden spoon"
+    },
+    {
+      "id": "430",
+      "text": "The butcher who gave you extra meat if you let him see your ankles"
+    },
+    {
+      "id": "431",
+      "text": "A funeral that turned into a party"
+    },
+    {
+      "id": "432",
+      "text": "Sophia's first crush, who later joined the priesthood (possibly related)"
+    },
+    {
+      "id": "433",
+      "text": "A Sicilian lullaby that is actually a threat"
+    },
+    {
+      "id": "434",
+      "text": "The goat that was part of someone's dowry"
+    },
+    {
+      "id": "435",
+      "text": "Nonna's wedding advice: \"Close your eyes and think of pasta\""
+    },
+    {
+      "id": "436",
+      "text": "A confession so long the priest fell asleep"
+    },
+    {
+      "id": "437",
+      "text": "The village gossip who turned out to be right about everything"
+    },
+    {
+      "id": "438",
+      "text": "An arranged marriage that worked out better than Blanche's love life"
+    },
+    {
+      "id": "439",
+      "text": "The time Sophia stowed away on a boat"
+    },
+    {
+      "id": "440",
+      "text": "A family feud that started over a fig tree"
+    },
+    {
+      "id": "441",
+      "text": "Black widows in the family — and not the spider kind"
+    },
+    {
+      "id": "442",
+      "text": "Olive oil used for purposes beyond cooking"
+    },
+    {
+      "id": "443",
+      "text": "The matriarch who ran the village with a glance"
+    },
+    {
+      "id": "444",
+      "text": "A Saint's Day celebration that the Vatican doesn't recognize"
+    },
+    {
+      "id": "445",
+      "text": "Smuggled salami and zero regrets"
+    },
+    {
+      "id": "446",
+      "text": "An unnervingly long hug"
+    },
+    {
+      "id": "447",
+      "text": "The realization that you've become your mother"
+    },
+    {
+      "id": "448",
+      "text": "A man who looked good from across the room and worse up close"
+    },
+    {
+      "id": "449",
+      "text": "Getting a second opinion because the first one was depressing"
+    },
+    {
+      "id": "450",
+      "text": "Jazz hands at an inappropriate time"
+    },
+    {
+      "id": "451",
+      "text": "An optimistic amount of lingerie for a Tuesday"
+    },
+    {
+      "id": "452",
+      "text": "\"Accidentally\" reading someone's diary"
+    },
+    {
+      "id": "453",
+      "text": "A vow of silence broken in under four minutes"
+    },
+    {
+      "id": "454",
+      "text": "The devastating power of a well-timed eyebrow raise"
+    },
+    {
+      "id": "455",
+      "text": "A second helping of everything, including mistakes"
+    },
+    {
+      "id": "456",
+      "text": "Someone else's husband, technically"
+    },
+    {
+      "id": "457",
+      "text": "A moment of passion on a fold-out couch"
+    },
+    {
+      "id": "458",
+      "text": "A surprise party where the surprise is the cops"
+    },
+    {
+      "id": "459",
+      "text": "Knowing exactly which fork to use and not caring"
+    },
+    {
+      "id": "460",
+      "text": "The will to live, powered entirely by spite"
+    },
+    {
+      "id": "461",
+      "text": "A heated argument about thread count"
+    },
+    {
+      "id": "462",
+      "text": "One last dance, followed by one last cocktail, followed by one last dance"
+    },
+    {
+      "id": "463",
+      "text": "A misunderstanding involving a cucumber and a checkout clerk"
+    },
+    {
+      "id": "464",
+      "text": "Someone who peaked in 1962 and hasn't noticed"
+    },
+    {
+      "id": "465",
+      "text": "A secret talent that should remain secret"
+    },
+    {
+      "id": "466",
+      "text": "The exact moment the evening went from elegant to regrettable"
+    },
+    {
+      "id": "467",
+      "text": "A very spirited game of strip poker with modified rules for arthritis"
+    },
+    {
+      "id": "468",
+      "text": "Accidentally CC'ing the wrong person on a very personal email"
+    },
+    {
+      "id": "469",
+      "text": "Making a grand entrance and immediately tripping"
+    },
+    {
+      "id": "470",
+      "text": "A friendship built on mutual sarcasm and shared desserts"
+    },
+    {
+      "id": "471",
+      "text": "An uncomfortable amount of eye contact with the waiter"
+    },
+    {
+      "id": "472",
+      "text": "The look of betrayal when someone eats the last cannoli"
+    },
+    {
+      "id": "473",
+      "text": "Bringing a casserole to assert dominance"
+    },
+    {
+      "id": "474",
+      "text": "A slow clap that was meant to be sarcastic but people joined in"
+    },
+    {
+      "id": "475",
+      "text": "Everything that happened between the appetizer and the ambulance"
+    },
+    {
+      "id": "476",
+      "text": "\"This reminds me of a time back in St. Olaf...\" (everyone groans)"
+    },
+    {
+      "id": "477",
+      "text": "The uncomfortable silence after Sophia says exactly what everyone's thinking"
+    },
+    {
+      "id": "478",
+      "text": "Waking up and choosing chaos"
+    },
+    {
+      "id": "479",
+      "text": "A handshake that lingered a beat too long"
+    },
+    {
+      "id": "480",
+      "text": "An RSVP that was somehow both yes and no"
+    },
+    {
+      "id": "481",
+      "text": "The energy of a woman who has buried two husbands and is looking at a third"
+    },
+    {
+      "id": "482",
+      "text": "A eulogy that turned into a roast"
+    },
+    {
+      "id": "483",
+      "text": "A polite decline that everyone knows means \"absolutely not\""
+    },
+    {
+      "id": "484",
+      "text": "Sophia, armed and dangerous with a wooden spoon"
+    },
+    {
+      "id": "485",
+      "text": "A woman who hasn't been embarrassed since 1971"
+    },
+    {
+      "id": "486",
+      "text": "The haunting comfort of leftover cheesecake at dawn"
+    },
+    {
+      "id": "487",
+      "text": "A problem that can only be solved on the lanai with wine"
+    },
+    {
+      "id": "488",
+      "text": "Four women, one bathroom, and a broken lock"
+    },
+    {
+      "id": "489",
+      "text": "Getting the last word, which is always Sophia"
+    },
+    {
+      "id": "490",
+      "text": "A night that started with \"just one glass\" and ended with an apology"
+    },
+    {
+      "id": "491",
+      "text": "Putting on lipstick before answering the door, even for the mailman"
+    },
+    {
+      "id": "492",
+      "text": "A truth bomb delivered over breakfast"
+    },
+    {
+      "id": "493",
+      "text": "The guilty pleasure of watching someone else's date go badly"
+    },
+    {
+      "id": "494",
+      "text": "A woman scorned and a very good lawyer"
+    },
+    {
+      "id": "495",
+      "text": "Something that was clearly none of your business but you made it your business anyway"
+    },
+    {
+      "id": "496",
+      "text": "The confidence of a woman who's been told no and heard maybe"
+    },
+    {
+      "id": "497",
+      "text": "Unresolved tension and a shared appetizer"
+    },
+    {
+      "id": "498",
+      "text": "A midnight confession over cheesecake that changes everything"
+    },
+    {
+      "id": "499",
+      "text": "The four of them — together, ridiculous, and irreplaceable"
+    },
+    {
+      "id": "500",
+      "text": "An extra-large t-shirt so big it's only good as a nightshirt that reads: \"Thank you for being a friend.\""
+    }
+  ]
+}

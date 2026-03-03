@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
+  import { getFirestore, doc, setDoc, getDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
+
+  const app = initializeApp({
+    projectId: "cardsagainstwhat",
+    appId: "1:808328792842:web:59b83499d1323cf1ff88f3",
+    apiKey: "AIzaSyBBqeRGVH08LhGl6NnTvX-J0Qr6iCnOOig",
+    authDomain: "cardsagainstwhat.firebaseapp.com"
+  });
+  const db = getFirestore(app);
+
+  const ref = doc(db, "test", "ping");
+  await setDoc(ref, { alive: true, ts: Date.now() });
+  console.log("PASS: write OK");
+
+  const snap = await getDoc(ref);
+  console.log("PASS: read OK -", JSON.stringify(snap.data()));
+
+  await deleteDoc(ref);
+  console.log("PASS: cleanup OK");
+
+  console.log("ALL TESTS PASSED");
+</script>

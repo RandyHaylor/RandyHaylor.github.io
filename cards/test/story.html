@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
+  import { getFirestore, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
+  import { createLobby, joinLobby } from "../src/lobby.js";
+
+  const app = initializeApp({
+    projectId: "cardsagainstwhat",
+    appId: "1:808328792842:web:59b83499d1323cf1ff88f3",
+    apiKey: "AIzaSyBBqeRGVH08LhGl6NnTvX-J0Qr6iCnOOig",
+    authDomain: "cardsagainstwhat.firebaseapp.com"
+  });
+  const db = getFirestore(app);
+
+  const player1 = { id: "p1", name: "Dorothy" };
+  const player2 = { id: "p2", name: "Blanche" };
+  const player3 = { id: "p3", name: "Rose" };
+
+  // Chapter 1: Player one creates a lobby
+  console.log("--- Chapter 1: Create Lobby ---");
+  const lobby = await createLobby(db, player1, "golden-girls");
+  console.log("Lobby created:", lobby.code);
+
+  // Set up onSnapshot hooks for each player
+  function watchPlayer(code, player) {
+    return onSnapshot(doc(db, "lobbies", code, "players", player.id), (snap) => {
+      if (snap.exists()) {
+        console.log(`[${player.name} state changed]`, JSON.stringify(snap.data()));
+      }
+    });
+  }
+
+  const unsub1 = watchPlayer(lobby.code, player1);
+
+  // Give snapshot a moment to fire
+  await new Promise(r => setTimeout(r, 1000));
+
+  // Chapter 2: Player two joins
+  console.log("--- Chapter 2: Blanche Joins ---");
+  const unsub2 = watchPlayer(lobby.code, player2);
+  const join2 = await joinLobby(db, lobby.code, player2);
+  if (join2.ok) console.log("PASS: Blanche joined");
+  else console.log("FAIL:", join2.error);
+
+  await new Promise(r => setTimeout(r, 1000));
+
+  // Chapter 3: Player three joins
+  console.log("--- Chapter 3: Rose Joins ---");
+  const unsub3 = watchPlayer(lobby.code, player3);
+  const join3 = await joinLobby(db, lobby.code, player3);
+  if (join3.ok) console.log("PASS: Rose joined");
+  else console.log("FAIL:", join3.error);
+
+  await new Promise(r => setTimeout(r, 1000));
+
+  console.log("--- Story complete ---");
+
+  // Clean up listeners
+  unsub1();
+  unsub2();
+  unsub3();
+</script>

@@ -1,0 +1,34 @@
+{
+  "deckInfo": {
+    "deckId": {
+      "type": "string",
+      "required": true,
+      "description": "Unique identifier, matches GameCatalog reference."
+    },
+    "displayName": {
+      "type": "string",
+      "required": true,
+      "description": "Shown in deck selection UI."
+    },
+    "description": {
+      "type": "string",
+      "required": false,
+      "description": "Optional flavor text."
+    },
+    "cardsUrl": {
+      "type": "string",
+      "required": true,
+      "description": "URL to the deck cards JSON file (hosted externally)."
+    },
+    "promptCount": {
+      "type": "integer",
+      "required": true,
+      "description": "Total number of prompt (black) cards in the deck."
+    },
+    "answerCount": {
+      "type": "integer",
+      "required": true,
+      "description": "Total number of answer (white) cards in the deck."
+    }
+  }
+}

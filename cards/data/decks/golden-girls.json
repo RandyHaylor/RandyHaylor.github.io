@@ -1,0 +1,8 @@
+{
+  "deckId": "golden-girls",
+  "displayName": "Golden Girls",
+  "description": "Golden Girls theme. Innuendo-forward. Cheesecake included.",
+  "cardsUrl": "https://raw.githubusercontent.com/RandyHaylor/cards-against-what/master/project/data/decks/golden-girls-cards.json",
+  "promptCount": 100,
+  "answerCount": 500
+}

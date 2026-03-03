@@ -1,0 +1,48 @@
+{
+  "deckCards": {
+    "deckId": {
+      "type": "string",
+      "required": true,
+      "description": "Must match the corresponding deck info deckId."
+    },
+    "prompts": {
+      "type": "array",
+      "required": true,
+      "items": {
+        "id": {
+          "type": "string",
+          "required": true,
+          "description": "Stable unique ID (e.g. p001)."
+        },
+        "text": {
+          "type": "string[]",
+          "required": true,
+          "description": "Frame segments. Answers slot between segments or after the last one. Length must be between 1 and pick + 1.",
+          "minItems": 1
+        },
+        "pick": {
+          "type": "integer",
+          "required": true,
+          "description": "Number of answer cards required.",
+          "min": 1
+        }
+      }
+    },
+    "answers": {
+      "type": "array",
+      "required": true,
+      "items": {
+        "id": {
+          "type": "string",
+          "required": true,
+          "description": "Stable unique ID (e.g. a001)."
+        },
+        "text": {
+          "type": "string",
+          "required": true,
+          "description": "Answer card text."
+        }
+      }
+    }
+  }
+}

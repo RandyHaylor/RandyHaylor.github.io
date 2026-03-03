@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<script type="module">
+  import { createActor } from "https://esm.sh/xstate@5";
+  import { serverMachine } from "../src/server/machine.js";
+  import { joinLobby, setPlayerReady, submitAnswer, pickWinner, startNextRound } from "../src/player/actions.js";
+  import { createSyncController } from "../src/playerSyncController.js";
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
+  import {
+    getFirestore,
+    doc,
+    getDoc,
+    deleteDoc,
+  } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
+
+  const app = initializeApp({
+    projectId: "cardsagainstwhat",
+    appId: "1:808328792842:web:59b83499d1323cf1ff88f3",
+    apiKey: "AIzaSyBBqeRGVH08LhGl6NnTvX-J0Qr6iCnOOig",
+    authDomain: "cardsagainstwhat.firebaseapp.com",
+  });
+  const db = getFirestore(app);
+
+  let pass = 0;
+  let fail = 0;
+  function check(label, actual, expected) {
+    const a = JSON.stringify(actual);
+    const e = JSON.stringify(expected);
+    if (a === e) {
+      console.log("PASS:", label);
+      pass++;
+    } else {
+      console.log("FAIL:", label, "— got", a, "expected", e);
+      fail++;
+    }
+  }
+
+  function waitUntil(conditionFn, timeout = 5000) {
+    return new Promise((resolve, reject) => {
+      const start = Date.now();
+      const poll = async () => {
+        if (await conditionFn()) return resolve();
+        if (Date.now() - start > timeout) return reject(new Error("waitUntil timed out"));
+        setTimeout(poll, 100);
+      };
+      poll();
+    });
+  }
+
+  const lobbyCode = "t3st";
+  const deckResponse = await fetch("/data/decks/golden-girls-cards.json");
+  const testDeck = await deckResponse.json();
+  const schemaResponse = await fetch("/data/game-settings-schema.json");
+  const testSchema = await schemaResponse.json();
+  console.log("Deck loaded:", testDeck.prompts.length, "prompts,", testDeck.answers.length, "answers");
+
+  // Clean up leftover data from previous runs
+  await deleteDoc(doc(db, "lobbies", lobbyCode, "players", "1")).catch(() => {});
+  await deleteDoc(doc(db, "lobbies", lobbyCode, "players", "2")).catch(() => {});
+  await deleteDoc(doc(db, "lobbies", lobbyCode, "players", "3")).catch(() => {});
+  await deleteDoc(doc(db, "lobbies", lobbyCode, "players", "p1")).catch(() => {});
+  await deleteDoc(doc(db, "lobbies", lobbyCode, "players", "p2")).catch(() => {});
+  await deleteDoc(doc(db, "lobbies", lobbyCode, "players", "p3")).catch(() => {});
+  await deleteDoc(doc(db, "lobbies", lobbyCode)).catch(() => {});
+
+  // Dorothy creates a lobby (host sync controller)
+  const hostSync = createSyncController(db);
+  const actor = createActor(serverMachine, { input: { syncController: hostSync, deckId: "golden-girls", lobbyCode } });
+  actor.start();
+  hostSync.setServerActor(actor);
+  console.log("Lobby code:", lobbyCode);
+
+  // Dorothy is the host
+  actor.send({ type: "ADD_PLAYER", playerId: "1", name: "Dorothy", isHost: true });
+  check("Dorothy in context", actor.getSnapshot().context.players[0].name, "Dorothy");
+
+  await waitUntil(async () => (await getDoc(doc(db, "lobbies", lobbyCode))).exists());
+  check("lobby doc exists", true, true);
+
+  // Phil tries a bad code
+  const philSync = createSyncController(db);
+  const philResult = await joinLobby(philSync, "zzzz", "99", "Phil");
+  check("Phil gets error for bad code", philResult.error, "Lobby not found");
+
+  // Blanche joins
+  const blancheSync = createSyncController(db);
+  let blancheState = null;
+  const unsubBlanche = blancheSync.watchMyDoc(lobbyCode, "2", (data) => {
+    blancheState = data;
+    console.log("Blanche sees:", JSON.stringify(blancheState));
+  });
+
+  await joinLobby(blancheSync, lobbyCode, "2", "Blanche");
+  await waitUntil(() => blancheState?.players?.length === 2);
+
+  check("Blanche sees 2 players", blancheState.players, [
+    { name: "Dorothy", score: 0, ready: false, isHost: true },
+    { name: "Blanche", score: 0, ready: false, isHost: false },
+  ]);
+
+  // Rose joins
+  const roseSync = createSyncController(db);
+  let roseState = null;
+  const unsubRose = roseSync.watchMyDoc(lobbyCode, "3", (data) => {
+    roseState = data;
+    console.log("Rose sees:", JSON.stringify(roseState));
+  });
+
+  await joinLobby(roseSync, lobbyCode, "3", "Rose");
+  await waitUntil(() => roseState?.players?.length === 3);
+  await waitUntil(() => blancheState?.players?.length === 3);
+
+  const allThreeNotReady = [
+    { name: "Dorothy", score: 0, ready: false, isHost: true },
+    { name: "Blanche", score: 0, ready: false, isHost: false },
+    { name: "Rose", score: 0, ready: false, isHost: false },
+  ];
+  check("all 3 not ready", blancheState.players, allThreeNotReady);
+
+  // Dorothy readies up (host — sync controller has server actor)
+  setPlayerReady(hostSync, lobbyCode, "1");
+  await waitUntil(() => blancheState?.players?.[0]?.ready === true);
+
+  check("Dorothy ready in Blanche's view", blancheState.players[0].ready, true);
+  check("Blanche still not ready", blancheState.players[1].ready, false);
+
+  // Blanche readies up (non-host — sync controller writes to Firestore)
+  setPlayerReady(blancheSync, lobbyCode, "2");
+  await waitUntil(() => roseState?.players?.[1]?.ready === true);
+
+  check("Blanche ready in Rose's view", roseState.players[1].ready, true);
+  check("Dorothy still ready", roseState.players[0].ready, true);
+  check("Rose still not ready", roseState.players[2].ready, false);
+
+  // START_GAME should fail — Rose isn't ready yet
+  actor.send({ type: "START_GAME" });
+  check("still in lobby (not all ready)", actor.getSnapshot().value, "lobby");
+
+  // Rose readies up (non-host — via Firestore)
+  setPlayerReady(roseSync, lobbyCode, "3");
+  await waitUntil(() => blancheState?.players?.[2]?.ready === true);
+
+  check("Rose ready in Blanche's view", blancheState.players[2].ready, true);
+
+  // All players ready — START_GAME should transition
+  const testSettings = { handSize: 5, scoreToWin: 7 };
+  actor.send({ type: "START_GAME", deck: testDeck, settings: testSettings, schema: testSchema });
+  check("transitioned to roundActive", actor.getSnapshot().value, "roundActive");
+
+  const ctx = actor.getSnapshot().context;
+  check("settings stored", ctx.settings.handSize, 5);
+  check("settings validated — scoreToWin", ctx.settings.scoreToWin, 7);
+  check("settings defaults filled in", ctx.settings.freeDiscardsPerRound, 2);
+  check("settings defaults — judgeMode", ctx.settings.judgeMode, "rotating");
+  check("Dorothy has 5 cards", ctx.players[0].hand.length, 5);
+  check("Blanche has 5 cards", ctx.players[1].hand.length, 5);
+  check("Rose has 5 cards", ctx.players[2].hand.length, 5);
+  check("Dorothy is judge (first player)", ctx.players[0].isJudge, true);
+  check("Blanche is not judge", ctx.players[1].isJudge, false);
+  check("all players have a prompt", ctx.players.every(p => p.currentPrompt !== null), true);
+  check("prompt has text array", Array.isArray(ctx.players[0].currentPrompt.text), true);
+  check("prompt has pick count", ctx.players[0].currentPrompt.pick, 1);
+  check("phase is round-active", ctx.players[0].phase, "round-active");
+  check("clientUpdates reset", ctx.players[0].clientUpdates.playerReady, false);
+
+  // Wait for Firestore sync of round-active state
+  await waitUntil(() => blancheState?.phase === "round-active");
+  check("Blanche sees round-active phase", blancheState.phase, "round-active");
+  check("Blanche has a hand", blancheState.hand.length, 5);
+  check("Blanche sees a prompt", blancheState.currentPrompt !== null, true);
+  check("Blanche prompt is structured", Array.isArray(blancheState.currentPrompt.text), true);
+
+  // === ROUND ACTIVE: Submissions ===
+
+  // Blanche submits an answer (non-host — via Firestore)
+  const blancheHand = ctx.players[1].hand;
+  submitAnswer(blancheSync, lobbyCode, "2", blancheHand[0].id, []);
+
+  // Should still be in roundActive — Rose hasn't submitted
+  await waitUntil(() => {
+    const s = actor.getSnapshot();
+    return s.context.players[1].clientUpdates.submission !== null;
+  });
+  check("still in roundActive after 1 submission", actor.getSnapshot().value, "roundActive");
+  check("Blanche shows ready (submitted)", actor.getSnapshot().context.players[1].players[1].ready, true);
+  check("Rose not ready yet", actor.getSnapshot().context.players[1].players[2].ready, false);
+
+  // Rose submits (non-host — via Firestore), with a discard
+  const roseHand = ctx.players[2].hand;
+  submitAnswer(roseSync, lobbyCode, "3", roseHand[0].id, [roseHand[1].id]);
+
+  await waitUntil(() => actor.getSnapshot().value === "judging");
+  check("transitioned to judging", actor.getSnapshot().value, "judging");
+
+  const judgingCtx = actor.getSnapshot().context;
+  check("submissions assembled", judgingCtx.submissions.length, 2);
+  check("Blanche still has 5 cards (submitted removed, topped up)", judgingCtx.players[1].hand.length, 5);
+  check("Rose has 5 cards (submitted + discard removed, topped up)", judgingCtx.players[2].hand.length, 5);
+  check("Dorothy hand unchanged (judge)", judgingCtx.players[0].hand.length, 5);
+  check("phase is judging", judgingCtx.players[0].phase, "judging");
+
+  // Wait for Firestore sync
+  await waitUntil(() => blancheState?.phase === "judging");
+  check("Blanche sees judging phase", blancheState.phase, "judging");
+  check("Blanche sees judge message", blancheState.message, "Dorothy is reviewing submissions.");
+
+  // === JUDGING: Dorothy picks a winner ===
+
+  const winnerId = judgingCtx.submissions[0].playerId;
+  const winnerName = judgingCtx.submissions[0].playerName;
+
+  // Dorothy is host/judge — pick winner goes directly to server actor
+  pickWinner(hostSync, lobbyCode, "1", winnerId);
+
+  check("transitioned to judged", actor.getSnapshot().value, "judged");
+  const judgedCtx = actor.getSnapshot().context;
+  const winner = judgedCtx.players.find((p) => p.id === winnerId);
+  check("winner got a point", winner.score, 1);
+  check("phase is judged", judgedCtx.players[0].phase, "judged");
+  check("message announces winner", judgedCtx.players[0].message, `${winnerName} wins this round!`);
+  check("scores updated in player list", judgedCtx.players[0].players.find((p) => p.name === winnerName).score, 1);
+
+  // Wait for Firestore sync of judged state
+  await waitUntil(() => blancheState?.phase === "judged");
+  check("Blanche sees judged phase", blancheState.phase, "judged");
+  check("Blanche sees winner message", blancheState.message, `${winnerName} wins this round!`);
+
+  // === JUDGED: Dorothy starts next round ===
+
+  startNextRound(hostSync, lobbyCode, "1");
+
+  check("transitioned back to roundActive", actor.getSnapshot().value, "roundActive");
+  const round2Ctx = actor.getSnapshot().context;
+  check("judge rotated to Blanche", round2Ctx.players[1].isJudge, true);
+  check("Dorothy no longer judge", round2Ctx.players[0].isJudge, false);
+  check("phase is round-active again", round2Ctx.players[0].phase, "round-active");
+  check("new prompt drawn", round2Ctx.promptIndex, 2);
+  check("clientUpdates reset for round 2", round2Ctx.players[0].clientUpdates.playerReady, false);
+  check("hands still 5 cards each", round2Ctx.players.every((p) => p.hand.length === 5), true);
+
+  // Wait for Firestore sync of round 2
+  await waitUntil(() => blancheState?.phase === "round-active" && blancheState?.isJudge === true);
+  check("Blanche sees she is judge", blancheState.isJudge, true);
+
+  unsubBlanche();
+  unsubRose();
+  actor.stop();
+
+  // === GAME-OVER TEST: scoreToWin = 1 ===
+
+  const goCode = "t3go";
+  await deleteDoc(doc(db, "lobbies", goCode, "players", "1")).catch(() => {});
+  await deleteDoc(doc(db, "lobbies", goCode, "players", "2")).catch(() => {});
+  await deleteDoc(doc(db, "lobbies", goCode)).catch(() => {});
+
+  const goHostSync = createSyncController(db);
+  const goActor = createActor(serverMachine, { input: { syncController: goHostSync, lobbyCode: goCode } });
+  goActor.start();
+  goHostSync.setServerActor(goActor);
+
+  goActor.send({ type: "ADD_PLAYER", playerId: "1", name: "Dorothy", isHost: true });
+
+  const goPlayerSync = createSyncController(db);
+  let goPlayerState = null;
+  const goUnsub = goPlayerSync.watchMyDoc(goCode, "2", (data) => { goPlayerState = data; });
+  await joinLobby(goPlayerSync, goCode, "2", "Blanche");
+  await waitUntil(() => goPlayerState?.players?.length === 2);
+
+  setPlayerReady(goHostSync, goCode, "1");
+  setPlayerReady(goPlayerSync, goCode, "2");
+  await waitUntil(() => goActor.getSnapshot().context.players.every((p) => p.clientUpdates.playerReady));
+
+  const goSettings = { handSize: 5, scoreToWin: 1 };
+  goActor.send({ type: "START_GAME", deck: testDeck, settings: goSettings, schema: testSchema });
+  check("go: in roundActive", goActor.getSnapshot().value, "roundActive");
+
+  // Blanche submits (only non-judge)
+  const goHand = goActor.getSnapshot().context.players[1].hand;
+  submitAnswer(goPlayerSync, goCode, "2", goHand[0].id, []);
+  await waitUntil(() => goActor.getSnapshot().value === "judging");
+
+  // Dorothy picks Blanche as winner
+  pickWinner(goHostSync, goCode, "1", "2");
+  check("go: in judged", goActor.getSnapshot().value, "judged");
+  check("go: Blanche has 1 point", goActor.getSnapshot().context.players[1].score, 1);
+
+  // NEXT_ROUND should trigger game-over (scoreToWin = 1)
+  startNextRound(goHostSync, goCode, "1");
+  check("go: transitioned to gameOver", goActor.getSnapshot().value, "gameOver");
+
+  const goCtx = goActor.getSnapshot().context;
+  check("go: phase is game-over", goCtx.players[0].phase, "game-over");
+  check("go: message announces game winner", goCtx.players[0].message, "Blanche wins the game!");
+
+  await waitUntil(() => goPlayerState?.phase === "game-over");
+  check("go: Blanche sees game-over", goPlayerState.phase, "game-over");
+  check("go: Blanche sees game winner message", goPlayerState.message, "Blanche wins the game!");
+
+  goUnsub();
+  goActor.stop();
+
+  console.log("=== Results:", pass, "passed,", fail, "failed ===");
+  if (fail === 0) console.log("ALL TESTS PASSED");
+</script>

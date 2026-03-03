@@ -1,0 +1,51 @@
+{
+  "id": "client",
+  "initial": "landing",
+  "states": {
+    "landing": {
+      "on": {
+        "LOBBY_JOINED": "lobby",
+        "LOBBY_CREATED": "lobby"
+      }
+    },
+    "lobby": {
+      "on": {
+        "GAME_STARTED": "picking"
+      }
+    },
+    "picking": {
+      "on": {
+        "ANSWER_SUBMITTED": "submitted",
+        "ROUND_CLOSED_AS_JUDGE": "judgingActive"
+      }
+    },
+    "submitted": {
+      "on": {
+        "JUDGING_STARTED": "judgingWaiting"
+      }
+    },
+    "judgingWaiting": {
+      "on": {
+        "RESULTS_RECEIVED": "postJudging"
+      }
+    },
+    "judgingActive": {
+      "on": {
+        "WINNER_PICKED": "postJudging"
+      }
+    },
+    "postJudging": {
+      "on": {
+        "NEW_ROUND": "nextRoundReady",
+        "GAME_OVER": "gameOver"
+      }
+    },
+    "nextRoundReady": {
+      "on": {
+        "PLAYER_JOINED_ROUND": "picking",
+        "GAME_OVER": "gameOver"
+      }
+    },
+    "gameOver": {}
+  }
+}
