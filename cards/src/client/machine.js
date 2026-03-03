@@ -223,6 +223,21 @@ export const clientMachine = setup({
             actions: ["saveLastRound", "storePlayerDoc"],
           },
           {
+            guard: "isJudgingAsJudge",
+            target: "judgingActive",
+            actions: ["saveLastRound", "storePlayerDoc"],
+          },
+          {
+            guard: "isJudgingAsPlayer",
+            target: "judgingWaiting",
+            actions: ["saveLastRound", "storePlayerDoc"],
+          },
+          {
+            guard: "isResultsReceived",
+            target: "postJudging",
+            actions: ["saveLastRound", "storePlayerDoc"],
+          },
+          {
             actions: "storePlayerDoc",
           },
         ],
@@ -243,6 +258,21 @@ export const clientMachine = setup({
           {
             guard: "isGameOver",
             target: "gameOver",
+            actions: "storePlayerDoc",
+          },
+          {
+            guard: "isJudgingAsJudge",
+            target: "judgingActive",
+            actions: "storePlayerDoc",
+          },
+          {
+            guard: "isJudgingAsPlayer",
+            target: "judgingWaiting",
+            actions: "storePlayerDoc",
+          },
+          {
+            guard: "isResultsReceived",
+            target: "postJudging",
             actions: "storePlayerDoc",
           },
           {
