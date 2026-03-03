@@ -233,11 +233,6 @@ export const clientMachine = setup({
             actions: ["saveLastRound", "storePlayerDoc"],
           },
           {
-            guard: "isResultsReceived",
-            target: "postJudging",
-            actions: ["saveLastRound", "storePlayerDoc"],
-          },
-          {
             actions: "storePlayerDoc",
           },
         ],

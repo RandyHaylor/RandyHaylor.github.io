@@ -106,12 +106,16 @@
     <section id="view-judging-active" class="hidden">
       <div id="prompt-judging" class="prompt-card"></div>
       <div id="submission-viewer">
-        <button id="sub-prev" class="nav-btn">&lt;</button>
+        <button id="sub-prev" class="nav-btn">&#10094;</button>
         <div id="sub-card" class="answer-card"></div>
-        <button id="sub-next" class="nav-btn">&gt;</button>
+        <button id="sub-next" class="nav-btn">&#10095;</button>
       </div>
       <p id="sub-counter"></p>
-      <button id="btn-pick-winner" class="action-btn">Pick This One</button>
+      <button id="btn-pick-winner" class="action-btn">Pick a Round Winner!</button>
+      <div id="judge-tip" class="info-tip">
+        <p>Only you can see the answers &mdash; read them to the group if you're able!</p>
+        <p>Everyone will get a chance to review all submissions once you pick a winner.</p>
+      </div>
     </section>
 
     <!-- Post Judging -->
@@ -119,9 +123,9 @@
       <div id="prompt-result" class="prompt-card"></div>
       <p id="result-message" class="result-msg"></p>
       <div id="result-viewer">
-        <button id="res-prev" class="nav-btn">&lt;</button>
+        <button id="res-prev" class="nav-btn">&#10094;</button>
         <div id="res-card" class="answer-card"></div>
-        <button id="res-next" class="nav-btn">&gt;</button>
+        <button id="res-next" class="nav-btn">&#10095;</button>
       </div>
       <p id="res-counter"></p>
       <button id="btn-next-round" class="action-btn hidden">Next Round</button>
@@ -132,9 +136,9 @@
       <div id="prompt-next-round" class="prompt-card"></div>
       <p id="next-round-msg" class="result-msg"></p>
       <div id="next-round-viewer">
-        <button id="nr-prev" class="nav-btn">&lt;</button>
+        <button id="nr-prev" class="nav-btn">&#10094;</button>
         <div id="nr-card" class="answer-card"></div>
-        <button id="nr-next" class="nav-btn">&gt;</button>
+        <button id="nr-next" class="nav-btn">&#10095;</button>
       </div>
       <p id="nr-counter"></p>
       <button id="btn-join-round" class="action-btn">Join Next Round</button>
