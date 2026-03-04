@@ -77,7 +77,7 @@
   let playerViews = [];
   playerBridge.onViewChange((view) => playerViews.push(view));
 
-  const joinResult = await playerBridge.joinLobby(lobbyCode, "2", "Blanche");
+  const joinResult = await playerBridge.joinLobby(lobbyCode, "Blanche");
   check("join succeeds", joinResult.ok, true);
   check("player is in lobby", playerBridge.getView().state, "lobby");
   check("player is not host", playerBridge.isPlayerHost(), false);
@@ -152,7 +152,7 @@
   await judgeBridge.createLobby("Dorothy", jCode);
 
   const p2Bridge = createUIBridge(createSyncController(db));
-  await p2Bridge.joinLobby(jCode, "2", "Blanche");
+  await p2Bridge.joinLobby(jCode, "Blanche");
   await waitUntil(() => p2Bridge.getView().players.length === 2);
 
   judgeBridge.readyUp();

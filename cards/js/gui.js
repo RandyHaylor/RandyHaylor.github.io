@@ -451,7 +451,7 @@ document.addEventListener("click", (e) => {
 menuStartNext.addEventListener("click", () => {
   menuOpen = false;
   hostMenu.classList.add("hidden");
-  showConfirm("Force start the next round? This skips the current round.", () => {
+  showConfirm("Are you sure? This is not guaranteed to work and is intended to fix a broken state after a player hangs or gets kicked.", () => {
     bridge.forceNextRound();
   });
 });

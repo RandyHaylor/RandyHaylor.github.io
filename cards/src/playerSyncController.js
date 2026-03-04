@@ -178,6 +178,18 @@ export function createSyncController(db) {
       }
     },
 
+    refreshAllNonHostClients(lobbyCode) {
+      if (!serverActor) return;
+      const players = serverActor.getSnapshot().context.players;
+      console.log("[REFRESH] sending forceRefresh to non-host players:", players.filter(p => !p.isHost).map(p => `${p.name}(${p.id})`).join(", "));
+      for (const p of players) {
+        if (p.isHost) continue;
+        updateDoc(doc(db, "lobbies", lobbyCode, "players", p.id), {
+          forceRefresh: true,
+        });
+      }
+    },
+
     watchMyDoc(lobbyCode, playerId, callback) {
       if (serverActor) {
         const sub = serverActor.subscribe(() => {
@@ -195,7 +207,18 @@ export function createSyncController(db) {
           if (snap.exists()) {
             const data = snap.data();
             console.log("[MY-DOC] via firestore:", data.phase, "isJudge:", data.isJudge, "clientUpdates:", JSON.stringify(data.clientUpdates));
+            if (data.forceRefresh) {
+              console.log("[MY-DOC] forceRefresh detected — clearing and reloading");
+              updateDoc(doc(db, "lobbies", lobbyCode, "players", playerId), {
+                forceRefresh: false,
+              });
+              window.location.reload();
+              return;
+            }
             callback(data);
+          } else {
+            console.log("[MY-DOC] doc deleted — player was kicked");
+            window.location.href = window.location.origin;
           }
         }
       );

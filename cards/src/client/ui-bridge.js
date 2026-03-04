@@ -177,12 +177,21 @@ export function createUIBridge(syncController) {
 
     kickPlayer(targetPlayerId) {
       if (!serverActor) return;
+      const snap = serverActor.getSnapshot();
+      console.log("[KICK] kicking player:", targetPlayerId, "| server state:", snap.value, "| players:", snap.context.players.map(p => `${p.name}(${p.id}, judge:${p.isJudge})`).join(", "), "| judgeIndex:", snap.context.judgeIndex);
       serverActor.send({ type: "KICK_PLAYER", playerId: targetPlayerId });
+      const after = serverActor.getSnapshot();
+      console.log("[KICK] after:", after.value, "| players:", after.context.players.map(p => `${p.name}(${p.id}, judge:${p.isJudge})`).join(", "), "| judgeIndex:", after.context.judgeIndex);
     },
 
     forceNextRound() {
       if (!serverActor) return;
+      const snap = serverActor.getSnapshot();
+      console.log("[FORCE-NEXT] before:", snap.value, "| players:", snap.context.players.map(p => `${p.name}(${p.id}, judge:${p.isJudge}, phase:${p.phase})`).join(", "), "| judgeIndex:", snap.context.judgeIndex);
+      syncController.refreshAllNonHostClients(lobbyCode);
       serverActor.send({ type: "FORCE_NEXT_ROUND" });
+      const after = serverActor.getSnapshot();
+      console.log("[FORCE-NEXT] after:", after.value, "| players:", after.context.players.map(p => `${p.name}(${p.id}, judge:${p.isJudge}, phase:${p.phase})`).join(", "), "| judgeIndex:", after.context.judgeIndex);
     },
 
     joinNextRound() {

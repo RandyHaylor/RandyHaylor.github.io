@@ -47,6 +47,7 @@ export function buildPlayerState(id, name, isHost) {
     currentPrompt: null,
     isJudge: false,
     message: "",
+    forceRefresh: false,
     submissionsToJudge: [],
     clientUpdates: {
       playerReady: false,
@@ -118,6 +119,7 @@ export function dealHands(players, answerCards, handSize) {
 }
 
 export function assignJudge(players, judgeIndex) {
+  console.log("[ASSIGN-JUDGE] judgeIndex:", judgeIndex, "| player count:", players.length, "| judge will be:", players[judgeIndex]?.name || "OUT OF BOUNDS");
   const playerList = buildPlayerList(players);
   return players.map((p, i) => ({
     ...p,
@@ -265,17 +267,22 @@ export function rotateJudgeIndex(judgeIndex, playerCount) {
 // -- Player removal --
 
 export function removePlayer(players, playerId) {
+  console.log("[REMOVE] removing player:", playerId, "from:", players.map(p => `${p.name}(${p.id})`).join(", "));
   const filtered = players.filter((p) => p.id !== playerId);
   const playerList = buildPlayerList(filtered);
+  console.log("[REMOVE] remaining:", filtered.map(p => `${p.name}(${p.id})`).join(", "));
   return filtered.map((p) => ({ ...p, players: playerList }));
 }
 
 export function adjustJudgeIndex(judgeIndex, players, kickedPlayerId) {
   const kickedIndex = players.findIndex((p) => p.id === kickedPlayerId);
-  if (kickedIndex < 0) return judgeIndex;
   const newCount = players.length - 1;
-  if (newCount === 0) return 0;
-  if (kickedIndex < judgeIndex) return judgeIndex - 1;
-  if (kickedIndex === judgeIndex) return judgeIndex % newCount;
-  return judgeIndex;
+  let newJudgeIndex;
+  if (kickedIndex < 0) newJudgeIndex = judgeIndex;
+  else if (newCount === 0) newJudgeIndex = 0;
+  else if (kickedIndex < judgeIndex) newJudgeIndex = judgeIndex - 1;
+  else if (kickedIndex === judgeIndex) newJudgeIndex = judgeIndex % newCount;
+  else newJudgeIndex = judgeIndex;
+  console.log("[JUDGE-IDX] kicked index:", kickedIndex, "| old judgeIndex:", judgeIndex, "| new judgeIndex:", newJudgeIndex, "| remaining count:", newCount);
+  return newJudgeIndex;
 }
