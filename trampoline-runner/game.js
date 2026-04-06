@@ -136,9 +136,7 @@ var World = class {
     this.config = config;
     this.player = new Player(config.canvasWidth * 0.2, config.canvasHeight * 0.5);
     this.trampolines = [];
-    this.trampolineField = null;
-    this.coinField = null;
-    this.enemyField = null;
+    this.worldGen = null;
     this.coins = [];
     this.enemies = [];
     this.score = 0;
@@ -160,31 +158,18 @@ var World = class {
   }
   update(dt) {
     this.player.update(dt, this.config.gravity);
-    if (this.trampolineField) {
-      this.trampolines = this.trampolineField.getTrampolinesInView(
+    if (this.worldGen) {
+      const entities = this.worldGen.getEntitiesInView(
         this.cameraX,
         this.cameraY,
         this.config.canvasWidth,
         this.config.canvasHeight
       );
-    }
-    if (this.coinField) {
-      const coinPositions = this.coinField.getEntitiesInView(
-        this.cameraX,
-        this.cameraY,
-        this.config.canvasWidth,
-        this.config.canvasHeight
+      this.trampolines = entities.trampolines.map(
+        (t) => new Trampoline(t.x, t.y, t.width)
       );
-      this.coins = coinPositions.filter((p) => !this.collectedCoins.has(this.coinKey(p.x, p.y))).map((p) => new Coin(p.x, p.y));
-    }
-    if (this.enemyField) {
-      const enemyPositions = this.enemyField.getEntitiesInView(
-        this.cameraX,
-        this.cameraY,
-        this.config.canvasWidth,
-        this.config.canvasHeight
-      );
-      this.enemies = enemyPositions.map((p) => new Enemy(p.x, p.y));
+      this.coins = entities.coins.filter((p) => !this.collectedCoins.has(this.coinKey(p.x, p.y))).map((p) => new Coin(p.x, p.y));
+      this.enemies = entities.enemies.map((p) => new Enemy(p.x, p.y));
     }
     for (const enemy of this.enemies) {
       enemy.update(dt);
@@ -200,17 +185,16 @@ var World = class {
       if (CollisionSystem.aabb(playerBounds, c.bounds())) {
         this.score += 1;
         this.collectedCoins.add(this.coinKey(c.x, c.y));
+        if (this.worldGen) {
+          this.worldGen.collectCoin(c.x, c.y);
+        }
         return false;
       }
       return true;
     });
-    if (!this.trampolineField) {
+    if (!this.worldGen) {
       this.trampolines = this.trampolines.filter((t) => !t.isFarBehind(this.player.x));
-    }
-    if (!this.coinField) {
       this.coins = this.coins.filter((c) => !c.isFarBehind(this.player.x));
-    }
-    if (!this.enemyField) {
       this.enemies = this.enemies.filter((e) => !e.isFarBehind(this.player.x));
     }
   }
@@ -229,155 +213,100 @@ var GameLoop = class {
   }
 };
 
-// trampoline-runner/src/math/PerlinNoise.ts
-var PerlinNoise = class {
-  constructor(seed) {
-    this.perm = this.buildPermutation(seed);
-  }
-  /** Returns a noise value in [-1, 1] for the given 2D coordinates. */
-  noise2D(x, y) {
-    const xi = Math.floor(x);
-    const yi = Math.floor(y);
-    const xf = x - xi;
-    const yf = y - yi;
-    const u = this.fade(xf);
-    const v = this.fade(yf);
-    const aa = this.hash(xi, yi);
-    const ab = this.hash(xi, yi + 1);
-    const ba = this.hash(xi + 1, yi);
-    const bb = this.hash(xi + 1, yi + 1);
-    const g00 = this.grad(aa, xf, yf);
-    const g10 = this.grad(ba, xf - 1, yf);
-    const g01 = this.grad(ab, xf, yf - 1);
-    const g11 = this.grad(bb, xf - 1, yf - 1);
-    const x0 = this.lerp(g00, g10, u);
-    const x1 = this.lerp(g01, g11, u);
-    return this.lerp(x0, x1, v);
-  }
-  /** Quintic fade curve: 6t^5 - 15t^4 + 10t^3 */
-  fade(t) {
-    return t * t * t * (t * (t * 6 - 15) + 10);
-  }
-  /** Linear interpolation */
-  lerp(a, b, t) {
-    return a + t * (b - a);
-  }
-  /** Hash 2D integer coords to a permutation value */
-  hash(ix, iy) {
-    const x = (ix % 256 + 256) % 256;
-    const y = (iy % 256 + 256) % 256;
-    return this.perm[(this.perm[x] + y) % 256];
-  }
-  /** Compute gradient dot product using hash to select from 4 gradients */
-  grad(hash, dx, dy) {
-    switch (hash & 3) {
-      case 0:
-        return dx + dy;
-      case 1:
-        return -dx + dy;
-      case 2:
-        return dx - dy;
-      case 3:
-        return -dx - dy;
-      default:
-        return 0;
-    }
-  }
-  /** Build a seeded permutation table using a simple LCG PRNG */
-  buildPermutation(seed) {
-    const perm = new Uint8Array(256);
-    for (let i = 0; i < 256; i++) perm[i] = i;
-    let s = seed >>> 0;
-    for (let i = 255; i > 0; i--) {
-      s = s * 1664525 + 1013904223 >>> 0;
-      const j = s % (i + 1);
-      const tmp = perm[i];
-      perm[i] = perm[j];
-      perm[j] = tmp;
-    }
-    return perm;
-  }
-};
+// trampoline-runner/src/math/HashRandom.ts
+function hashRandom(x, y) {
+  let h = x * 374761393 + y * 668265263 | 0;
+  h = Math.imul(h ^ h >>> 13, 1274126177);
+  h = Math.imul(h ^ h >>> 16, 1911520717);
+  h = h ^ h >>> 13;
+  return (h >>> 0) / 4294967296;
+}
 
-// trampoline-runner/src/systems/TrampolineField.ts
-var CELL_SIZE = 250;
-var NOISE_THRESHOLD = 0.1;
-var MIN_WIDTH = 80;
-var MAX_WIDTH = 300;
-var NOISE_SCALE = 0.05;
-var TrampolineField = class {
-  constructor(seed, canvasWidth, canvasHeight) {
-    this.noise = new PerlinNoise(seed);
-    this.canvasWidth = canvasWidth;
-    this.canvasHeight = canvasHeight;
+// trampoline-runner/src/systems/WorldGen.ts
+var CHANNEL_OFFSET = {
+  trampolines: 0,
+  coins: 1,
+  enemies: 2
+};
+var WorldGen = class {
+  constructor(config, collectedCoins) {
+    this.cellSize = config.cellSize ?? 100;
+    this.configs = {
+      trampolines: config.trampolines,
+      coins: config.coins,
+      enemies: config.enemies
+    };
+    this.collectedCoins = collectedCoins ?? /* @__PURE__ */ new Set();
   }
-  getTrampolinesInView(cameraX, cameraY, viewportWidth, viewportHeight) {
-    const buffer = viewportWidth * 0.25;
-    const left = cameraX - buffer;
-    const right = cameraX + viewportWidth + buffer;
-    const top = cameraY - buffer;
-    const bottom = cameraY + viewportHeight + buffer;
-    const cellLeft = Math.floor(left / CELL_SIZE);
-    const cellRight = Math.floor(right / CELL_SIZE);
-    const cellTop = Math.floor(top / CELL_SIZE);
-    const cellBottom = Math.floor(bottom / CELL_SIZE);
-    const trampolines = [];
-    for (let cx = cellLeft; cx <= cellRight; cx++) {
-      for (let cy = cellTop; cy <= cellBottom; cy++) {
-        const noiseVal = this.noise.noise2D(cx * NOISE_SCALE, cy * NOISE_SCALE);
-        if (noiseVal > NOISE_THRESHOLD) {
-          const t = (noiseVal - NOISE_THRESHOLD) / (1 - NOISE_THRESHOLD);
-          const width = MIN_WIDTH + t * (MAX_WIDTH - MIN_WIDTH);
-          const x = cx * CELL_SIZE;
-          const y = cy * CELL_SIZE;
-          trampolines.push(new Trampoline(x, y, width));
+  hash(gridX, gridY, type) {
+    return hashRandom(gridX * 3 + CHANNEL_OFFSET[type], gridY);
+  }
+  shouldSpawn(gridX, gridY, type) {
+    const config = this.configs[type];
+    const h = this.hash(gridX, gridY, type);
+    if (h >= config.chance) return false;
+    const r = config.minSpacing;
+    for (let dx = -r; dx <= r; dx++) {
+      for (let dy = -r; dy <= r; dy++) {
+        if (dx === 0 && dy === 0) continue;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist > r) continue;
+        const nx = gridX + dx;
+        const ny = gridY + dy;
+        const nh = this.hash(nx, ny, type);
+        if (nh < config.chance && nh > h) {
+          return false;
         }
       }
     }
-    return trampolines;
-  }
-};
-
-// trampoline-runner/src/systems/EntityField.ts
-var CELL_SIZE2 = 200;
-var NOISE_SCALE2 = 0.08;
-var NOISE_OFFSET = 1e3;
-var COIN_THRESHOLD = 0.05;
-var ENEMY_THRESHOLD = 0.25;
-var EntityField = class {
-  constructor(seed, canvasWidth, canvasHeight, entityType) {
-    this.noise = new PerlinNoise(seed);
-    this.canvasWidth = canvasWidth;
-    this.canvasHeight = canvasHeight;
-    this.entityType = entityType;
-    this.threshold = entityType === "coin" ? COIN_THRESHOLD : ENEMY_THRESHOLD;
+    return true;
   }
   getEntitiesInView(cameraX, cameraY, viewportWidth, viewportHeight) {
-    const buffer = viewportWidth * 0.25;
-    const left = cameraX - buffer;
-    const right = cameraX + viewportWidth + buffer;
-    const top = cameraY - buffer;
-    const bottom = cameraY + viewportHeight + buffer;
-    const cellLeft = Math.floor(left / CELL_SIZE2);
-    const cellRight = Math.floor(right / CELL_SIZE2);
-    const cellTop = Math.floor(top / CELL_SIZE2);
-    const cellBottom = Math.floor(bottom / CELL_SIZE2);
-    const entities = [];
-    for (let cx = cellLeft; cx <= cellRight; cx++) {
-      for (let cy = cellTop; cy <= cellBottom; cy++) {
-        const noiseVal = this.noise.noise2D(
-          cx * NOISE_SCALE2 + NOISE_OFFSET,
-          cy * NOISE_SCALE2 + NOISE_OFFSET
-        );
-        if (noiseVal > this.threshold) {
-          entities.push({
-            x: cx * CELL_SIZE2,
-            y: cy * CELL_SIZE2
-          });
+    const bufferX = viewportWidth * 0.25;
+    const bufferY = viewportHeight * 0.25;
+    const left = cameraX - bufferX;
+    const right = cameraX + viewportWidth + bufferX;
+    const top = cameraY - bufferY;
+    const bottom = cameraY + viewportHeight + bufferY;
+    const minGX = Math.floor(left / this.cellSize);
+    const maxGX = Math.floor(right / this.cellSize);
+    const minGY = Math.floor(top / this.cellSize);
+    const maxGY = Math.floor(bottom / this.cellSize);
+    const result = {
+      trampolines: [],
+      coins: [],
+      enemies: []
+    };
+    for (let gx = minGX; gx <= maxGX; gx++) {
+      for (let gy = minGY; gy <= maxGY; gy++) {
+        const worldX = gx * this.cellSize;
+        const worldY = gy * this.cellSize;
+        if (this.shouldSpawn(gx, gy, "trampolines")) {
+          const cfg = this.configs.trampolines;
+          let width = this.cellSize;
+          if (cfg.sizeRange) {
+            const sizeHash = hashRandom(gx * 3 + 10, gy);
+            width = cfg.sizeRange.min + sizeHash * (cfg.sizeRange.max - cfg.sizeRange.min);
+          }
+          result.trampolines.push({ x: worldX, y: worldY, width });
+        }
+        if (this.shouldSpawn(gx, gy, "coins")) {
+          const key = `${gx},${gy}`;
+          if (!this.collectedCoins.has(key)) {
+            result.coins.push({ x: worldX, y: worldY });
+          }
+        }
+        if (this.shouldSpawn(gx, gy, "enemies")) {
+          result.enemies.push({ x: worldX, y: worldY });
         }
       }
     }
-    return entities;
+    return result;
+  }
+  collectCoin(x, y) {
+    const gx = Math.round(x / this.cellSize);
+    const gy = Math.round(y / this.cellSize);
+    this.collectedCoins.add(`${gx},${gy}`);
   }
 };
 
@@ -491,12 +420,12 @@ function startGame(canvas) {
   };
   const world = new World(config);
   const gameLoop = new GameLoop(world);
-  const trampolineField = new TrampolineField(12345, config.canvasWidth, config.canvasHeight);
-  const coinField = new EntityField(54321, config.canvasWidth, config.canvasHeight, "coin");
-  const enemyField = new EntityField(67890, config.canvasWidth, config.canvasHeight, "enemy");
-  world.trampolineField = trampolineField;
-  world.coinField = coinField;
-  world.enemyField = enemyField;
+  world.worldGen = new WorldGen({
+    cellSize: 100,
+    trampolines: { chance: 0.3, minSpacing: 2, sizeRange: { min: 80, max: 300 } },
+    coins: { chance: 0.2, minSpacing: 1 },
+    enemies: { chance: 0.1, minSpacing: 3 }
+  });
   const camera = new Camera(config.canvasWidth, config.canvasHeight);
   const renderer = new Renderer(ctx);
   const input = new InputSystem(world.player);
