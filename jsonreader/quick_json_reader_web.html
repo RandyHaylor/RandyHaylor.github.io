@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Quick JSON Reader</title>
+  <style>
+    :root { color-scheme: dark; --bg:#111418; --panel:#1a2027; --panel-2:#202833; --text:#e6edf3; --muted:#96a2b4; --border:#2e3948; --accent:#4ea1ff; --accent-2:#76b7ff; --danger:#ff7b72; --success:#7ee787; }
+    * { box-sizing: border-box; }
+    body { margin:0; background:var(--bg); color:var(--text); font:14px/1.45 system-ui,-apple-system,Segoe UI,Roboto,sans-serif; }
+    .app { display:grid; grid-template-columns:340px 1fr; min-height:100vh; }
+    .sidebar { border-right:1px solid var(--border); background:var(--panel); padding:16px; overflow:auto; }
+    .main { display:flex; flex-direction:column; min-width:0; }
+    h1 { margin:0 0 8px; font-size:20px; }
+    .sub { color:var(--muted); margin-bottom:16px; }
+    .group { background:var(--panel-2); border:1px solid var(--border); border-radius:10px; padding:12px; margin-bottom:12px; }
+    .group h2 { margin:0 0 10px; font-size:13px; letter-spacing:.02em; text-transform:uppercase; color:var(--muted); }
+    label { display:block; margin-bottom:8px; font-weight:600; }
+    input[type="text"], input[type="number"], select { width:100%; border:1px solid var(--border); background:#0f141a; color:var(--text); padding:8px 10px; border-radius:8px; outline:none; }
+    .row { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+    .check { display:flex; align-items:center; gap:8px; margin:8px 0; font-weight:500; }
+    .check input { margin:0; }
+    button { appearance:none; border:1px solid var(--border); background:#0f141a; color:var(--text); padding:9px 12px; border-radius:8px; cursor:pointer; font-weight:600; }
+    button.primary { background:var(--accent); border-color:var(--accent); color:#08131f; }
+    button:hover { border-color:var(--accent-2); }
+    .toolbar { display:flex; gap:8px; flex-wrap:wrap; padding:14px 16px; border-bottom:1px solid var(--border); background:var(--panel); }
+    .status { padding:10px 16px; border-bottom:1px solid var(--border); color:var(--muted); min-height:42px; }
+    .status.error { color:var(--danger); }
+    .status.success { color:var(--success); }
+    .output { flex:1; min-height:0; }
+    pre { margin:0; padding:16px; white-space:pre-wrap; word-break:break-word; overflow:auto; height:100%; font:13px/1.45 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; background:#0b0f14; }
+    .hint, .file-meta { color:var(--muted); font-size:12px; margin-top:6px; word-break:break-all; }
+    @media (max-width:900px) { .app { grid-template-columns:1fr; } .sidebar { border-right:0; border-bottom:1px solid var(--border); } }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <h1>Quick JSON Reader</h1>
+      <div class="sub">Single-file static UI around the shared JS engine.</div>
+
+      <div class="group">
+        <h2>Input</h2>
+        <label for="fileInput">JSON file</label>
+        <input id="fileInput" type="file" accept=".json,application/json">
+        <div id="fileMeta" class="file-meta">No file loaded.</div>
+      </div>
+
+      <div class="group">
+        <h2>Search</h2>
+        <label for="searchKeys">Search keys</label>
+        <input id="searchKeys" type="text" placeholder="user profile session">
+        <label for="searchVals">Search values</label>
+        <input id="searchVals" type="text" placeholder="error timeout abc123">
+        <label class="check"><input id="includeChildren" type="checkbox"> Include search children</label>
+        <div class="hint">Separate terms with spaces.</div>
+      </div>
+
+      <div class="group">
+        <h2>Hide</h2>
+        <label for="hideMatching">Hide fields matching</label>
+        <input id="hideMatching" type="text" placeholder="token password secret">
+        <label for="hideContaining">Hide fields containing</label>
+        <input id="hideContaining" type="text" placeholder="debug internal temp">
+      </div>
+
+      <div class="group">
+        <h2>Output</h2>
+        <label for="outputMode">Output mode</label>
+        <select id="outputMode">
+          <option value="txt">txt</option>
+          <option value="csv">csv</option>
+          <option value="json">json</option>
+        </select>
+        <div class="row" style="margin-top: 10px;">
+          <div>
+            <label for="truncateLength">Truncate line length</label>
+            <input id="truncateLength" type="number" min="0" placeholder="none">
+          </div>
+          <div>
+            <label for="indentSize">Indent size</label>
+            <input id="indentSize" type="number" min="0" value="2">
+          </div>
+        </div>
+        <label class="check"><input id="showLineNumbers" type="checkbox" checked> Show line numbers</label>
+        <label class="check"><input id="showSchema" type="checkbox"> Show schema only</label>
+        <div class="hint">Schema mode must be used alone.</div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <div class="toolbar">
+        <button id="refreshBtn" class="primary">Refresh</button>
+        <button id="resetBtn">Reset</button>
+        <button id="downloadBtn">Download output</button>
+      </div>
+      <div id="status" class="status">Load a JSON file, then click Refresh.</div>
+      <div class="output">
+        <pre id="output">No output yet.</pre>
+      </div>
+    </main>
+  </div>
+
+  <script src="./quick_json_reader.js"></script>
+  <script>
+    const state = { rawText: '', fileName: '', outputText: '' };
+    const els = {
+      fileInput: document.getElementById('fileInput'),
+      fileMeta: document.getElementById('fileMeta'),
+      searchKeys: document.getElementById('searchKeys'),
+      searchVals: document.getElementById('searchVals'),
+      includeChildren: document.getElementById('includeChildren'),
+      hideMatching: document.getElementById('hideMatching'),
+      hideContaining: document.getElementById('hideContaining'),
+      outputMode: document.getElementById('outputMode'),
+      truncateLength: document.getElementById('truncateLength'),
+      indentSize: document.getElementById('indentSize'),
+      showLineNumbers: document.getElementById('showLineNumbers'),
+      showSchema: document.getElementById('showSchema'),
+      refreshBtn: document.getElementById('refreshBtn'),
+      resetBtn: document.getElementById('resetBtn'),
+      downloadBtn: document.getElementById('downloadBtn'),
+      status: document.getElementById('status'),
+      output: document.getElementById('output'),
+    };
+
+    function words(text) { return text.trim() ? text.trim().split(/\s+/) : []; }
+    function setStatus(message, kind = '') { els.status.textContent = message; els.status.className = kind ? `status ${kind}` : 'status'; }
+
+    function syncUiRules() {
+      const output = els.outputMode.value;
+      const schema = els.showSchema.checked;
+      const isJson = output === 'json';
+      els.showLineNumbers.disabled = isJson || schema;
+      if (isJson) els.showLineNumbers.checked = false;
+      els.truncateLength.disabled = isJson || schema;
+      const schemaLocks = [els.searchKeys, els.searchVals, els.includeChildren, els.hideMatching, els.hideContaining, els.outputMode, els.indentSize];
+      for (const el of schemaLocks) el.disabled = schema;
+      if (schema) {
+        els.outputMode.value = 'txt';
+        els.showLineNumbers.checked = true;
+        els.truncateLength.value = '';
+        els.indentSize.value = '2';
+      }
+    }
+
+    function buildConfig() {
+      return {
+        output: els.outputMode.value,
+        showSchema: els.showSchema.checked,
+        searchKeys: words(els.searchKeys.value),
+        searchVals: words(els.searchVals.value),
+        includeSearchChildren: els.includeChildren.checked,
+        hideFieldsMatching: words(els.hideMatching.value),
+        hideFieldsContaining: words(els.hideContaining.value),
+        truncateLineLength: els.truncateLength.value,
+        showLineNumbers: els.showLineNumbers.checked,
+        indentSize: els.indentSize.value || 2,
+      };
+    }
+
+    function updateOutput() {
+      if (!state.rawText) { setStatus('Load a JSON file first.', 'error'); return; }
+      try {
+        const result = window.QuickJsonReader.runWithJsonText(state.rawText, buildConfig());
+        state.outputText = result.outputText;
+        els.output.textContent = state.outputText || '';
+        setStatus('Render complete.', 'success');
+      } catch (error) {
+        state.outputText = '';
+        els.output.textContent = '';
+        setStatus(error && error.message ? error.message : String(error), 'error');
+      }
+    }
+
+    async function handleFileChange(event) {
+      const file = event.target.files && event.target.files[0];
+      if (!file) {
+        state.rawText = ''; state.fileName = '';
+        els.fileMeta.textContent = 'No file loaded.';
+        els.output.textContent = 'No output yet.';
+        setStatus('Load a JSON file, then click Refresh.');
+        return;
+      }
+      try {
+        state.rawText = await file.text();
+        state.fileName = file.name;
+        els.fileMeta.textContent = `${file.name} • ${file.size.toLocaleString()} bytes`;
+        setStatus('File loaded. Click Refresh to render.', 'success');
+      } catch (error) {
+        state.rawText = ''; state.fileName = ''; state.outputText = '';
+        els.fileMeta.textContent = 'Failed to read file.';
+        setStatus(error && error.message ? error.message : String(error), 'error');
+      }
+    }
+
+    function resetForm() {
+      els.searchKeys.value = '';
+      els.searchVals.value = '';
+      els.includeChildren.checked = false;
+      els.hideMatching.value = '';
+      els.hideContaining.value = '';
+      els.outputMode.value = 'txt';
+      els.truncateLength.value = '';
+      els.indentSize.value = '2';
+      els.showLineNumbers.checked = true;
+      els.showSchema.checked = false;
+      syncUiRules();
+      if (state.rawText) updateOutput();
+      else { state.outputText = ''; els.output.textContent = 'No output yet.'; setStatus('Settings reset.'); }
+    }
+
+    function downloadOutput() {
+      if (!state.outputText) { setStatus('Nothing to download yet.', 'error'); return; }
+      const mode = els.showSchema.checked ? 'schema' : els.outputMode.value;
+      const extension = mode === 'txt' ? 'txt' : mode;
+      const baseName = state.fileName ? state.fileName.replace(/\.json$/i, '') : 'quick_json_reader_output';
+      const blob = new Blob([state.outputText], { type: 'text/plain;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `${baseName}_${mode}.${extension}`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
+      setStatus('Download started.', 'success');
+    }
+
+    els.fileInput.addEventListener('change', handleFileChange);
+    els.refreshBtn.addEventListener('click', updateOutput);
+    els.resetBtn.addEventListener('click', resetForm);
+    els.downloadBtn.addEventListener('click', downloadOutput);
+    els.outputMode.addEventListener('change', syncUiRules);
+    els.showSchema.addEventListener('change', syncUiRules);
+    syncUiRules();
+  </script>
+</body>
+</html>
