@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Quick JSON Reader</title>
+  <title>QckJSONReader</title>
   <style>
     :root { color-scheme: dark; --bg:#111418; --panel:#1a2027; --panel-2:#202833; --text:#e6edf3; --muted:#96a2b4; --border:#2e3948; --accent:#4ea1ff; --accent-2:#76b7ff; --danger:#ff7b72; --success:#7ee787; }
     * { box-sizing: border-box; }
@@ -28,7 +28,28 @@
     .status.error { color:var(--danger); }
     .status.success { color:var(--success); }
     .output { flex:1; min-height:0; }
-    pre { margin:0; padding:16px; white-space:pre-wrap; word-break:break-word; overflow:auto; height:100%; font:13px/1.45 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; background:#0b0f14; }
+    .output-examples { display:grid; gap:12px; padding:16px; }
+    .output-sample {
+      margin:0;
+      padding:16px;
+      white-space:pre-wrap;
+      word-break:break-word;
+      overflow:auto;
+      font:13px/1.45 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+      background:#0b0f14;
+      border:1px solid var(--border);
+      border-radius:10px;
+    }
+    pre.live-output {
+      margin:0;
+      padding:16px;
+      white-space:pre-wrap;
+      word-break:break-word;
+      overflow:auto;
+      height:100%;
+      font:13px/1.45 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+      background:#0b0f14;
+    }
     .hint, .file-meta { color:var(--muted); font-size:12px; margin-top:6px; word-break:break-all; }
     @media (max-width:900px) { .app { grid-template-columns:1fr; } .sidebar { border-right:0; border-bottom:1px solid var(--border); } }
   </style>
@@ -36,8 +57,16 @@
 <body>
   <div class="app">
     <aside class="sidebar">
-      <h1>Quick JSON Reader</h1>
-      <div class="sub">Single-file static UI around the shared JS engine.</div>
+      <h1>{"Quick JSON Reader":"Web"}</h1>
+      <div class="sub">
+         Single-file static UI around the shared JS engine.
+        <br>
+         More info, use as <b><font color="white">ai tool</font></b>, workflow integration:
+        <br>
+        <a href="https://github.com/RandyHaylor/quick-json-reader">
+         github.com/RandyHaylor/quick-json-reader
+        </a>
+      </div>
 
       <div class="group">
         <h2>Input</h2>
@@ -49,9 +78,9 @@
       <div class="group">
         <h2>Search</h2>
         <label for="searchKeys">Search keys</label>
-        <input id="searchKeys" type="text" placeholder="user profile session">
+        <input id="searchKeys" type="text" placeholder="text to find keys">
         <label for="searchVals">Search values</label>
-        <input id="searchVals" type="text" placeholder="error timeout abc123">
+        <input id="searchVals" type="text" placeholder="text to find vals">
         <label class="check"><input id="includeChildren" type="checkbox"> Include search children</label>
         <div class="hint">Separate terms with spaces.</div>
       </div>
@@ -59,9 +88,9 @@
       <div class="group">
         <h2>Hide</h2>
         <label for="hideMatching">Hide fields matching</label>
-        <input id="hideMatching" type="text" placeholder="token password secret">
+        <input id="hideMatching" type="text" placeholder="text to match fields to hide">
         <label for="hideContaining">Hide fields containing</label>
-        <input id="hideContaining" type="text" placeholder="debug internal temp">
+        <input id="hideContaining" type="text" placeholder="text to match fields to hide">
       </div>
 
       <div class="group">
@@ -75,7 +104,7 @@
         <div class="row" style="margin-top: 10px;">
           <div>
             <label for="truncateLength">Truncate line length</label>
-            <input id="truncateLength" type="number" min="0" placeholder="none">
+            <input id="truncateLength" type="number" min="0" placeholder="limit length of key and val output">
           </div>
           <div>
             <label for="indentSize">Indent size</label>
@@ -94,9 +123,47 @@
         <button id="resetBtn">Reset</button>
         <button id="downloadBtn">Download output</button>
       </div>
-      <div id="status" class="status">Load a JSON file, then click Refresh.</div>
-      <div class="output">
-        <pre id="output">No output yet.</pre>
+      <div id="status" class="status">Load a JSON file, then click Refresh. Example outputs are shown below until then.</div>
+      <div class="output" id="output">
+        <div class="output-examples">
+          <pre class="output-sample">1 | example
+2 |   output_mode: txt
+3 |     show_line_numbers: true
+4 |     best_for: readable inspection
+5 |     why: line numbers help reference specific output rows
+6 |     action: load a json file and click refresh</pre>
+
+          <pre class="output-sample">example
+  output_mode: txt
+    show_line_numbers: false
+    best_for: cleaner reading
+    why: removes visual noise when line references are unnecessary</pre>
+
+          <pre class="output-sample">{
+  "example": {
+    "output_mode": "json",
+    "details": {
+      "best_for": "automation and app integration",
+      "why": "structured output is easier for downstream tools to consume"
+    }
+  }
+}</pre>
+
+          <pre class="output-sample">example,output_mode,csv
+example,details,best_for structured extraction
+example,details,why csv output is useful for spreadsheets and tabular workflows</pre>
+
+          <pre class="output-sample">{
+  "example": {
+    "output_mode": "string",
+    "details": {
+      "best_for": "structure discovery",
+      "why": "quickly reveals the shape of unknown json"
+    },
+    "note": "If you check 'Show schema only' you'll get a light representation of the structure of the json content - very useful for writing quick extraction or exploration scripts - especially for ai agents"
+  }
+}</pre>
+        </div>
       </div>
     </main>
   </div>
@@ -159,16 +226,67 @@
       };
     }
 
+    function showLiveOutput(text) {
+      const pre = document.createElement('pre');
+      pre.className = 'live-output';
+      pre.textContent = text || '';
+      els.output.replaceChildren(pre);
+    }
+
+    function restoreExampleOutput() {
+      els.output.innerHTML = `
+        <div class="output-examples">
+          <pre class="output-sample">1 | example
+2 |   output_mode: txt
+3 |     show_line_numbers: true
+4 |     best_for: readable inspection
+5 |     why: line numbers help reference specific output rows
+6 |     action: load a json file and click refresh</pre>
+
+          <pre class="output-sample">example
+  output_mode: txt
+    show_line_numbers: false
+    best_for: cleaner reading
+    why: removes visual noise when line references are unnecessary</pre>
+
+          <pre class="output-sample">{
+  "example": {
+    "output_mode": "json",
+    "details": {
+      "best_for": "automation and app integration",
+      "why": "structured output is easier for downstream tools to consume"
+    }
+  }
+}</pre>
+
+          <pre class="output-sample">example,output_mode,csv
+example,details,best_for structured extraction
+example,details,why csv output is useful for spreadsheets and tabular workflows</pre>
+
+          <pre class="output-sample">{
+  "example": {
+    "output_mode": "string",
+    "details": {
+      "best_for": "structure discovery",
+      "why": "quickly reveals the shape of unknown json"
+    },
+    "note": "If you check 'Show schema only' you'll get a light representation of the structure of the json content - very useful for writing quick extraction or exploration scripts - especially for ai agents"
+  }
+}</pre>
+        </div>
+      `;
+    }
+
     function updateOutput() {
       if (!state.rawText) { setStatus('Load a JSON file first.', 'error'); return; }
       try {
         const result = window.QuickJsonReader.runWithJsonText(state.rawText, buildConfig());
         state.outputText = result.outputText;
-        els.output.textContent = state.outputText || '';
+        showLiveOutput(state.outputText);
         setStatus('Render complete.', 'success');
       } catch (error) {
         state.outputText = '';
-        els.output.textContent = '';
+        showLiveOutput('');
         setStatus(error && error.message ? error.message : String(error), 'error');
       }
     }
@@ -178,8 +296,8 @@
       if (!file) {
         state.rawText = ''; state.fileName = '';
         els.fileMeta.textContent = 'No file loaded.';
-        els.output.textContent = 'No output yet.';
-        setStatus('Load a JSON file, then click Refresh.');
+        restoreExampleOutput();
+        setStatus('Load a JSON file, then click Refresh. Example outputs are shown below until then.');
         return;
       }
       try {
@@ -190,6 +308,7 @@
       } catch (error) {
         state.rawText = ''; state.fileName = ''; state.outputText = '';
         els.fileMeta.textContent = 'Failed to read file.';
+        restoreExampleOutput();
         setStatus(error && error.message ? error.message : String(error), 'error');
       }
     }
@@ -207,7 +326,11 @@
       els.showSchema.checked = false;
       syncUiRules();
       if (state.rawText) updateOutput();
-      else { state.outputText = ''; els.output.textContent = 'No output yet.'; setStatus('Settings reset.'); }
+      else {
+        state.outputText = '';
+        restoreExampleOutput();
+        setStatus('Settings reset.');
+      }
     }
 
     function downloadOutput() {
