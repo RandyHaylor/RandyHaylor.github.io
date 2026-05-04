@@ -808,6 +808,10 @@ function drawRoom(c, gx, gy){
     }
     const lbl = makeTextSprite(name);
     lbl.position.set(ix, 0.95, iz);
+    lbl.userData.isItemNameLabel = true;
+    lbl.userData.itemName = name;
+    lbl.userData.cellX = gx;
+    lbl.userData.cellY = gy;
     dungeonGroup.add(lbl);
   });
   // enemy: a red upright box; if this is the player's cell push it toward
@@ -1980,6 +1984,82 @@ window.addEventListener('blur', ()=>{
   heldRepeatingKeys.clear();
 });
 
+// ---- touch controls on the 3D viewport ----
+// Swipe up/down/left/right → forward/backward/turn-left/turn-right.
+// Short tap → raycast from camera; tapping an item-name label picks
+// up that item, tapping an enemy or its phrase bubble fires combatAttack
+// (only if in combat with that enemy), otherwise tap toggles the door
+// directly in front of the player.
+const TOUCH_SWIPE_MIN_PX = 30;
+const _touchRaycaster = new THREE.Raycaster();
+const _touchNDC = new THREE.Vector2();
+let _touchStart = null;
+function _handleGameTouchStart(e){
+  if(!e.touches || !e.touches[0]) return;
+  const t = e.touches[0];
+  _touchStart = { x: t.clientX, y: t.clientY };
+}
+function _handleGameTouchEnd(e){
+  if(!_touchStart) return;
+  const t = (e.changedTouches && e.changedTouches[0]);
+  if(!t){ _touchStart = null; return; }
+  const dx = t.clientX - _touchStart.x;
+  const dy = t.clientY - _touchStart.y;
+  _touchStart = null;
+  if(document.getElementById('startScreen') &&
+     !document.getElementById('startScreen').hidden) return;
+  if(state.dead) return;
+  const dist = Math.hypot(dx, dy);
+  if(dist >= TOUCH_SWIPE_MIN_PX){
+    if(Math.abs(dx) > Math.abs(dy)){
+      if(dx > 0) rotate(+1); else rotate(-1);
+    } else {
+      if(dy > 0) tryMoveBackward(); else tryMoveForward();
+    }
+    e.preventDefault();
+    return;
+  }
+  // Tap: raycast.
+  const game = document.getElementById('game');
+  const rect = game.getBoundingClientRect();
+  const nx = (t.clientX - rect.left) / rect.width  * 2 - 1;
+  const ny = -((t.clientY - rect.top) / rect.height * 2 - 1);
+  _touchNDC.set(nx, ny);
+  _touchRaycaster.setFromCamera(_touchNDC, camera);
+  if(scene){
+    const hits = _touchRaycaster.intersectObjects(scene.children, true);
+    for(const h of hits){
+      const u = h.object.userData;
+      if(!u) continue;
+      if(u.isItemNameLabel &&
+         u.cellX === state.player.x && u.cellY === state.player.y){
+        const c = cellAt(state.player.x, state.player.y);
+        const idx = c.items.indexOf(u.itemName);
+        if(idx >= 0) pickUpItem(idx);
+        e.preventDefault();
+        return;
+      }
+      if((u.isEnemy || u.isEnemyPhrase) && state.combat){
+        combatAttack();
+        e.preventDefault();
+        return;
+      }
+    }
+  }
+  // Fallback: tap with a door directly ahead → toggle it.
+  const c = cellAt(state.player.x, state.player.y);
+  if(c && c.walls[state.player.dir].type === 'door'){
+    toggleDoor();
+    e.preventDefault();
+  }
+}
+function attachGameTouchHandlers(){
+  const game = document.getElementById('game');
+  if(!game) return;
+  game.addEventListener('touchstart', _handleGameTouchStart, { passive: true });
+  game.addEventListener('touchend',   _handleGameTouchEnd,   { passive: false });
+}
+
 // Scale the fixed 400x800 wrap to fit the *visible* viewport (the
 // visualViewport API gives us the real area on iOS Safari/Chrome where the
 // dynamic bottom bar otherwise eats into innerHeight). Same layout on all
@@ -2220,6 +2300,7 @@ document.getElementById('btnSettingsClose').onclick = closeSettingsOverlay;
 initThree();
 newLevel(1);
 fitWrapToViewport();
+attachGameTouchHandlers();
 // Fire-and-forget: enemy chatter library loads on its own; phrases will
 // start appearing once the JSON arrives. No-op if it can't be fetched.
 loadAllEnemyPhraseLibraries();
