@@ -1,0 +1,129 @@
+{
+  "format": "mono mp3",
+  "sample_rate_hz": 22050,
+  "music_bitrate": "56k",
+  "sfx_bitrate": "32k",
+  "revision": "v4_full_music",
+  "music_notes": "Full-length structured retro/haunting versions, roughly 84-98 seconds each.",
+  "sfx_notes": "SFX copied from v3 revision.",
+  "music": [
+    {
+      "title": "Catacomb Nocturne",
+      "path": "music_mp3/01_catacomb_nocturne.mp3",
+      "approx_seconds": 86
+    },
+    {
+      "title": "Black Lantern Waltz",
+      "path": "music_mp3/02_black_lantern_waltz.mp3",
+      "approx_seconds": 92
+    },
+    {
+      "title": "Crypt Procession",
+      "path": "music_mp3/03_crypt_procession.mp3",
+      "approx_seconds": 88
+    },
+    {
+      "title": "Moonlit Requiem",
+      "path": "music_mp3/04_moonlit_requiem.mp3",
+      "approx_seconds": 96
+    },
+    {
+      "title": "Iron Chapel",
+      "path": "music_mp3/05_iron_chapel.mp3",
+      "approx_seconds": 90
+    },
+    {
+      "title": "Graveyard Courante",
+      "path": "music_mp3/06_graveyard_courante.mp3",
+      "approx_seconds": 84
+    },
+    {
+      "title": "Veil of Ashes",
+      "path": "music_mp3/07_veil_of_ashes.mp3",
+      "approx_seconds": 98
+    },
+    {
+      "title": "Hollow Court",
+      "path": "music_mp3/08_hollow_court.mp3",
+      "approx_seconds": 90
+    },
+    {
+      "title": "Raven Fughetta",
+      "path": "music_mp3/09_raven_fughetta.mp3",
+      "approx_seconds": 94
+    },
+    {
+      "title": "Stone Spiral",
+      "path": "music_mp3/10_stone_spiral.mp3",
+      "approx_seconds": 92
+    }
+  ],
+  "sfx": {
+    "damage_dealt": [
+      "sfx_mp3/damage_dealt/damage_dealt_1.mp3",
+      "sfx_mp3/damage_dealt/damage_dealt_2.mp3",
+      "sfx_mp3/damage_dealt/damage_dealt_3.mp3",
+      "sfx_mp3/damage_dealt/damage_dealt_4.mp3"
+    ],
+    "damage_taken": [
+      "sfx_mp3/damage_taken/damage_taken_1.mp3",
+      "sfx_mp3/damage_taken/damage_taken_2.mp3",
+      "sfx_mp3/damage_taken/damage_taken_3.mp3",
+      "sfx_mp3/damage_taken/damage_taken_4.mp3"
+    ],
+    "death_sting": [
+      "sfx_mp3/death_sting/death_sting_1.mp3",
+      "sfx_mp3/death_sting/death_sting_2.mp3",
+      "sfx_mp3/death_sting/death_sting_3.mp3",
+      "sfx_mp3/death_sting/death_sting_4.mp3"
+    ],
+    "descend_stairs": [
+      "sfx_mp3/descend_stairs/descend_stairs_1.mp3",
+      "sfx_mp3/descend_stairs/descend_stairs_2.mp3",
+      "sfx_mp3/descend_stairs/descend_stairs_3.mp3",
+      "sfx_mp3/descend_stairs/descend_stairs_4.mp3"
+    ],
+    "door_open": [
+      "sfx_mp3/door_open/door_open_1.mp3",
+      "sfx_mp3/door_open/door_open_2.mp3",
+      "sfx_mp3/door_open/door_open_3.mp3",
+      "sfx_mp3/door_open/door_open_4.mp3"
+    ],
+    "door_shut": [
+      "sfx_mp3/door_shut/door_shut_1.mp3",
+      "sfx_mp3/door_shut/door_shut_2.mp3",
+      "sfx_mp3/door_shut/door_shut_3.mp3",
+      "sfx_mp3/door_shut/door_shut_4.mp3"
+    ],
+    "footstep": [
+      "sfx_mp3/footstep/footstep_1.mp3",
+      "sfx_mp3/footstep/footstep_2.mp3",
+      "sfx_mp3/footstep/footstep_3.mp3",
+      "sfx_mp3/footstep/footstep_4.mp3"
+    ],
+    "gold_collect": [
+      "sfx_mp3/gold_collect/gold_collect_1.mp3",
+      "sfx_mp3/gold_collect/gold_collect_2.mp3",
+      "sfx_mp3/gold_collect/gold_collect_3.mp3",
+      "sfx_mp3/gold_collect/gold_collect_4.mp3"
+    ],
+    "herb_collect": [
+      "sfx_mp3/herb_collect/herb_collect_1.mp3",
+      "sfx_mp3/herb_collect/herb_collect_2.mp3",
+      "sfx_mp3/herb_collect/herb_collect_3.mp3",
+      "sfx_mp3/herb_collect/herb_collect_4.mp3"
+    ],
+    "herb_take": [
+      "sfx_mp3/herb_take/herb_take_1.mp3",
+      "sfx_mp3/herb_take/herb_take_2.mp3",
+      "sfx_mp3/herb_take/herb_take_3.mp3",
+      "sfx_mp3/herb_take/herb_take_4.mp3"
+    ],
+    "sword_swing": [
+      "sfx_mp3/sword_swing/sword_swing_1.mp3",
+      "sfx_mp3/sword_swing/sword_swing_2.mp3",
+      "sfx_mp3/sword_swing/sword_swing_3.mp3",
+      "sfx_mp3/sword_swing/sword_swing_4.mp3"
+    ]
+  }
+}

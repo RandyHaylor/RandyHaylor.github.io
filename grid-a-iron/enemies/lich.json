@@ -1,0 +1,20 @@
+{
+  "name": "Lich",
+  "phrases": [
+    "Mortal worm", "Centuries old", "Your soul", "Bow.",
+    "Trinkets and dust", "I see your end", "Warm flesh...",
+    "Hexed", "Necromancy", "Pitiful", "Rot, rot",
+    "I do not bleed", "Forgotten arts", "By dark stars",
+    "Witness", "Your line ends", "Long memory",
+    "Older than this dungeon", "I felt your fear",
+    "Velvet shadows", "Unbind, unbind",
+    "Scribe of doom", "Skip the prayer",
+    "Spellfire", "Whisper to bones", "Ancient grudge",
+    "Power flows", "Step closer", "Time bends here",
+    "Curse spoken"
+  ],
+  "movements": [
+    "drifts", "weaves a sigil", "intones", "raises hand",
+    "robe rustles", "eyes flare", "staff thumps", "exhales chill"
+  ]
+}

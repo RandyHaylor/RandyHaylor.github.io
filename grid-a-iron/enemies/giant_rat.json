@@ -1,0 +1,19 @@
+{
+  "name": "Giant Rat",
+  "phrases": [
+    "Squeak!", "Cheese please?", "My turf", "Plague carrier", "Nibble nibble",
+    "Tail twitch", "Beady eyes", "Bite bite", "Hide here", "Rat king",
+    "Tiny terror", "Crumb thief", "Dark scurry", "Sniff sniff", "Fur fluff",
+    "Whisker tickle", "Claw claw", "Old cheese!", "Underground!", "Pestilence",
+    "Run run run", "Furry fury", "Fang flash", "Mine!", "Greedy",
+    "Cellar lord", "Twitchy nose", "Eat your toes", "Disease vector", "Brown menace",
+    "Feast time", "Tunnel master", "Garbage king", "Plague time", "Squeak attack",
+    "Many of us", "Hungry always", "Skitter skitter", "Black death", "Smelly socks",
+    "Nest defender", "Crumb guardian", "Filth lord", "Whisker twitch", "Chunk chunk",
+    "Devour", "Gnaw gnaw", "Tail whip", "Greasy", "Pellet army"
+  ],
+  "movements": [
+    "scurries", "sniffs", "bares fangs", "twitches whiskers",
+    "lashes tail", "hunches low", "scratches floor", "shuffles paws"
+  ]
+}

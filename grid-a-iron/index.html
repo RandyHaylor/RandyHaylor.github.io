@@ -1,0 +1,2787 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>grid-A-Iron Dungeon</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<!-- VT323 = IBM VT-style monochrome terminal font, the closest match to
+     the 8086-era PC text-mode look. Already referenced in the CSS stack. -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=VT323&display=swap" />
+<style>
+  html,body { margin:0; padding:0; background:#111; color:#0f0;
+              font-family: "VT323","Courier New",monospace; overflow:hidden;
+              overscroll-behavior:none; touch-action:manipulation;
+              display:flex; justify-content:center; align-items:flex-start;
+              height:100%; width:100%; }
+  /* Fixed portrait viewport: 400 logical x 700 logical. Aspect chosen so
+     the width-fit and height-fit scales are roughly equal on iPhone-sized
+     viewports — width fills, height has just enough headroom for the
+     dynamic browser bottom bar. */
+  /* Use outline (not border) so the green frame draws outside the box
+     and doesn't shave 2px off the inner content area, which previously
+     made the canvas overlap the right-side border. */
+  #wrap { width:400px; height:700px; position:relative; background:#000;
+          outline:1px solid #0a0;
+          transform-origin: top left; }
+  /* 3D area: 4:3 (400x300) at top, UI takes the remaining 400px below. */
+  #game { position:absolute; left:0; top:0; width:400px; height:300px; overflow:hidden; }
+  #game canvas { display:block; width:400px; height:300px; }
+  /* Held-item HUD: anchored at the bottom of the 3D viewport, sprite
+     pushed half off-screen so only the top peeks up (flame for torch,
+     blade tip for sword). overflow:hidden on #game clips the rest.
+     Doubled size from 96 -> 192. */
+  .hand { position:absolute; bottom:-92px; width:192px; height:192px;
+          pointer-events:none; image-rendering:pixelated; z-index:5; }
+  .hand img { width:100%; height:100%; image-rendering:pixelated; display:block; }
+  .hand.left  { left:0;    transform: rotate(-15deg);
+                 transition: opacity 600ms ease-out; }
+  .hand.right { right:0;   transform: rotate(20deg); }
+  .hand[hidden]{ display:none; }
+  /* Top HUD strip over the 3D view: dungeon level on the left,
+     HP centered (so it never overlaps the compass on the right). */
+  #topHud { position:absolute; top:6px; left:46px; right:46px;
+             display:flex; align-items:center; pointer-events:none;
+             color:#fff; font-family:"VT323","Courier New",monospace;
+             font-size:18px; letter-spacing:1px; z-index:7;
+             text-shadow: 0 0 4px #000, 0 0 4px #000; }
+  #topHudLvl { flex:0 0 auto; }
+  #topHudHp  { flex:1; text-align:center; }
+  #topHudHp.low { color:#ff3030; }
+  /* Damage flash: full red veil over the 3D viewport, fades out fast. */
+  #hitFlash { position:absolute; inset:0; background:rgba(220,30,30,0.55);
+              pointer-events:none; opacity:0; z-index:8; }
+  @keyframes hitFlashKf {
+    0%   { opacity:0.6; }
+    100% { opacity:0; }
+  }
+  #hitFlash.active { animation: hitFlashKf 360ms ease-out; }
+  /* Big red damage number on player hit. */
+  #playerDamageNum { position:absolute; left:0; right:0; top:30%;
+                     text-align:center; font-size:84px; font-weight:bold;
+                     color:#ff3030; pointer-events:none; opacity:0;
+                     z-index:9; font-family:"VT323","Courier New",monospace;
+                     text-shadow: 0 0 12px #800, 0 0 24px #400; }
+  @keyframes playerDamageNumKf {
+    0%   { opacity:1; transform:translateY(0); }
+    100% { opacity:0; transform:translateY(-40px); }
+  }
+  #playerDamageNum.show { animation: playerDamageNumKf 700ms ease-out forwards; }
+  /* #darkVignette removed — was producing a fake flashlight-forward
+     effect by darkening the screen corners. */
+  #darkVignette { display:none !important; }
+  /* Attack swing: slash sword down and in front (toward screen center)
+     in combination with the camera yaw rotation, then snap back.
+     Combined duration tracks the JS PLAYER_SWING_TOTAL_MS. */
+  @keyframes attackSwingKf {
+    0%   { transform: translate(0, 0)        rotate(20deg); }
+    50%  { transform: translate(-70px,-40px) rotate(-65deg); }
+    100% { transform: translate(0, 0)        rotate(20deg); }
+  }
+  .hand.right.attackSwing { animation: attackSwingKf 168ms ease-in-out; }
+  #ui {
+    position:absolute; left:0; top:300px; width:400px; height:400px;
+    background:rgba(0,0,0,0.92); border-top:2px solid #0f0;
+    padding:6px; box-sizing:border-box; font-size:14px; line-height:1.25;
+    display:grid; grid-template-rows: 1fr auto auto; gap:6px;
+  }
+  #ui .panel { border:1px solid #0a0; padding:4px 6px; min-height:0; position:relative; }
+  /* Status panel grid: two columns of stat lines. */
+  #statusGrid { display:grid; grid-template-columns: 1fr 1fr; gap:2px 12px; font-size:14px; }
+  /* Inventory overlay: covers all UI panels when shown.
+     The [hidden] attribute on the element didn't take effect because
+     `display:flex` overrides the user-agent `display:none`; we add
+     an explicit higher-specificity rule to enforce hide. */
+  #inventoryOverlay { position:absolute; left:0; right:0; top:0; bottom:0;
+                       background:rgba(0,0,0,0.96); border-top:2px solid #0f0;
+                       padding:10px; box-sizing:border-box; z-index:50;
+                       display:flex; flex-direction:column; gap:6px; }
+  #inventoryOverlay[hidden] { display:none !important; }
+  /* Hamburger settings button: top-left of the wrap, always present
+     above all other UI (below only the start screen / death overlay). */
+  #hamburgerBtn { position:absolute; top:6px; left:6px; z-index:90;
+                   background:rgba(0,0,0,0.65); color:#9f9;
+                   border:1px solid #0a0; font-size:18px; line-height:1;
+                   padding:4px 8px; cursor:pointer; }
+  #settingsOverlay { position:absolute; left:0; right:0; top:0; bottom:0;
+                      background:rgba(0,0,0,0.96); border-top:2px solid #0f0;
+                      padding:12px; box-sizing:border-box; z-index:95;
+                      display:flex; flex-direction:column; gap:10px;
+                      font-family:"VT323","Courier New",monospace; }
+  #settingsOverlay[hidden] { display:none !important; }
+  #settingsHeader { color:#9f9; letter-spacing:1px;
+                     border-bottom:1px solid #0a0; padding-bottom:4px; }
+  #settingsOverlay .settings-row { display:flex; align-items:center;
+                                    gap:8px; color:#cfc; font-size:16px; }
+  #settingsOverlay .settings-row input[type=range] { flex:1; }
+  /* Start screen with splash + volume sliders. Required user-gesture
+     before any audio plays. */
+  #startScreen { position:absolute; left:0; right:0; top:0; bottom:0;
+                  background:#000; z-index:120; padding:14px;
+                  box-sizing:border-box; display:flex; flex-direction:column;
+                  align-items:center; justify-content:center; gap:14px;
+                  font-family:"VT323","Courier New",monospace; }
+  #startScreen[hidden] { display:none !important; }
+  /* Text-only title on the start screen (no splash image). */
+  #startTitle { text-align:center; line-height:1.05; }
+  #startTitle .big { font-size:48px; color:#9bff9b;
+                      text-shadow: 0 0 6px #060, 0 0 14px #030;
+                      letter-spacing:2px; }
+  #startTitle .sub { font-size:38px; color:#ffd34d;
+                      text-shadow: 0 0 6px #420, 0 0 14px #210;
+                      letter-spacing:6px; margin-top:4px; }
+  #startScreen .vol-row { display:flex; align-items:center; gap:8px;
+                           color:#cfc; font-size:16px; min-width:240px; }
+  #startScreen .vol-row input[type=range] { flex:1; }
+  #btnStartGame { font-size:22px; padding:10px 26px; background:#063;
+                   color:#aaffaa; border:1px solid #0f6;
+                   box-shadow: 0 0 6px #0f4 inset, 0 0 6px #0f4; }
+  /* Vendor overlay: same shape as inventory; green accents to match
+     the friendly NPC. */
+  #vendorOverlay { position:absolute; left:0; right:0; top:0; bottom:0;
+                    background:rgba(0,0,0,0.96); border-top:2px solid #0f0;
+                    padding:10px; box-sizing:border-box; z-index:50;
+                    display:flex; flex-direction:column; gap:6px; }
+  #vendorOverlay[hidden] { display:none !important; }
+  #vendorHeader { color:#9f9; letter-spacing:1px; border-bottom:1px solid #0a0; padding-bottom:4px; }
+  #vendorItemList { flex:1; overflow:auto; }
+  #vendorItemList .vendorRow { display:flex; align-items:center; gap:8px; padding:3px 0;
+                                border-bottom:1px dashed #050; }
+  /* Death overlay: covers the whole wrap (game + UI), fades to black,
+     then message / stats / button fade in via cascading transitions. */
+  #deathOverlay { position:absolute; inset:0; background:#000; z-index:80;
+                  opacity:0; transition: opacity 1.4s ease-in;
+                  display:flex; flex-direction:column; align-items:center;
+                  justify-content:center; padding:20px; box-sizing:border-box;
+                  color:#bca; gap:14px; pointer-events:none;
+                  font-family: "VT323","Courier New",monospace; }
+  #deathOverlay.active { opacity:0.97; pointer-events:auto; }
+  #deathOverlay[hidden] { display:none !important; }
+  #deathMsg { font-size:24px; color:#c66; text-align:center; opacity:0;
+              transition: opacity 1.0s ease 1.4s; letter-spacing:1px; }
+  #deathStats { font-size:16px; opacity:0;
+                transition: opacity 1.0s ease 2.4s;
+                text-align:left; min-width:240px; line-height:1.35; }
+  #btnPlayAgain { font-size:18px; padding:8px 16px; opacity:0;
+                  transition: opacity 1.0s ease 3.0s; }
+  #deathOverlay.active #deathMsg,
+  #deathOverlay.active #deathStats,
+  #deathOverlay.active #btnPlayAgain { opacity:1; }
+  #invHeader { color:#9f9; letter-spacing:1px; border-bottom:1px solid #0a0; padding-bottom:4px; }
+  #invItemList { flex:1; overflow:auto; }
+  #invItemList .invRow { display:flex; align-items:center; gap:8px; padding:3px 0;
+                          border-bottom:1px dashed #050; }
+  /* ROOM panel: discovered map fills the panel as a half-transparent
+     backdrop; room text/items/log layer on top. */
+  #roomPanel > #discoveredMap {
+    position:absolute; inset:0; padding:4px 6px;
+    opacity:0.45; pointer-events:none;
+    overflow:hidden;
+    display:flex; align-items:center; justify-content:center;
+    margin:0 !important;
+  }
+  #roomPanel > #discoveredMap pre {
+    margin:0; color:#cfc;
+    /* fluid scale: line-height tight; size left to inline style */
+  }
+  #roomPanel > h3,
+  #roomPanel > #roomDesc,
+  #roomPanel > #itemList,
+  #roomPanel > #log { position:relative; z-index:1; opacity:0.78; }
+  /* Player arrow lives above the map but below the room text. */
+  #playerArrowMarker {
+    position:absolute; left:50%; top:50%;
+    transform: translate(-50%, -50%) rotate(0deg);
+    transition: transform 250ms ease-out;
+    color:#bff5b0; font-family:'Courier New',monospace; font-size:22px;
+    font-weight:bold; pointer-events:none; z-index:1;
+    text-shadow: 0 0 4px rgba(120,255,120,0.6);
+  }
+  /* Buttons inside ROOM panel (item Take buttons) stay fully opaque so
+     they remain readable/tappable. */
+  #roomPanel > #itemList button { opacity:1; }
+  #ui h3 { margin:0 0 3px 0; font-size:13px; color:#9f9; letter-spacing:1px; }
+
+  /* Compact 2x3 symbol d-pad for movement / interaction. */
+  .dpad { display:grid; grid-template-columns:1fr 1fr 1fr; gap:4px; }
+  .dpad button { font-size:22px; padding:8px 0; line-height:1;
+                 min-height:38px; }
+  /* Door button uses a text label rather than a symbol — make it fit. */
+  #btnDoor { font-size:13px; }
+  /* Descend / Vendor buttons get the same green-glow pulse when usable. */
+  #btnVendor.available,
+  .dpad button.available {
+    background:#063;
+    color:#aaffaa;
+    border-color:#0f6;
+    box-shadow: 0 0 6px #0f4 inset, 0 0 6px #0f4;
+    animation: descendPulse 1.2s ease-in-out infinite;
+  }
+  @keyframes descendPulse {
+    0%,100% { box-shadow: 0 0 6px #0f4 inset, 0 0 5px #0f4; }
+    50%     { box-shadow: 0 0 6px #0f4 inset, 0 0 14px #0f6; }
+  }
+  #ui h3 { margin:0 0 4px 0; font-size:16px; color:#9f9; letter-spacing:1px; }
+  #log { font-size:12px; line-height:1.2; overflow:hidden; max-height:60px; }
+  #log div { opacity:.95; }
+  button { background:#020; color:#0f0; border:1px solid #0a0; font-family:inherit; font-size:16px;
+           padding:4px 8px; margin:2px 2px 0 0; cursor:pointer; }
+  button:hover { background:#040; }
+  button:disabled { color:#050; border-color:#040; cursor:not-allowed; }
+  #compass { position:absolute; top:6px; right:6px; background:rgba(0,0,0,.65);
+             padding:4px; border:1px solid #0a0;
+             display:flex; align-items:center; }
+  #compassText { display:none; }
+  #compassRose { width:42px; height:42px; position:relative; }
+  #compassRose .ring { position:absolute; inset:0; border:1px solid #0a0; border-radius:50%; }
+  #compassRose .needle {
+    position:absolute; left:50%; top:50%; width:0; height:0;
+    border-left:4px solid transparent; border-right:4px solid transparent;
+    border-bottom:18px solid #ff4444;
+    transform-origin: 50% 100%;
+    transform: translate(-50%,-100%) rotate(0deg);
+    transition: transform .15s ease-out;
+    filter: drop-shadow(0 0 2px #f00);
+  }
+  #compassRose .tail {
+    position:absolute; left:50%; top:50%; width:0; height:0;
+    border-left:3px solid transparent; border-right:3px solid transparent;
+    border-top:14px solid #888;
+    transform-origin: 50% 0%;
+    transform: translate(-50%,0%) rotate(0deg);
+    transition: transform .15s ease-out;
+  }
+  #compassRose .lbl { position:absolute; font-size:9px; color:#9f9; }
+  #compassRose .lN { top:0;    left:50%; transform:translate(-50%,-2px); }
+  #compassRose .lS { bottom:0; left:50%; transform:translate(-50%,2px); }
+  #compassRose .lE { top:50%;  right:0;  transform:translate(2px,-50%); }
+  #compassRose .lW { top:50%;  left:0;   transform:translate(-2px,-50%); }
+  #compassText { line-height:1.25; }
+</style>
+</head>
+<body>
+<div id="wrap">
+<button id="hamburgerBtn" title="Settings" aria-label="Settings">&#9776;</button>
+<div id="settingsOverlay" hidden>
+  <div id="settingsHeader">SETTINGS <span style="font-size:11px;opacity:.7;">(Close to dismiss)</span></div>
+  <div class="settings-row">Music
+    <input type="range" id="settingsMusicVolSlider" min="0" max="1" step="0.01" value="0.125" />
+  </div>
+  <div class="settings-row">SFX
+    <input type="range" id="settingsSfxVolSlider"   min="0" max="1" step="0.01" value="0.35" />
+  </div>
+  <button id="btnSettingsClose" style="margin-top:8px;">Close</button>
+</div>
+<div id="game">
+  <!-- Held items: clipped against game viewport bottom so only the
+       upper portion of the held sprite peeks up like a Doom-era HUD. -->
+  <div class="hand left"><img src="sprites/item_torch.png" alt="torch" /></div>
+  <div class="hand right" id="rightHand" hidden><img src="sprites/item_rusty_sword.png" alt="weapon" /></div>
+  <!-- Red flash overlay: pulsed when an enemy hit lands. -->
+  <div id="hitFlash"></div>
+  <!-- Big red damage number when the player gets hit. -->
+  <div id="playerDamageNum"></div>
+  <!-- Radial vignette: shown only when torch is out, gives a fuzzy
+       circular black border around what little remains visible. -->
+  <div id="darkVignette"></div>
+  <!-- Top HUD strip: dungeon level + HP. Always visible over the 3D view. -->
+  <div id="topHud">
+    <span id="topHudLvl">Lv 1</span>
+    <span id="topHudHp">HP 20/20</span>
+  </div>
+</div>
+<div id="compass">
+  <div id="compassRose">
+    <div class="ring"></div>
+    <div class="lbl lN">N</div><div class="lbl lE">E</div>
+    <div class="lbl lS">S</div><div class="lbl lW">W</div>
+    <div class="needle" id="compassNeedle"></div>
+    <div class="tail" id="compassTail"></div>
+  </div>
+  <div id="compassText"></div>
+</div>
+<div id="ui">
+  <div class="panel" id="roomPanel">
+    <div id="roomDesc">—</div>
+    <div id="itemList"></div>
+    <div id="log"></div>
+    <div id="discoveredMap" style="margin-top:6px;"></div>
+    <!-- Player arrow: centered overlay, rotates smoothly with facing,
+         stays put while the discoveredMap pans under it. -->
+    <div id="playerArrowMarker">^</div>
+  </div>
+  <div class="panel" id="combatPanel">
+    <div id="statusGrid"></div>
+    <div id="combatActions"></div>
+    <div id="combatPanelButtons" style="margin-top:4px; display:flex; gap:6px; flex-wrap:wrap;">
+      <button id="btnInventory">Inventory (I)</button>
+      <button id="btnVendor" style="display:none;">Vendor (V)</button>
+    </div>
+  </div>
+  <div id="deathOverlay" hidden>
+    <div id="deathMsg">one more skeleton for my army...</div>
+    <div id="deathStats"></div>
+    <button id="btnPlayAgain">Play Again (Space)</button>
+  </div>
+  <div id="startScreen">
+    <div id="startTitle">
+      <div class="big">grid-A-Iron</div>
+      <div class="sub">DUNGEON</div>
+    </div>
+    <button id="btnStartGame">Enter</button>
+  </div>
+  <div id="vendorOverlay" hidden>
+    <div id="vendorHeader">VENDOR <span style="font-size:11px;opacity:.7;">(V or Close to dismiss)</span></div>
+    <div id="vendorItemList"></div>
+    <button id="btnVendorClose" style="margin-top:8px;">Close</button>
+  </div>
+  <div id="inventoryOverlay" hidden>
+    <div id="invHeader">INVENTORY <span style="font-size:11px;opacity:.7;">(I or Close to dismiss)</span></div>
+    <div id="invItemList"></div>
+    <button id="btnInvClose" style="margin-top:8px;">Close</button>
+  </div>
+  <div class="panel" id="movePanel">
+    <div class="dpad">
+      <button id="btnLeft"   title="Turn left (A)">↺</button>
+      <button id="btnFwd"    title="Forward (W)">↑</button>
+      <button id="btnRight"  title="Turn right (D)">↻</button>
+      <button id="btnDoor"   title="Open/close door (E)">Open Door (E)</button>
+      <button id="btnBack"   title="Backward (S)">↓</button>
+      <button id="btnStairs" title="Descend stairs (Space)">▼</button>
+    </div>
+  </div>
+</div>
+</div>
+
+<script type="importmap">
+{ "imports": { "three": "https://unpkg.com/three@0.160.0/build/three.module.js" } }
+</script>
+<script type="module">
+import * as THREE from 'three';
+
+// -------- constants --------
+const N=0, E=1, S=2, W=3;
+const DIR_NAMES = ['N','E','S','W'];
+const DIR_VEC = [[0,-1],[1,0],[0,1],[-1,0]]; // dx,dy for N,E,S,W (y grows south)
+const CELL = 4; // world units per room
+const WALL_H = 3;
+
+// -------- random --------
+function rng(seed){ let s=seed>>>0; return ()=>{ s=(s*1664525+1013904223)>>>0; return s/4294967296; }; }
+let R = rng(Date.now()&0xffffffff);
+const ri = (n)=>Math.floor(R()*n);
+const choice = (a)=>a[ri(a.length)];
+
+// -------- dungeon generation --------
+// Each cell has walls[4] where each is 'wall' | 'open' | 'door' (door has 'open' bool).
+// We carve a maze via DFS, then convert some carved edges to doors, leave rest open. Outer = wall.
+function makeLevel(level){
+  const W_=8, H_=8;
+  const cells = [];
+  for(let y=0;y<H_;y++){
+    const row=[];
+    for(let x=0;x<W_;x++){
+      row.push({
+        x,y,
+        walls:[{type:'wall'},{type:'wall'},{type:'wall'},{type:'wall'}],
+        items:[], enemy:null, stairs:false, visited:false, seen:false
+      });
+    }
+    cells.push(row);
+  }
+  const cellAt=(x,y)=> (x>=0&&y>=0&&x<W_&&y<H_)?cells[y][x]:null;
+
+  // DFS maze
+  const stack=[[ri(W_),ri(H_)]];
+  cellAt(stack[0][0],stack[0][1]).visited=true;
+  while(stack.length){
+    const [x,y]=stack[stack.length-1];
+    const opts=[];
+    for(let d=0;d<4;d++){
+      const nx=x+DIR_VEC[d][0], ny=y+DIR_VEC[d][1];
+      const c=cellAt(nx,ny);
+      if(c && !c.visited) opts.push(d);
+    }
+    if(!opts.length){ stack.pop(); continue; }
+    const d=choice(opts);
+    const nx=x+DIR_VEC[d][0], ny=y+DIR_VEC[d][1];
+    const here=cellAt(x,y), there=cellAt(nx,ny);
+    // 30% chance carve becomes a closed door; else open passage
+    const isDoor = R()<0.3;
+    here.walls[d] = isDoor ? {type:'door',open:false} : {type:'open'};
+    there.walls[(d+2)%4] = isDoor ? {type:'door',open:false} : {type:'open'};
+    there.visited=true;
+    stack.push([nx,ny]);
+  }
+
+  // Add a few extra openings for loops
+  for(let i=0;i<6;i++){
+    const x=ri(W_), y=ri(H_), d=ri(4);
+    const nx=x+DIR_VEC[d][0], ny=y+DIR_VEC[d][1];
+    const a=cellAt(x,y), b=cellAt(nx,ny);
+    if(!b) continue;
+    if(a.walls[d].type==='wall'){
+      a.walls[d]={type:'open'};
+      b.walls[(d+2)%4]={type:'open'};
+    }
+  }
+
+  // Place player far from stairs
+  const px=ri(W_), py=ri(H_);
+  let sx,sy;
+  do { sx=ri(W_); sy=ri(H_); } while(Math.abs(sx-px)+Math.abs(sy-py) < 6);
+  cellAt(sx,sy).stairs=true;
+
+  // Exactly one sword and one shield per floor; tier gated by level.
+  let swordToSpawn  = (level >= 6) ? 'Steel Sword'  : (level >= 4 ? 'Iron Sword'  : 'Rusty Sword');
+  let shieldToSpawn = (level >= 6) ? 'Steel Shield' : (level >= 4 ? 'Iron Shield' : 'Rusty Shield');
+  function placeUniqueFloorItem(name){
+    for(let attempt=0; attempt<60; attempt++){
+      const ix=ri(W_), iy=ri(H_);
+      if(ix===px && iy===py) continue;
+      const c = cellAt(ix,iy);
+      if(!c || c.stairs) continue;
+      c.items.push(name);
+      return true;
+    }
+    return false;
+  }
+  placeUniqueFloorItem(swordToSpawn);
+  placeUniqueFloorItem(shieldToSpawn);
+  // Exactly one spare torch per level. Removed from the random sprinkle
+  // pool below so this remains the only torch.
+  placeUniqueFloorItem('Torch');
+  // Sprinkle other floor items (no swords/shields/torches here).
+  const itemsPool = ['Healing Herb','Gold (5gp)'];
+  for(let i=0;i<5;i++){
+    const c = cells[ri(H_)][ri(W_)];
+    if(c.stairs) continue;
+    c.items.push(choice(itemsPool));
+  }
+
+  // Sprinkle enemies (not in player's start cell, not on stairs).
+  // Level-gated pool: skeletons L2+, cave trolls L4+, liches L6+.
+  const enemiesPool = [
+    {name:'Giant Rat',  hp:5,  atk:2, minLevel:1},
+    {name:'Goblin',     hp:8,  atk:3, minLevel:1},
+    {name:'Slime',      hp:6,  atk:2, minLevel:1},
+    {name:'Skeleton',   hp:10, atk:4, minLevel:2},
+    {name:'Cave Troll', hp:18, atk:6, minLevel:4},
+    {name:'Lich',       hp:30, atk:7, minLevel:6},
+  ];
+  const eligibleEnemies = enemiesPool.filter(e => e.minLevel <= level);
+  const enemyCount = 3 + level;
+  for(let i=0;i<enemyCount;i++){
+    const ex=ri(W_), ey=ri(H_);
+    if(ex===px && ey===py) continue;
+    const c=cellAt(ex,ey);
+    if(c.enemy || c.stairs) continue;
+    const t = choice(eligibleEnemies);
+    c.enemy = { ...t, hpMax:t.hp };
+  }
+
+  // Vendor: only on even floors (2, 4, 6, ...). Placed in the 3x3
+  // around the player's start cell, never on the start cell itself,
+  // never on stairs, and not on any enemy cell.
+  if(level % 2 === 0){
+    const candidates = [];
+    for(let dy=-1; dy<=1; dy++){
+      for(let dx=-1; dx<=1; dx++){
+        if(dx===0 && dy===0) continue;
+        const vx = px+dx, vy = py+dy;
+        if(vx<0 || vy<0 || vx>=W_ || vy>=H_) continue;
+        const c = cellAt(vx, vy);
+        if(!c || c.stairs || c.enemy) continue;
+        candidates.push(c);
+      }
+    }
+    if(candidates.length){
+      const pick = candidates[ri(candidates.length)];
+      pick.npc = { name: 'Vendor' };
+    }
+  }
+
+  return { W_, H_, cells, px, py };
+}
+
+// -------- game state --------
+const state = {
+  level: 1,
+  player: { x:0, y:0, dir:N, hp:20, hpMax:20, gold:0,
+            inv:['Healing Herb','Healing Herb'],
+            weapon: { name:'Fists', atk:2 },
+            shield: { name:'None',  dr:0 },
+            torchCharges: 0 },
+  dungeon: null,
+  combat: null, // {enemy, ref to cell}
+  awaitInput: false,
+  anim: null, // {kind:'move'|'rotate', startTs, durMs, fromPos:THREE.Vector3, toPos, fromYaw, toYaw, onDone}
+  // Single-slot input buffer: if the player presses another move/rotate
+  // while an animation is mid-flight, we save it here and fire it the
+  // moment the current animation (and any chained follow-up) ends.
+  // Latest press wins (overwrites any earlier pending action).
+  pendingAction: null,
+  attackSwing:  null, // {startTs, durMs}
+  screenShake:  null, // {startTs, until, durMs, magnitude}
+  enemyLunge:   null, // {startTs, durMs, enemyObj, basePos:Vec3, peakPos:Vec3, peakFired, onPeak, onDone}
+  combatBusy:   false,// true while a player attack + enemy turn chain is in flight
+  dead:         false,
+  deathStartTs: 0,
+  stats: {
+    goldCollected: 0,
+    enemiesKilled: 0,
+    damageDealt:   0,
+    damageTaken:   0,
+    herbsEaten:    0,
+    visitedKeys:   new Set(), // unique "<level>:<x>:<y>" cells entered
+  },
+};
+const PLAYER_SWING_TOTAL_MS = 168;   // 140 + 20%, matches CSS attackSwingKf
+const ENEMY_HIT_FLASH_MS = 84;
+const ENEMY_LUNGE_DURATION_MS = 192;
+const ENEMY_LUNGE_DEPTH = 0.8;       // world units enemy moves toward camera at peak
+const ANIM_DURATION_MS = 250;
+const ATTACK_SWING_DURATION_MS = 132; // 110 + 20%
+const SCREEN_SHAKE_DURATION_MS = 220;
+const SCREEN_SHAKE_MAGNITUDE = 0.18;
+const ENEMY_BOB_AMPLITUDE = 0.06;
+const ENEMY_BOB_PERIOD_MS = 600;
+
+function newLevel(level){
+  const d = makeLevel(level);
+  state.dungeon = d;
+  state.player.x = d.px;
+  state.player.y = d.py;
+  state.player.dir = N;
+  state.combat = null;
+  state.combatBusy = false;
+  if(state.stats) state.stats.visitedKeys.add(`${level}:${d.px}:${d.py}`);
+  // On level 1, the player starts torchless — guarantee a torch lying
+  // at their feet so they can immediately light up.
+  if(level === 1){
+    const startCell = d.cells[d.py][d.px];
+    if(startCell.items.indexOf('Torch') < 0) startCell.items.push('Torch');
+  }
+  buildScene();
+  log(`-- Level ${level} --`);
+  refreshUI();
+}
+
+// -------- three.js scene --------
+let scene, camera, renderer;
+let dungeonGroup;
+
+function initThree(){
+  scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x000000);
+  // Fuzzy fog of war: starts close (slight dimming even in current room)
+  // and reaches full black just past the BFS boundary (5x5 / Chebyshev<=2).
+  // Camera-anchored so it moves smoothly in any direction.
+  scene.fog = new THREE.Fog(0x000000, CELL * 0.5, CELL * 2.6);
+
+  // 3D viewport: 4:3 (400x300), top of the layout — same on every device.
+  const VIEW_W = 400, VIEW_H = 300;
+  camera = new THREE.PerspectiveCamera(75, VIEW_W/VIEW_H, 0.05, 50);
+  renderer = new THREE.WebGLRenderer({ antialias:false });
+  renderer.setPixelRatio(1);
+  renderer.setSize(VIEW_W, VIEW_H);
+  // Use physically-correct light units (not legacy). With this set,
+  // PointLight intensity is in lumens-style values and decay=2 gives
+  // a real inverse-square falloff. We keep this on so behavior matches
+  // the three.js docs the user pasted.
+  renderer.useLegacyLights = false;
+  document.getElementById('game').appendChild(renderer.domElement);
+
+  // Ambient light disabled — only the omnidirectional torch point
+  // light contributes illumination. Unlit pixels render pure black.
+  const amb = new THREE.AmbientLight(0xffeedd, 0);
+  amb.name = 'ambient';
+  scene.add(amb);
+  // Omnidirectional point light. Intensity / distance / decay are
+  // adjusted live by applyTorchLightingEffects.
+  const torch = new THREE.PointLight(0xffaa66, 60, CELL*4, 2);
+  torch.name='torch';
+  scene.add(torch);
+  // VISIBLE flame marker — a small unlit emissive sphere that follows
+  // torch.position every frame, so you can SEE exactly where the
+  // omnidirectional point light source is in the scene. Equivalent to
+  // a PointLightHelper but uses MeshBasicMaterial so it's pure color
+  // (not affected by lighting itself, always visible).
+  const flameMarkerGeom = new THREE.SphereGeometry(0.18, 10, 10);
+  const flameMarkerMat  = new THREE.MeshBasicMaterial({ color: 0xffcc66 });
+  const flameMarker     = new THREE.Mesh(flameMarkerGeom, flameMarkerMat);
+  flameMarker.name = 'torchFlameMarker';
+  scene.add(flameMarker);
+}
+
+// ---- Texture/sprite loading from sprites/ folder ----
+const TEX_LOADER = new THREE.TextureLoader();
+function loadTilingTexture(path, repeat=1){
+  const t = TEX_LOADER.load(path);
+  t.wrapS = t.wrapT = THREE.RepeatWrapping;
+  t.magFilter = THREE.NearestFilter;
+  t.minFilter = THREE.LinearMipMapLinearFilter;
+  t.repeat.set(repeat, repeat);
+  return t;
+}
+function loadSpriteTexture(path){
+  const t = TEX_LOADER.load(path);
+  t.magFilter = THREE.NearestFilter;
+  t.minFilter = THREE.LinearFilter;
+  return t;
+}
+const wallTex  = loadTilingTexture('sprites/tex_wall_dank_stone.png',    1);
+const floorTex = loadTilingTexture('sprites/tex_floor_dirty_stone.png',  1);
+const ceilTex  = loadTilingTexture('sprites/tex_ceiling_dark_stone.png', 1);
+
+// Filename map for in-world sprites (enemies + items).
+const ENEMY_SPRITE_PATH = {
+  'Giant Rat':  'sprites/enemy_giant_rat.png',
+  'Goblin':     'sprites/enemy_goblin.png',
+  'Skeleton':   'sprites/enemy_skeleton.png',
+  'Slime':      'sprites/enemy_slime.png',
+  'Cave Troll': 'sprites/enemy_cave_troll.png',
+  'Lich':       'sprites/enemy_lich.png',
+};
+const ITEM_SPRITE_PATH = {
+  'Rusty Sword':  'sprites/item_rusty_sword.png',
+  'Iron Sword':   'sprites/item_iron_sword.png',
+  'Steel Sword':  'sprites/item_steel_sword.png',
+  'Rusty Shield': 'sprites/item_rusty_shield.png',
+  'Iron Shield':  'sprites/item_iron_shield.png',
+  'Steel Shield': 'sprites/item_steel_shield.png',
+  'Healing Herb': 'sprites/item_healing_herb.png',
+  'Torch':        'sprites/item_torch.png',
+};
+function makeBillboardSprite(path, worldHeight){
+  const m = new THREE.SpriteMaterial({ map:loadSpriteTexture(path), depthTest:true, transparent:true });
+  const sp = new THREE.Sprite(m);
+  sp.scale.set(worldHeight, worldHeight, 1);
+  return sp;
+}
+
+const matWall = new THREE.MeshStandardMaterial({ map:wallTex, roughness:1 });
+const matFloor = new THREE.MeshStandardMaterial({ map:floorTex, roughness:1 });
+const matCeil = new THREE.MeshStandardMaterial({ map:ceilTex, roughness:1 });
+const matDoorClosed = new THREE.MeshStandardMaterial({ color:0x884422, roughness:.7 });
+const matDoorOpen = new THREE.MeshStandardMaterial({ color:0x000000, transparent:true, opacity:0 });
+const matStairsDoor = new THREE.MeshStandardMaterial({ color:0x000000, emissive:0x000000 });
+const matEnemy = new THREE.MeshStandardMaterial({ color:0xaa2222, emissive:0x440000 });
+const matItem = new THREE.MeshStandardMaterial({ color:0xffcc33, emissive:0x664400 });
+
+// Build only the visible rooms (current + next-in-front if passage is open)
+function buildScene(){
+  if(dungeonGroup) scene.remove(dungeonGroup);
+  // Tear down any objects we parented directly to the scene root
+  // (phrase bubbles, detached dying enemy meshes) so they don't leak
+  // across level transitions and float over the new dungeon.
+  if(scene){
+    const stragglers = scene.children.filter(o => {
+      const u = o.userData; return u && (u.isEnemyPhrase || u.isEnemy);
+    });
+    for(const o of stragglers){
+      scene.remove(o);
+      if(o.material){
+        if(o.material.map && o.userData.isEnemyPhrase) o.material.map.dispose();
+        // Don't dispose shared textures (enemy sprite atlas) — only the
+        // canvas-generated phrase texture. Material dispose is safe here.
+        try { o.material.dispose(); } catch(_){}
+      }
+      if(o.userData.ownerEnemy && o.userData.ownerEnemy.currentPhraseSprite === o){
+        o.userData.ownerEnemy.currentPhraseSprite = null;
+      }
+    }
+  }
+  dungeonGroup = new THREE.Group();
+  scene.add(dungeonGroup);
+  renderVisibleRooms();
+}
+
+function cellAt(x,y){
+  const d = state.dungeon;
+  if(!d) return null;
+  if(x<0||y<0||x>=d.W_||y>=d.H_) return null;
+  return d.cells[y][x];
+}
+
+function passageOpenInFront(c, dir){
+  if(!c) return false;
+  const w = c.walls[dir];
+  if(w.type==='open') return true;
+  if(w.type==='door' && w.open) return true;
+  return false;
+}
+
+function renderVisibleRooms(){
+  while(dungeonGroup.children.length) dungeonGroup.remove(dungeonGroup.children[0]);
+  const p = state.player;
+  const here = cellAt(p.x,p.y);
+  if(!here) return;
+
+  // Visibility: BFS from player's cell, only crossing edges that are
+  // passable (open passage OR open door), limited to a 3x3 neighborhood
+  // (Chebyshev distance <= 1). This means up to 3 rooms in front when a
+  // straight hallway opens up, plus side-rooms reachable by going around
+  // a corner one step. Pre-rendering the wider set means rotation /
+  // forward animations have geometry already in place (no black flash).
+  // (Seen-marking is no longer done inside renderVisibleRooms — it runs
+  // only on explicit player look events: enterCell, rotate, toggleDoor.
+  // Otherwise re-renders triggered by combat, lighting changes, or loot
+  // drops would errantly mark in-front cells the player never looked at.)
+  // 3D rendering still uses the wider 3x3-around-player BFS through open
+  // edges — that pre-loads geometry so rotation/move tweens have rooms
+  // to fly through. This does NOT mark cells as seen.
+  const queue = [{cx:p.x, cy:p.y}];
+  const visited = new Set([`${p.x},${p.y}`]);
+  // While a move animation is active, also include the source cell so
+  // the camera has geometry under itself the entire way across — no
+  // unrendered "void" between cells.
+  if(state.anim && state.anim.kind === 'move' &&
+     typeof state.anim.fromCellX === 'number'){
+    const fk = `${state.anim.fromCellX},${state.anim.fromCellY}`;
+    if(!visited.has(fk)){
+      visited.add(fk);
+      queue.push({cx: state.anim.fromCellX, cy: state.anim.fromCellY});
+    }
+  }
+  while(queue.length){
+    const {cx,cy} = queue.shift();
+    const c = cellAt(cx,cy);
+    if(!c) continue;
+    drawRoom(c, cx, cy);
+    for(let d=0; d<4; d++){
+      if(!passageOpenInFront(c,d)) continue;
+      const nx = cx + DIR_VEC[d][0], ny = cy + DIR_VEC[d][1];
+      const key = `${nx},${ny}`;
+      if(visited.has(key)) continue;
+      // Lit: Chebyshev <= 2. Out: 0 — no neighbor geometry rendered.
+      const radius = (state.player.torchCharges > 0) ? 2 : 0;
+      if(Math.abs(nx - p.x) > radius || Math.abs(ny - p.y) > radius) continue;
+      visited.add(key);
+      queue.push({cx:nx, cy:ny});
+    }
+  }
+  if(!state.anim){
+    setCameraToCellAndDir(p.x, p.y, p.dir);
+  }
+  // Move torch with player
+  const torch = scene.getObjectByName('torch');
+  if(torch) torch.position.copy(camera.position);
+}
+
+function drawRoom(c, gx, gy){
+  const ox = gx*CELL, oz = gy*CELL;
+  // floor
+  const floor = new THREE.Mesh(new THREE.PlaneGeometry(CELL,CELL), matFloor);
+  floor.rotation.x = -Math.PI/2;
+  floor.position.set(ox+CELL/2, 0, oz+CELL/2);
+  dungeonGroup.add(floor);
+  // ceiling
+  const ceil = new THREE.Mesh(new THREE.PlaneGeometry(CELL,CELL), matCeil);
+  ceil.rotation.x = Math.PI/2;
+  ceil.position.set(ox+CELL/2, WALL_H, oz+CELL/2);
+  dungeonGroup.add(ceil);
+  // 4 walls (N=-z, E=+x, S=+z, W=-x)
+  for(let d=0;d<4;d++){
+    drawWall(c.walls[d], d, ox, oz, c);
+  }
+  // stairs marker (black door with down arrow on north wall if cell has stairs)
+  if(c.stairs){
+    drawStairsMarker(ox,oz);
+  }
+  // items: PNG billboard sprites (fallback to glowing box for unknown names)
+  c.items.forEach((name, idx)=>{
+    const spread = (c.items.length>1) ? 0.7 : 0;
+    const ang = (idx / Math.max(c.items.length,1)) * Math.PI*2;
+    const ix = ox+CELL/2 + Math.cos(ang)*spread;
+    const iz = oz+CELL/2 + Math.sin(ang)*spread;
+    const path = ITEM_SPRITE_PATH[name];
+    if(path){
+      const sp = makeBillboardSprite(path, 0.7);
+      sp.position.set(ix, 0.45, iz);
+      dungeonGroup.add(sp);
+    } else {
+      const itm = new THREE.Mesh(new THREE.BoxGeometry(0.4,0.4,0.4), matItem);
+      itm.position.set(ix, 0.25, iz);
+      dungeonGroup.add(itm);
+    }
+    const lbl = makeTextSprite(name);
+    lbl.position.set(ix, 0.95, iz);
+    dungeonGroup.add(lbl);
+  });
+  // enemy: a red upright box; if this is the player's cell push it toward
+  // the wall the player is facing so player + enemy each have a wall behind.
+  if(c.enemy){
+    let ex = ox+CELL/2, ez = oz+CELL/2;
+    if(gx === state.player.x && gy === state.player.y){
+      const ev = DIR_VEC[state.player.dir];
+      ex += ev[0] * CELL * 0.35;
+      ez += ev[1] * CELL * 0.35;
+    }
+    const path = ENEMY_SPRITE_PATH[c.enemy.name];
+    let eObj;
+    if(path){
+      eObj = makeBillboardSprite(path, 1.6);
+      eObj.position.set(ex, 0.85, ez);
+    } else {
+      eObj = new THREE.Mesh(new THREE.BoxGeometry(0.8,1.6,0.5), matEnemy);
+      eObj.position.set(ex, 0.8, ez);
+    }
+    eObj.userData.isEnemy = true;
+    eObj.userData.baseY = eObj.position.y;
+    eObj.userData.bobPhase = Math.random() * Math.PI * 2;
+    eObj.userData.cellX = gx;
+    eObj.userData.cellY = gy;
+    eObj.userData.enemyRef = c.enemy;
+    // Phrase sprites are parented to the scene root (not this mesh), so
+    // they survive a renderVisibleRooms rebuild and don't need to be
+    // cleared here.
+    dungeonGroup.add(eObj);
+  }
+  // Friendly NPC (vendor) — same billboard treatment, no combat.
+  if(c.npc){
+    const path = NPC_SPRITE_PATH[c.npc.name];
+    let nObj;
+    if(path){
+      nObj = makeBillboardSprite(path, 1.6);
+      nObj.position.set(ox+CELL/2, 0.85, oz+CELL/2);
+    } else {
+      nObj = new THREE.Mesh(new THREE.BoxGeometry(0.8,1.6,0.5),
+        new THREE.MeshStandardMaterial({color:0x55cc55, emissive:0x114411}));
+      nObj.position.set(ox+CELL/2, 0.8, oz+CELL/2);
+    }
+    nObj.userData.isNpc   = true;
+    nObj.userData.baseY   = nObj.position.y;
+    nObj.userData.bobPhase = Math.random()*Math.PI*2;
+    nObj.userData.cellX   = gx;
+    nObj.userData.cellY   = gy;
+    nObj.userData.npcRef  = c.npc;
+    dungeonGroup.add(nObj);
+  }
+}
+
+function drawWall(w, dir, ox, oz, c){
+  let cx=ox+CELL/2, cz=oz+CELL/2, rotY=0, dx=0, dz=0;
+  if(dir===N){ dz=-CELL/2; rotY=0; }
+  if(dir===S){ dz=+CELL/2; rotY=Math.PI; }
+  if(dir===E){ dx=+CELL/2; rotY=-Math.PI/2; }
+  if(dir===W){ dx=-CELL/2; rotY=Math.PI/2; }
+  const px=cx+dx, pz=cz+dz;
+  if(w.type==='wall'){
+    const m = new THREE.Mesh(new THREE.PlaneGeometry(CELL, WALL_H), matWall);
+    m.position.set(px, WALL_H/2, pz); m.rotation.y = rotY;
+    dungeonGroup.add(m);
+  } else if(w.type==='door'){
+    const frame = new THREE.Mesh(new THREE.PlaneGeometry(CELL, WALL_H*0.25), matWall);
+    frame.position.set(px, WALL_H*0.875, pz); frame.rotation.y=rotY;
+    dungeonGroup.add(frame);
+    if(!w.open){
+      const door = new THREE.Mesh(new THREE.PlaneGeometry(CELL*0.6, WALL_H*0.75), matDoorClosed);
+      door.position.set(px, WALL_H*0.375, pz); door.rotation.y=rotY;
+      dungeonGroup.add(door);
+    }
+    const filler1 = new THREE.Mesh(new THREE.PlaneGeometry(CELL*0.2, WALL_H*0.75), matWall);
+    const filler2 = filler1.clone();
+    const ax = (rotY===0||Math.abs(rotY)===Math.PI) ? CELL*0.4 : 0;
+    const az = (rotY===0||Math.abs(rotY)===Math.PI) ? 0 : CELL*0.4;
+    filler1.position.set(px-ax, WALL_H*0.375, pz-az); filler1.rotation.y=rotY;
+    filler2.position.set(px+ax, WALL_H*0.375, pz+az); filler2.rotation.y=rotY;
+    dungeonGroup.add(filler1, filler2);
+  }
+  // open passage: render nothing
+}
+
+// ----- camera pose helpers (kept identical between snap and tween) -----
+const PLAYER_BACK_OFFSET = CELL * 0.4;
+function cameraPosForCellAndDir(cx, cy, dir){
+  const v = DIR_VEC[dir];
+  return new THREE.Vector3(
+    cx*CELL + CELL/2 - v[0]*PLAYER_BACK_OFFSET,
+    WALL_H*0.55,
+    cy*CELL + CELL/2 - v[1]*PLAYER_BACK_OFFSET
+  );
+}
+// Yaw such that camera (default forward = -Z) ends up looking along DIR_VEC[dir].
+function yawForDir(dir){
+  const v = DIR_VEC[dir];
+  return Math.atan2(-v[0], -v[1]);
+}
+function setCameraToCellAndDir(cx, cy, dir){
+  const pos = cameraPosForCellAndDir(cx, cy, dir);
+  camera.position.copy(pos);
+  camera.rotation.set(0, yawForDir(dir), 0);
+  const torch = scene.getObjectByName('torch');
+  if(torch) torch.position.copy(pos);
+}
+// Choose the shortest signed delta between two yaws (radians).
+function shortestYawDelta(from, to){
+  let d = (to - from) % (Math.PI*2);
+  if(d >  Math.PI) d -= Math.PI*2;
+  if(d < -Math.PI) d += Math.PI*2;
+  return d;
+}
+function smoothstep(t){ return t*t*(3 - 2*t); }
+
+function makeTextSprite(text, opts){
+  opts = opts || {};
+  const borderColor = opts.borderColor || '#0f0';
+  const textColor   = opts.textColor   || '#bfffbf';
+  const padX=12, padY=8;
+  const cv = document.createElement('canvas');
+  const ctx = cv.getContext('2d');
+  const font = 'bold 36px "Courier New", monospace';
+  ctx.font = font;
+  const metrics = ctx.measureText(text);
+  cv.width  = Math.ceil(metrics.width) + padX*2;
+  cv.height = 48 + padY*2;
+  // redo because resizing canvas resets ctx
+  const c2 = cv.getContext('2d');
+  c2.font = font;
+  if(!opts.noBackground){
+    c2.fillStyle = 'rgba(0,0,0,0.7)';
+    c2.fillRect(0,0,cv.width,cv.height);
+  }
+  if(!opts.noBorder){
+    c2.strokeStyle = borderColor;
+    c2.lineWidth = 2;
+    c2.strokeRect(1,1,cv.width-2,cv.height-2);
+  }
+  c2.fillStyle = textColor;
+  c2.textBaseline = 'middle';
+  c2.fillText(text, padX, cv.height/2);
+  const tex = new THREE.CanvasTexture(cv);
+  tex.minFilter = THREE.LinearFilter;
+  // depthTest:true so walls/doors occlude the label like a real object.
+  const mat = new THREE.SpriteMaterial({ map:tex, depthTest:true, transparent:true });
+  const sp = new THREE.Sprite(mat);
+  // Halved from previous size — labels were dominating the frame.
+  const scale = 0.007;
+  sp.scale.set(cv.width*scale, cv.height*scale, 1);
+  return sp;
+}
+
+// Lazily-loaded stairs-down floor texture (top-down hatch sprite).
+let _stairsTexCached = null;
+function getStairsDownTexture(){
+  if(_stairsTexCached) return _stairsTexCached;
+  const t = TEX_LOADER.load('sprites/floor_stairs_down.png');
+  t.magFilter = THREE.NearestFilter;
+  t.minFilter = THREE.LinearFilter;
+  _stairsTexCached = t;
+  return t;
+}
+function drawStairsMarker(ox, oz){
+  // Flat floor plane with the stairs-down sprite, sitting just above the
+  // floor mesh to avoid z-fighting.
+  const tex = getStairsDownTexture();
+  const mat = new THREE.MeshStandardMaterial({
+    map: tex, transparent: true, roughness: 1, side: THREE.DoubleSide
+  });
+  const stairs = new THREE.Mesh(new THREE.PlaneGeometry(CELL*0.85, CELL*0.85), mat);
+  stairs.rotation.x = -Math.PI/2;
+  stairs.position.set(ox + CELL/2, 0.02, oz + CELL/2);
+  dungeonGroup.add(stairs);
+
+  // Bobbing green down-arrow cone hovering over the hatch.
+  const arrow = new THREE.Mesh(
+    new THREE.ConeGeometry(0.32, 0.55, 6),
+    new THREE.MeshStandardMaterial({ color:0x33ff33, emissive:0x115511 })
+  );
+  arrow.rotation.x = Math.PI; // point down
+  arrow.position.set(ox + CELL/2, 1.0, oz + CELL/2);
+  arrow.userData.isStairsArrow = true;
+  arrow.userData.baseY = arrow.position.y;
+  arrow.userData.bobPhase = Math.random() * Math.PI * 2;
+  dungeonGroup.add(arrow);
+
+  // Floating 'Descend' label above the arrow.
+  const label = makeTextSprite('Descend');
+  label.position.set(ox + CELL/2, 1.55, oz + CELL/2);
+  label.userData.isStairsLabel = true;
+  label.userData.baseY = label.position.y;
+  label.userData.bobPhase = arrow.userData.bobPhase;
+  dungeonGroup.add(label);
+}
+
+// -------- gameplay actions --------
+// Mark the player's own cell as seen (you're physically in it), and
+// mark the cell DIRECTLY in front as seen if there's an open passage
+// or open door AND the torch is lit (you can actually see through it).
+// This is the only place that grants ASCII-map visibility.
+function markPlayerLookSeen(){
+  const p = state.player;
+  const here = cellAt(p.x, p.y);
+  if(!here) return;
+  here.seen = true;
+  if(state.player.torchCharges <= 0) return; // can't see in the dark
+  if(passageOpenInFront(here, p.dir)){
+    const fx = p.x + DIR_VEC[p.dir][0];
+    const fy = p.y + DIR_VEC[p.dir][1];
+    const front = cellAt(fx, fy);
+    if(front) front.seen = true;
+  }
+}
+
+function tryMoveForward(){
+  if(state.anim){ state.pendingAction = tryMoveForward; return; }
+  if(state.combat){ log("You can't run blindly — you're in combat. Use Run."); return; }
+  const p = state.player;
+  const here = cellAt(p.x,p.y);
+  if(!passageOpenInFront(here,p.dir)){
+    const w = here.walls[p.dir];
+    if(w.type==='door' && !w.open) log("A door blocks your path. Open it first.");
+    // Walls just silently refuse — no log spam when bumping a wall.
+    return;
+  }
+  const fromPos = cameraPosForCellAndDir(p.x, p.y, p.dir);
+  p.x += DIR_VEC[p.dir][0];
+  p.y += DIR_VEC[p.dir][1];
+  cellAt(p.x, p.y).seen = true;
+  const toPos = cameraPosForCellAndDir(p.x, p.y, p.dir);
+  state.anim = {
+    kind:'move', startTs: performance.now(), durMs: ANIM_DURATION_MS,
+    fromPos, toPos, fromYaw: yawForDir(p.dir), toYaw: yawForDir(p.dir),
+    fromCellX: p.x - DIR_VEC[p.dir][0], fromCellY: p.y - DIR_VEC[p.dir][1],
+    toCellX:   p.x,                     toCellY:   p.y,
+    onDone: ()=>{
+      consumePlayerTorchStep();
+      enterCell();
+    }
+  };
+  playSfx('footstep');
+  renderVisibleRooms();
+}
+
+function enterCell(){
+  const c = cellAt(state.player.x, state.player.y);
+  state.stats.visitedKeys.add(`${state.level}:${state.player.x}:${state.player.y}`);
+  markPlayerLookSeen();
+  if(c.enemy){
+    state.combat = { enemy: c.enemy, cellRef: c };
+    log(`A ${c.enemy.name} blocks the way! (HP ${c.enemy.hp}/${c.enemy.hpMax})`);
+  } else if(c.npc){
+    log(`A ${c.npc.name} greets you. Press V to trade.`);
+  }
+  renderVisibleRooms();
+  refreshUI();
+}
+
+// Step backward one cell (no facing change). If we land in a cell that
+// already has an enemy, chain a 180° spin animation onto the back-step so
+// the player ends up facing the threat before combat starts.
+function tryMoveBackward(){
+  if(state.anim){ state.pendingAction = tryMoveBackward; return; }
+  if(state.combat){ log("You can't back up in combat. Use Run."); return; }
+  const p = state.player;
+  const back = (p.dir + 2) % 4;
+  const here = cellAt(p.x, p.y);
+  if(!passageOpenInFront(here, back)){
+    const w = here.walls[back];
+    if(w.type==='door' && !w.open) log("A door is shut behind you.");
+    // Walls behind: silent, same rule as forward.
+    return;
+  }
+  const fromPos = cameraPosForCellAndDir(p.x, p.y, p.dir);
+  p.x += DIR_VEC[back][0];
+  p.y += DIR_VEC[back][1];
+  cellAt(p.x, p.y).seen = true;
+  const toPos = cameraPosForCellAndDir(p.x, p.y, p.dir);
+  state.anim = {
+    kind:'move', startTs: performance.now(), durMs: ANIM_DURATION_MS,
+    fromPos, toPos, fromYaw: yawForDir(p.dir), toYaw: yawForDir(p.dir),
+    fromCellX: p.x - DIR_VEC[back][0], fromCellY: p.y - DIR_VEC[back][1],
+    toCellX:   p.x,                    toCellY:   p.y,
+    onDone: ()=>{
+      consumePlayerTorchStep();
+      const here2 = cellAt(p.x, p.y);
+      if(here2.enemy){
+        // Chain a 180° spin animation; combat starts after the spin.
+        const oldDir = p.dir;
+        const oldYaw = yawForDir(oldDir);
+        const oldPosePos = cameraPosForCellAndDir(p.x, p.y, oldDir);
+        p.dir = (p.dir + 2) % 4;
+        const newYaw = oldYaw + shortestYawDelta(oldYaw, yawForDir(p.dir));
+        const newPosePos = cameraPosForCellAndDir(p.x, p.y, p.dir);
+        renderVisibleRooms(); // redraw with new dir so the enemy mesh re-offsets toward the new facing wall
+        state.anim = {
+          kind:'rotate', startTs: performance.now(), durMs: ANIM_DURATION_MS,
+          fromPos: oldPosePos, toPos: newPosePos,
+          fromYaw: oldYaw, toYaw: newYaw,
+          onDone: ()=>{ log("You whirl around to face the threat!"); enterCell(); }
+        };
+      } else {
+        enterCell();
+      }
+    }
+  };
+  playSfx('footstep');
+  renderVisibleRooms();
+}
+
+function rotate(delta){
+  if(state.anim){ state.pendingAction = ()=>rotate(delta); return; }
+  if(state.combat){ log("Not while fighting!"); return; }
+  const p = state.player;
+  const oldDir = p.dir;
+  const fromYaw = yawForDir(oldDir);
+  p.dir = ((p.dir + delta) % 4 + 4) % 4;
+  markPlayerLookSeen();
+  const toYaw = fromYaw + shortestYawDelta(fromYaw, yawForDir(p.dir));
+  // Rotate the camera-offset vector AROUND the cell center over time, so
+  // the camera traces an arc (constant radius from center), not a chord
+  // that cuts through the middle of the room and back out — that produced
+  // the "zigzag through center" feel.
+  state.anim = {
+    kind:'rotate-arc',
+    startTs: performance.now(), durMs: ANIM_DURATION_MS,
+    cellCenterX: p.x*CELL + CELL/2,
+    cellCenterZ: p.y*CELL + CELL/2,
+    fromYaw, toYaw,
+    onDone: ()=>{ refreshUI(); }
+  };
+  // Render with new dir so any newly-visible next-ahead room is in scene
+  // during the spin. anim is set, so camera won't be snapped.
+  renderVisibleRooms();
+  refreshUI();
+}
+
+function toggleDoor(){
+  const p = state.player;
+  const here = cellAt(p.x,p.y);
+  const w = here.walls[p.dir];
+  if(w.type !== 'door'){ log("There's no door in front of you."); return; }
+  w.open = !w.open;
+  // mirror on other side
+  const nx=p.x+DIR_VEC[p.dir][0], ny=p.y+DIR_VEC[p.dir][1];
+  const other = cellAt(nx,ny);
+  if(other) other.walls[(p.dir+2)%4].open = w.open;
+  playSfx('door');
+  log(w.open ? "You open the door. It groans on rusty hinges." : "You shut the door.");
+  markPlayerLookSeen();
+  renderVisibleRooms();
+  refreshUI();
+}
+
+function descendStairs(){
+  const c = cellAt(state.player.x, state.player.y);
+  if(!c.stairs){ log("No stairs here."); return; }
+  playSfx('descend_stairs');
+  state.level++;
+  log(`You descend deeper into the dungeon...`);
+  newLevel(state.level);
+}
+
+// Weapons table: name -> attack value. Anything in here is treated as a weapon
+// (only one carried at a time; picking a new one drops the current onto the floor).
+const WEAPON_STATS = {
+  'Fists':       2,
+  'Rusty Sword': 3,
+  'Iron Sword':  5,
+  'Steel Sword': 7,
+};
+// Consumables table: name -> use(player) function returning a log line.
+// Each use removes one of the item from inventory.
+const CONSUMABLES = {
+  'Healing Herb': (p)=>{
+    const before = p.hp;
+    p.hp = Math.min(p.hpMax, p.hp + 8);
+    state.stats.herbsEaten += 1;
+    return `You eat a Healing Herb. HP +${p.hp - before} (now ${p.hp}/${p.hpMax}).`;
+  }
+};
+// Optional guards: if guard returns a string, the consumable is NOT consumed
+// and the string is logged instead. Lets us refuse to waste a herb at full HP.
+const CONSUMABLE_GUARDS = {
+  'Healing Herb': (p)=>{
+    if(p.hp >= p.hpMax) return "You're too healthy to waste a healing herb...";
+    return null;
+  }
+};
+// Shields table: name -> damage reduction (subtracted from incoming hits).
+// Same single-slot rules as weapons: picking up a different shield drops
+// the previous one onto the floor.
+const SHIELD_STATS = {
+  'Rusty Shield': 1,
+  'Iron Shield':  2,
+  'Steel Shield': 3,
+};
+
+function pickUpItem(idx){
+  // In combat, picking up something costs your action.
+  if(state.combat && state.combatBusy) return;
+  const c = cellAt(state.player.x, state.player.y);
+  const item = c.items.splice(idx,1)[0];
+  if(item.startsWith('Gold')){
+    const m = item.match(/(\d+)/);
+    const g = m? parseInt(m[1]):0;
+    state.player.gold += g;
+    state.stats.goldCollected += g;
+    playSfx('gold_collect');
+    log(`You pocket ${g}gp.`);
+  } else if(WEAPON_STATS.hasOwnProperty(item)){
+    const old = state.player.weapon;
+    state.player.weapon = { name:item, atk:WEAPON_STATS[item] };
+    playSfx('herb_collect');
+    if(old.name !== 'Fists'){
+      c.items.push(old.name);
+      log(`You wield ${item} (atk ${WEAPON_STATS[item]}); you drop your ${old.name}.`);
+    } else {
+      log(`You wield ${item} (atk ${WEAPON_STATS[item]}).`);
+    }
+  } else if(SHIELD_STATS.hasOwnProperty(item)){
+    const old = state.player.shield;
+    state.player.shield = { name:item, dr:SHIELD_STATS[item] };
+    playSfx('herb_collect');
+    if(old.name !== 'None'){
+      c.items.push(old.name);
+      log(`You strap on ${item} (dmg-reduction ${SHIELD_STATS[item]}); you drop your ${old.name}.`);
+    } else {
+      log(`You strap on ${item} (dmg-reduction ${SHIELD_STATS[item]}).`);
+    }
+  } else if(item === 'Torch' && state.player.torchCharges <= 0){
+    // Auto-light a freshly picked-up torch when the current one is out
+    // (instead of adding to inventory).
+    state.player.torchCharges = freshTorchCharges();
+    playSfx('herb_collect');
+    log("You light the torch and the dark recoils.");
+  } else {
+    state.player.inv.push(item);
+    playSfx('herb_collect');
+    log(`You pick up: ${item}.`);
+  }
+  renderVisibleRooms();
+  refreshUI();
+  // If in combat, picking the item up was your action → enemy retaliates.
+  if(state.combat){
+    state.combatBusy = true;
+    enemyTurn();
+  }
+}
+
+// -------- combat --------
+// Player hit chance is 75% on every attack.
+const PLAYER_HIT_CHANCE = 0.75;
+
+function triggerAttackSwingAnimation(){
+  playSfx('sword_swing');
+  // Camera yaw bob and sword down-and-forward swing run in combination,
+  // started at the same instant — no raise/hold/lower phasing.
+  const rh = document.getElementById('rightHand');
+  if(rh && !rh.hidden){
+    rh.classList.remove('attackSwing');
+    void rh.offsetWidth; // force reflow so re-adding restarts the animation
+    rh.classList.add('attackSwing');
+  }
+  state.attackSwing = { startTs: performance.now(), durMs: ATTACK_SWING_DURATION_MS };
+}
+
+function combatAttack(){
+  if(state.dead) return;
+  if(state.combatBusy) return;        // ignore while previous attack-turn is in flight
+  if(!state.combat) return;
+  state.combatBusy = true;
+  const e = state.combat.enemy;
+  triggerAttackSwingAnimation();
+  // Pre-roll the player swing now (so the damage text in the eventual
+  // log feels matched to this swing), but defer applying it and the
+  // enemy turn until the player's full attack animation finishes.
+  const playerHit = R() < PLAYER_HIT_CHANCE;
+  const playerDmg = playerHit ? (1 + ri(state.player.weapon.atk)) : 0;
+  // Schedule the enemy red-tint flash at the peak of the rotation (mid-swing)
+  // so the visual hit lands when the sword visually does.
+  if(playerHit){
+    const peakDelayMs = Math.floor(PLAYER_SWING_TOTAL_MS * 0.5);
+    setTimeout(()=>{
+      const cellRef = state.combat && state.combat.cellRef;
+      if(!cellRef) return;
+      const enemyObj = findEnemySpriteForCell(cellRef.x, cellRef.y);
+      if(enemyObj){
+        flashEnemyHurtTint(enemyObj);
+        spawnFloatingDamageNumberAboveEnemy(playerDmg, enemyObj);
+        playSfx('damage_dealt');
+      }
+    }, peakDelayMs);
+  }
+  setTimeout(()=>{
+    if(!state.combat || state.combat.enemy !== e) return;
+    if(playerHit){
+      e.hp -= playerDmg;
+      state.stats.damageDealt += playerDmg;
+      log(`You strike the ${e.name} for ${playerDmg}.`);
+      if(e.hp <= 0){
+        state.stats.enemiesKilled += 1;
+        log(`The ${e.name} crumples to the floor!`);
+        const cellRef = state.combat.cellRef;
+        // Loot drop: 50/50 gold or herb. Weak enemies (minLevel 1)
+        // drop 1gp; harder enemies drop 1..state.level gp.
+        let drop;
+        if(Math.random() < 0.5){
+          const isWeak = (e.minLevel || 1) <= 1;
+          const goldAmount = isWeak ? 1 : (1 + Math.floor(Math.random() * Math.max(1, state.level)));
+          drop = `Gold (${goldAmount}gp)`;
+        } else {
+          drop = 'Healing Herb';
+        }
+        cellRef.items.push(drop);
+        log(`It drops ${drop}.`);
+        state.combat = null;
+        state.combatBusy = false;
+        const dyingObj = findEnemySpriteForCell(cellRef.x, cellRef.y);
+        // Tear down any active phrase bubble for this enemy first; the
+        // phrase tick only processes enemies still inside dungeonGroup
+        // and the dying mesh is about to be detached to scene root.
+        if(e.currentPhraseSprite){
+          scene.remove(e.currentPhraseSprite);
+          if(e.currentPhraseSprite.material){
+            if(e.currentPhraseSprite.material.map) e.currentPhraseSprite.material.map.dispose();
+            e.currentPhraseSprite.material.dispose();
+          }
+          e.currentPhraseSprite = null;
+        }
+        if(dyingObj){
+          // Detach the dying mesh from dungeonGroup and re-parent it to
+          // the scene root, so a renderVisibleRooms triggered by player
+          // movement (or any re-render) won't yank it out and won't
+          // re-create a fresh full-color enemy in its place. Clear
+          // cell.enemy immediately so future renders skip the cell.
+          dungeonGroup.remove(dyingObj);
+          scene.add(dyingObj);
+          cellRef.enemy = null;
+          // Re-render now so the just-dropped loot is drawn into the
+          // cell immediately (was waiting until the player's next move).
+          renderVisibleRooms();
+          playEnemyDeathAnimation(dyingObj, ()=>{
+            scene.remove(dyingObj);
+            if(dyingObj.material){
+              if(dyingObj.material.map) dyingObj.material.map.dispose();
+              dyingObj.material.dispose();
+            }
+            refreshUI();
+          });
+        } else {
+          cellRef.enemy = null;
+          renderVisibleRooms();
+        }
+        refreshUI();
+        return;
+      }
+    } else {
+      log(`You swing at the ${e.name} and miss!`);
+    }
+    enemyTurn();
+  }, PLAYER_SWING_TOTAL_MS);
+}
+function combatRun(){
+  if(!state.combat) return;
+  // 60% chance to run back to where we came from
+  if(R() < 0.6){
+    const p = state.player;
+    const back = (p.dir+2)%4;
+    const here = cellAt(p.x,p.y);
+    if(passageOpenInFront(here,back)){
+      p.x += DIR_VEC[back][0]; p.y += DIR_VEC[back][1];
+      log("You scramble back the way you came!");
+      state.combat = null;
+      renderVisibleRooms();
+      refreshUI();
+      return;
+    }
+    log("Nowhere to run — your back is to a wall!");
+  } else {
+    log("You stumble trying to run!");
+  }
+  enemyTurn();
+}
+// Enemy hit chance: level 1 enemies hit 50% of the time. Higher levels
+// scale up by +5% per level, capped at 90%.
+function enemyHitChance(){
+  return Math.min(0.9, 0.5 + 0.05 * Math.max(0, state.level - 1));
+}
+
+function enemyTurn(){
+  const e = state.combat && state.combat.enemy;
+  if(!e) return;
+  const willHit = R() < enemyHitChance();
+  const raw = 1 + ri(e.atk);
+  const dr = state.player.shield.dr;
+  const dmg = willHit ? Math.max(0, raw - dr) : 0;
+
+  const applyAtPeak = ()=>{
+    if(!willHit){
+      log(`The ${e.name} lunges and misses!`);
+      refreshUI();
+      return;
+    }
+    state.player.hp -= dmg;
+    if(dmg > 0){
+      state.stats.damageTaken += dmg;
+      const now = performance.now();
+      state.screenShake = {
+        startTs: now, until: now + SCREEN_SHAKE_DURATION_MS,
+        durMs: SCREEN_SHAKE_DURATION_MS, magnitude: SCREEN_SHAKE_MAGNITUDE
+      };
+      const f = document.getElementById('hitFlash');
+      if(f){
+        f.classList.remove('active');
+        void f.offsetWidth;
+        f.classList.add('active');
+      }
+      showPlayerDamageNumberHud(dmg);
+      playSfx('damage_taken');
+    }
+    if(dr > 0 && dmg < raw){
+      log(`The ${e.name} hits you for ${dmg} (your ${state.player.shield.name} blocked ${raw - dmg}).`);
+    } else {
+      log(`The ${e.name} hits you for ${dmg}.`);
+    }
+    if(state.player.hp <= 0){
+      log("You die in the dark.");
+      triggerPlayerDeath();
+    }
+    refreshUI();
+  };
+
+  // Find the enemy sprite for the current combat cell to lunge it. If
+  // we can't (rare — geometry not visible), fall through to immediate.
+  const cellRef = state.combat.cellRef;
+  const enemyObj = findEnemySpriteForCell(cellRef.x, cellRef.y);
+  const onLungeDone = ()=>{ state.combatBusy = false; };
+  if(enemyObj){
+    startEnemyLungeAnimation(enemyObj, applyAtPeak, onLungeDone);
+  } else {
+    applyAtPeak();
+    onLungeDone();
+  }
+}
+
+// -------- UI --------
+function log(msg){
+  const el = document.getElementById('log');
+  const d = document.createElement('div');
+  d.textContent = '> ' + msg;
+  el.prepend(d);
+  while(el.children.length>6) el.removeChild(el.lastChild);
+}
+
+// Discovered top-down map of the whole level. Unseen cells = ' ',
+// seen cells = '.', player cell = facing arrow ^>v<.
+// Stairs marked 'X' once seen.
+// Each cell renders as a 3-wide x 3-tall block sharing edges with neighbors:
+//   + - +
+//   | . |
+//   + - +
+// where corners are '+', wall H is '-', wall V is '|', closed door H is '=',
+// closed door V is '"', and open passage / open door is a blank.
+// Cell interior is the player arrow, 'X' for stairs, '.' for plain seen room,
+// ' ' for unseen.
+function buildDiscoveredLevelAsciiMap(){
+  const d = state.dungeon, p = state.player;
+  const arrow = ['^','>','v','<'][p.dir];
+  const cols=d.W_, rows=d.H_;
+  const gw = cols*2+1, gh = rows*2+1;
+  const g = Array.from({length:gh}, ()=> Array(gw).fill(' '));
+  const wallH = (w)=> w.type==='wall' ? '-' : w.type==='door' ? (w.open ? ' ' : '=') : ' ';
+  const wallV = (w)=> w.type==='wall' ? '|' : w.type==='door' ? (w.open ? ' ' : '"') : ' ';
+  let minRow=rows, maxRow=-1, minCol=cols, maxCol=-1;
+  for(let y=0;y<rows;y++){
+    for(let x=0;x<cols;x++){
+      const c = d.cells[y][x];
+      if(!c.seen) continue;
+      if(y<minRow) minRow=y; if(y>maxRow) maxRow=y;
+      if(x<minCol) minCol=x; if(x>maxCol) maxCol=x;
+      const cx = x*2+1, cy = y*2+1;
+      g[cy-1][cx-1] = '+'; g[cy-1][cx+1] = '+';
+      g[cy+1][cx-1] = '+'; g[cy+1][cx+1] = '+';
+      g[cy-1][cx] = wallH(c.walls[N]);
+      g[cy+1][cx] = wallH(c.walls[S]);
+      g[cy][cx-1] = wallV(c.walls[W]);
+      g[cy][cx+1] = wallV(c.walls[E]);
+      // Player char is drawn as a separate centered overlay that rotates
+      // smoothly with facing direction; here we just mark stairs.
+      if(c.stairs)                 g[cy][cx] = 'X';
+      else                         g[cy][cx] = ' ';
+    }
+  }
+  // Always return the full-level grid (no bounding-box trim) so callers
+  // can translate it by exact ch/em units to keep the player centered.
+  return g.map(r => r.join('')).join('\n');
+}
+
+// Top-down 5x5 ASCII of current room. Walls show as #, open passage as ' ',
+// closed door as +, open door as . . Player @ in center, arrow shows facing.
+function roomAsciiMap(c, dir){
+  const sym = (w)=> w.type==='wall' ? '#'
+                  : w.type==='door' ? (w.open ? '.' : '+')
+                  : ' ';
+  const arrow = ['^','>','v','<'][dir];
+  const N_ = sym(c.walls[N]);
+  const S_ = sym(c.walls[S]);
+  const E_ = sym(c.walls[E]);
+  const W_ = sym(c.walls[W]);
+  const lines = [
+    `#${'#'}${N_}${'#'}#`,
+    `#   #`,
+    `${W_}  ${arrow}  ${E_}`.replace(/\s+/, m=>m).slice(0,5),
+    `#   #`,
+    `#${'#'}${S_}${'#'}#`,
+  ];
+  // Build line 3 carefully (5 chars wide): W . arrow . E
+  lines[2] = `${W_} ${arrow} ${E_}`;
+  return lines.join('\n');
+}
+
+// ---------- torch charges ----------
+function freshTorchCharges(){ return 75 + Math.floor(Math.random()*16); } // 75..90
+const TORCH_RELIGHT_DELAY_MS = 1200; // brief darkness before the new torch lights
+function extinguishPlayerTorch(){
+  state.player.torchCharges = 0;
+  const hasSpare = state.player.inv.indexOf('Torch') >= 0;
+  if(hasSpare){
+    log("Your torch sputters out...");
+    // Brief darkness/fade-out moment before the spare lights up.
+    setTimeout(()=>{
+      const idx = state.player.inv.indexOf('Torch');
+      if(idx < 0) return;
+      state.player.inv.splice(idx, 1);
+      state.player.torchCharges = freshTorchCharges();
+      log("You light a fresh torch.");
+      refreshUI();
+    }, TORCH_RELIGHT_DELAY_MS);
+  } else {
+    log("Your torch dies. The dark presses in...");
+  }
+}
+function consumePlayerTorchStep(){
+  if(state.player.torchCharges <= 0) return;
+  state.player.torchCharges -= 1;
+  if(state.player.torchCharges <= 0){
+    extinguishPlayerTorch();
+  }
+}
+
+function updateRightHandSprite(){
+  const rh = document.getElementById('rightHand');
+  if(!rh) return;
+  const wname = state.player.weapon.name;
+  if(wname === 'Fists'){
+    rh.hidden = true;
+    return;
+  }
+  const path = ITEM_SPRITE_PATH[wname];
+  if(!path){ rh.hidden = true; return; }
+  const img = rh.querySelector('img');
+  if(img.getAttribute('src') !== path) img.setAttribute('src', path);
+  rh.hidden = false;
+}
+
+// Cumulative angle (in degrees) for the player arrow overlay so we
+// always rotate the SHORT way between cardinal directions. CSS
+// transition handles the smoothing visually.
+let playerArrowAngleDeg = 0;
+function updatePlayerArrowRotation(){
+  const m = document.getElementById('playerArrowMarker');
+  if(!m) return;
+  // Map direction index (N,E,S,W) -> cardinal degrees with 0 = arrow pointing up.
+  const targetByDir = [0, 90, 180, 270];
+  const target = targetByDir[state.player.dir];
+  // Shortest signed delta in degrees, mod 360.
+  let delta = ((target - playerArrowAngleDeg) % 360 + 540) % 360 - 180;
+  playerArrowAngleDeg = playerArrowAngleDeg + delta;
+  m.style.transform = `translate(-50%, -50%) rotate(${playerArrowAngleDeg}deg)`;
+}
+
+// Translate the discovered-map <pre> so that the cell at (visX, visY)
+// in continuous cell coords sits at the panel's visual center. Called
+// every render frame so the map pans smoothly during a move animation.
+function updateDiscoveredMapTranslate(visX, visY){
+  const pre = document.getElementById('discoveredMapPre');
+  if(!pre || !state.dungeon) return;
+  const playerMapCol = visX * 2 + 1;
+  const playerMapRow = visY * 2 + 1;
+  const mapGw = state.dungeon.W_ * 2 + 1;
+  const mapGh = state.dungeon.H_ * 2 + 1;
+  const dxCh = (mapGw / 2) - playerMapCol - 0.5;
+  const dyEm = (mapGh / 2) - playerMapRow - 0.5;
+  pre.style.transform = `translate(${dxCh}ch, ${dyEm}em)`;
+}
+
+function refreshUI(){
+  const p = state.player;
+  const c = cellAt(p.x,p.y);
+  updateRightHandSprite();
+  updatePlayerArrowRotation();
+  // Top HUD strip over the 3D view.
+  const lvlEl = document.getElementById('topHudLvl');
+  const hpEl  = document.getElementById('topHudHp');
+  if(lvlEl) lvlEl.textContent = `Dungeon LVL: ${state.level}`;
+  if(hpEl){
+    hpEl.textContent = `HP ${p.hp}/${p.hpMax}`;
+    hpEl.classList.toggle('low', p.hp < 6);
+  }
+  // Compass: rotate red needle to point in player's facing dir.
+  // CSS rotation: needle base points up (= North). N=0deg, E=90, S=180, W=270.
+  const dirDeg = [0,90,180,270][p.dir];
+  document.getElementById('compassNeedle').style.transform =
+    `translate(-50%,-100%) rotate(${dirDeg}deg)`;
+  document.getElementById('compassTail').style.transform =
+    `translate(-50%,0%) rotate(${dirDeg}deg)`;
+  // Compact HUD top-right: rose + 3 short stat lines.
+  document.getElementById('compassText').innerHTML =
+    `Lv ${state.level}<br>(${p.x},${p.y})<br>Face ${DIR_NAMES[p.dir]}`;
+  // The discovered map renders as a half-transparent backdrop behind the
+  // ROOM info text. We render the full level once per refreshUI; the
+  // <pre>'s translate is updated every frame in updateDiscoveredMapTranslate
+  // so the player's character (^>v<) stays centered and the map pans
+  // smoothly during move animations.
+  document.getElementById('discoveredMap').innerHTML =
+    `<pre id="discoveredMapPre" style="margin:0;color:#cfc;font-size:18px;line-height:1.0;` +
+    `font-family:'Courier New',monospace;">${buildDiscoveredLevelAsciiMap()}</pre>`;
+  updateDiscoveredMapTranslate(state.player.x, state.player.y);
+
+  // room panel
+  let desc = `You stand in a stone chamber.`;
+  if(c.stairs) desc += ` In the center: a black portal etched with a downward arrow.`;
+  const wf = c.walls[p.dir];
+  desc += `\nAhead: ${wf.type==='wall' ? 'solid wall' : wf.type==='door' ? (wf.open?'open doorway':'closed door') : 'open passage'}.`;
+  document.getElementById('roomDesc').textContent = desc;
+
+  const itemList = document.getElementById('itemList');
+  itemList.innerHTML = '';
+  c.items.forEach((it,i)=>{
+    const b = document.createElement('button');
+    b.textContent = (i===0 ? `Take (T): ${it}` : `Take: ${it}`);
+    b.onclick = ()=> pickUpItem(i);
+    itemList.appendChild(b);
+  });
+
+  // status / combat panel
+  // Status panel: two-column grid. Inventory line lives in the overlay,
+  // accessed via the Inventory (I) button beneath this grid.
+  const torchLabel = (p.torchCharges > 0)
+    ? `Torch: ${p.torchCharges} steps`
+    : 'Torch: out';
+  document.getElementById('statusGrid').innerHTML =
+    `<div>HP ${p.hp}/${p.hpMax}</div><div>Gold ${p.gold}</div>` +
+    `<div>Wpn: ${p.weapon.name} (atk ${p.weapon.atk})</div>` +
+    `<div>Shld: ${p.shield.name} (DR ${p.shield.dr})</div>` +
+    `<div style="grid-column:1 / span 2;">${torchLabel}</div>`;
+
+  const ca = document.getElementById('combatActions');
+  ca.innerHTML = '';
+  if(state.combat){
+    const e = state.combat.enemy;
+    const t = document.createElement('div');
+    t.textContent = `In combat with ${e.name} (HP ${e.hp}/${e.hpMax})`;
+    ca.appendChild(t);
+    const ba = document.createElement('button'); ba.textContent='Attack (F)'; ba.onclick=combatAttack;
+    const bf = document.createElement('button'); bf.textContent='Run (R)'; bf.onclick=combatRun;
+    ca.append(ba,bf);
+  }
+
+  // movement buttons enable/disable
+  document.getElementById('btnFwd').disabled = !!state.combat;
+  document.getElementById('btnLeft').disabled = !!state.combat;
+  document.getElementById('btnRight').disabled = !!state.combat;
+  const doorBtn = document.getElementById('btnDoor');
+  const wallAhead = c.walls[p.dir];
+  doorBtn.disabled = !!state.combat || wallAhead.type !== 'door';
+  doorBtn.textContent = (wallAhead.type === 'door' && wallAhead.open)
+    ? 'Close Door (E)' : 'Open Door (E)';
+  const stairsBtn = document.getElementById('btnStairs');
+  stairsBtn.disabled = !c.stairs || !!state.combat;
+  stairsBtn.classList.toggle('available', !!c.stairs && !state.combat);
+  const vendorBtn = document.getElementById('btnVendor');
+  if(vendorBtn){
+    vendorBtn.style.display = c.npc ? '' : 'none';
+    vendorBtn.classList.toggle('available', !!c.npc && !state.combat);
+  }
+}
+
+// -------- death sequence --------
+function triggerPlayerDeath(){
+  if(state.dead) return;
+  state.dead = true;
+  state.deathStartTs = performance.now();
+  fadeOutMusicThenPlayDeathSting();
+  state.combat = null;
+  state.combatBusy = false;
+  state.pendingAction = null;
+  // Hide all enemy sprites so they don't appear to tilt with the camera
+  // during the death pitch-down (sprites always billboard to the camera,
+  // which produced the "enemy rotating with player" look).
+  // Note: enemy sprites are NOT hidden on death and the camera is NOT
+  // tilted. The world stays oriented as it was; the death overlay fades
+  // black on top. Enemy phrase bubbles are still cleared so we don't
+  // see chatter under the fade.
+  if(scene){
+    const phraseSprites = scene.children.filter(o => o.userData && o.userData.isEnemyPhrase);
+    for(const sp of phraseSprites){
+      scene.remove(sp);
+      if(sp.material){
+        if(sp.material.map) sp.material.map.dispose();
+        sp.material.dispose();
+      }
+      if(sp.userData.ownerEnemy) sp.userData.ownerEnemy.currentPhraseSprite = null;
+    }
+  }
+  // Render stats summary into the overlay.
+  const s = state.stats;
+  const stats = document.getElementById('deathStats');
+  stats.innerHTML =
+    `<div>Gold collected: ${s.goldCollected}</div>` +
+    `<div>Enemies killed: ${s.enemiesKilled}</div>` +
+    `<div>Damage dealt:   ${s.damageDealt}</div>` +
+    `<div>Damage taken:   ${s.damageTaken}</div>` +
+    `<div>Herbs eaten:    ${s.herbsEaten}</div>` +
+    `<div>Rooms explored: ${s.visitedKeys.size}</div>` +
+    `<div>Final dungeon level: ${state.level}</div>`;
+  const ov = document.getElementById('deathOverlay');
+  ov.hidden = false;
+  void ov.offsetWidth;
+  ov.classList.add('active');
+  // Pin the red flash so the last-damage tint persists into the fade-to-black.
+  const hf = document.getElementById('hitFlash');
+  if(hf){
+    hf.classList.remove('active');
+    hf.style.animation = 'none';
+    hf.style.opacity = '0.55';
+  }
+}
+function restartGameAfterDeath(){
+  // Simplest reset path: full reload preserves no in-memory state.
+  location.reload();
+}
+
+// -------- vendor overlay --------
+// Stock list: { name, price, kind } — kind 'consumable' lands in inv as
+// usable Healing Herb (existing CONSUMABLES table handles it).
+const VENDOR_STOCK = [
+  { name: 'Healing Herb', price: 5,  kind: 'consumable' },
+  { name: 'Torch',        price: 10, kind: 'spare'      },
+];
+function renderVendorOverlay(){
+  const list = document.getElementById('vendorItemList');
+  list.innerHTML = '';
+  for(const item of VENDOR_STOCK){
+    const row = document.createElement('div'); row.className = 'vendorRow';
+    const label = document.createElement('div');
+    label.style.flex = '1';
+    label.textContent = `${item.name}  —  ${item.price}gp`;
+    row.appendChild(label);
+    const btn = document.createElement('button');
+    // Only the FIRST stock row gets the "(B)" hotkey hint, since B
+    // buys whichever item is at the top of the vendor's listing.
+    btn.textContent = (list.children.length === 0)
+      ? `Buy (B) ${item.price}gp`
+      : `Buy (${item.price}gp)`;
+    btn.disabled = state.player.gold < item.price;
+    btn.onclick = ()=> buyFromVendor(item);
+    row.appendChild(btn);
+    list.appendChild(row);
+  }
+  const goldRow = document.createElement('div');
+  goldRow.style.marginTop = '8px';
+  goldRow.style.color = '#cfc';
+  goldRow.textContent = `Your gold: ${state.player.gold}gp`;
+  list.appendChild(goldRow);
+}
+function buyFromVendor(item){
+  if(state.player.gold < item.price){
+    log("Not enough gold.");
+    return;
+  }
+  state.player.gold -= item.price;
+  state.player.inv.push(item.name);
+  playSfx('herb_collect');
+  log(`Bought ${item.name} for ${item.price}gp.`);
+  refreshUI();
+  renderVendorOverlay();
+}
+function isOnVendorCell(){
+  const c = cellAt(state.player.x, state.player.y);
+  return !!(c && c.npc);
+}
+function openVendorOverlay(){
+  if(!isOnVendorCell()){ log("No vendor here."); return; }
+  renderVendorOverlay();
+  document.getElementById('vendorOverlay').hidden = false;
+}
+function closeVendorOverlay(){
+  document.getElementById('vendorOverlay').hidden = true;
+}
+function toggleVendorOverlay(){
+  const ov = document.getElementById('vendorOverlay');
+  if(ov.hidden) openVendorOverlay();
+  else closeVendorOverlay();
+}
+
+// -------- inventory overlay --------
+function renderInventoryOverlay(){
+  const list = document.getElementById('invItemList');
+  list.innerHTML = '';
+  if(state.player.inv.length === 0){
+    list.innerHTML = '<div style="opacity:.7;">(no items)</div>';
+    return;
+  }
+  // Group by name with counts.
+  const counts = {};
+  state.player.inv.forEach(n => counts[n] = (counts[n]||0) + 1);
+  Object.keys(counts).forEach(name => {
+    const row = document.createElement('div'); row.className = 'invRow';
+    const label = document.createElement('div');
+    label.style.flex = '1';
+    label.textContent = `${name} x${counts[name]}`;
+    row.appendChild(label);
+    if(CONSUMABLES.hasOwnProperty(name)){
+      const useBtn = document.createElement('button');
+      useBtn.textContent = (name === 'Healing Herb') ? 'Use Herb (H)' : 'Use';
+      useBtn.onclick = ()=> useConsumableByName(name);
+      row.appendChild(useBtn);
+    }
+    list.appendChild(row);
+  });
+}
+function useConsumableByName(name){
+  const idx = state.player.inv.indexOf(name);
+  if(idx < 0) return;
+  // While in combat, using an item costs your turn. Skip during a busy
+  // turn-in-flight so it doesn't double-trigger.
+  if(state.combat && state.combatBusy) return;
+  // Refusal guard: don't consume if conditions don't allow it.
+  const guard = CONSUMABLE_GUARDS[name];
+  if(guard){
+    const refusal = guard(state.player);
+    if(refusal){
+      log(refusal);
+      return;
+    }
+  }
+  state.player.inv.splice(idx, 1);
+  const fn = CONSUMABLES[name];
+  if(fn){
+    const msg = fn(state.player);
+    if(name === 'Healing Herb') playSfx('herb_take');
+    log(msg);
+  }
+  refreshUI();
+  renderInventoryOverlay();
+  // If in combat, that consumed our action → enemy retaliates.
+  if(state.combat){
+    state.combatBusy = true;
+    enemyTurn();
+  }
+}
+function openInventoryOverlay(){
+  renderInventoryOverlay();
+  document.getElementById('inventoryOverlay').hidden = false;
+}
+function closeInventoryOverlay(){
+  document.getElementById('inventoryOverlay').hidden = true;
+}
+function toggleInventoryOverlay(){
+  const ov = document.getElementById('inventoryOverlay');
+  if(ov.hidden) openInventoryOverlay();
+  else closeInventoryOverlay();
+}
+
+// -------- bindings --------
+document.getElementById('btnFwd').onclick   = tryMoveForward;
+document.getElementById('btnBack').onclick  = tryMoveBackward;
+document.getElementById('btnLeft').onclick  = ()=>rotate(-1);
+document.getElementById('btnRight').onclick = ()=>rotate(+1);
+document.getElementById('btnDoor').onclick  = toggleDoor;
+document.getElementById('btnStairs').onclick= descendStairs;
+document.getElementById('btnInventory').onclick = toggleInventoryOverlay;
+document.getElementById('btnInvClose').onclick  = closeInventoryOverlay;
+document.getElementById('btnVendorClose').onclick = closeVendorOverlay;
+document.getElementById('btnVendor').onclick      = toggleVendorOverlay;
+document.getElementById('btnPlayAgain').onclick = restartGameAfterDeath;
+
+// Movement keys auto-repeat at our own rate so the player isn't blocked
+// by the OS's initial keydown-repeat delay. Other keys fire once per
+// physical press (no auto-repeat).
+const KEY_REPEAT_INTERVAL_MS = 260; // a hair longer than ANIM_DURATION_MS
+const REPEAT_KEYS = new Set([
+  'w','W','a','A','s','S','d','D',
+  'ArrowUp','ArrowDown','ArrowLeft','ArrowRight',
+  'f','F'   // hold-to-attack
+]);
+const heldRepeatingKeys = new Set();
+
+function dispatchKeyAction(key){
+  // Game not yet started (start screen still up) -> ignore all keys.
+  const ss = document.getElementById('startScreen');
+  if(ss && !ss.hidden) return;
+  // When dead, only Space restarts the run; everything else is locked.
+  if(state.dead){
+    if(key === ' ') restartGameAfterDeath();
+    return;
+  }
+  if(key==='w'||key==='W'||key==='ArrowUp')         tryMoveForward();
+  else if(key==='s'||key==='S'||key==='ArrowDown')  tryMoveBackward();
+  else if(key==='a'||key==='A'||key==='ArrowLeft')  rotate(-1);
+  else if(key==='d'||key==='D'||key==='ArrowRight') rotate(+1);
+  else if(key==='e'||key==='E') toggleDoor();
+  else if(key===' ') descendStairs();
+  else if(key==='t'||key==='T'){
+    const c = cellAt(state.player.x, state.player.y);
+    if(c.items.length) pickUpItem(0);
+    else log("Nothing on the floor here.");
+  }
+  else if(key==='f'||key==='F'){
+    if(state.combat) combatAttack();
+    else triggerAttackSwingAnimation();
+  }
+  else if(key==='r'||key==='R'){
+    if(state.combat) combatRun();
+    else log("Nothing to run from.");
+  }
+  else if(key==='i'||key==='I'){
+    toggleInventoryOverlay();
+  }
+  else if(key==='h'||key==='H'){
+    if(state.player.inv.includes('Healing Herb')) useConsumableByName('Healing Herb');
+    else log("No Healing Herb to use.");
+  }
+  else if(key==='v'||key==='V'){
+    toggleVendorOverlay();
+  }
+  else if(key==='b'||key==='B'){
+    // Buy from vendor: only when the vendor overlay is open.
+    const ov = document.getElementById('vendorOverlay');
+    if(ov && !ov.hidden && VENDOR_STOCK.length){
+      buyFromVendor(VENDOR_STOCK[0]);
+    }
+  }
+}
+
+window.addEventListener('keydown', (e)=>{
+  // Ignore OS-driven repeats; we handle our own repeat below.
+  if(e.repeat) return;
+  dispatchKeyAction(e.key);
+  if(!REPEAT_KEYS.has(e.key)) return;
+  if(heldRepeatingKeys.has(e.key)) return;
+  heldRepeatingKeys.add(e.key);
+  const fireRepeat = ()=>{
+    if(!heldRepeatingKeys.has(e.key)) return;
+    dispatchKeyAction(e.key);
+    setTimeout(fireRepeat, KEY_REPEAT_INTERVAL_MS);
+  };
+  // First repeat fires after the same interval — no OS-style 500ms wait.
+  setTimeout(fireRepeat, KEY_REPEAT_INTERVAL_MS);
+});
+
+window.addEventListener('keyup', (e)=>{
+  heldRepeatingKeys.delete(e.key);
+});
+
+window.addEventListener('blur', ()=>{
+  heldRepeatingKeys.clear();
+});
+
+// Scale the fixed 400x800 wrap to fit the *visible* viewport (the
+// visualViewport API gives us the real area on iOS Safari/Chrome where the
+// dynamic bottom bar otherwise eats into innerHeight). Same layout on all
+// platforms — we only zoom the whole thing.
+function fitWrapToViewport(){
+  const el = document.getElementById('wrap');
+  if(!el) return;
+  const vv = window.visualViewport;
+  const vw = vv ? vv.width  : window.innerWidth;
+  const vh = vv ? vv.height : window.innerHeight;
+  const scale = Math.min(vw/400, vh/700);
+  el.style.transform = `scale(${scale})`;
+  // Lock body to the visible area so iOS doesn't expose dead space below.
+  document.body.style.height = vh + 'px';
+  document.body.style.width  = vw + 'px';
+}
+window.addEventListener('resize', fitWrapToViewport);
+window.addEventListener('orientationchange', fitWrapToViewport);
+if(window.visualViewport){
+  window.visualViewport.addEventListener('resize', fitWrapToViewport);
+  window.visualViewport.addEventListener('scroll', fitWrapToViewport);
+}
+
+// ---------- audio: random music + SFX bank ----------
+const AUDIO_BASE = 'dark_atari_dungeon_mp3_pack_v4_full_music';
+const MUSIC_TRACKS = [
+  '01_beethoven_moonlight_sonata_mvt1_csharp_minor.mp3',
+  '02_bach_toccata_and_fugue_d_minor.mp3',
+  '03_chopin_funeral_march_bflat_minor.mp3',
+  '04_chopin_prelude_op28_no20_c_minor.mp3',
+  '05_chopin_prelude_op28_no4_e_minor.mp3',
+  '06_mozart_requiem_lacrimosa_d_minor.mp3',
+  '07_schubert_erlkonig_g_minor.mp3',
+  '08_grieg_in_the_hall_of_the_mountain_king.mp3',
+  '09_saint_saens_danse_macabre_g_minor.mp3',
+  '10_beethoven_symphony_5_c_minor.mp3'
+].map(f => `${AUDIO_BASE}/music_mp3/${f}`);
+// Asset folder ships door_shut_*.mp3 in door_open_shut/; we use those for
+// any door toggle (open or close).
+function sfxList(folder, prefix, count){
+  const out = [];
+  for(let i=1;i<=count;i++) out.push(`${AUDIO_BASE}/sfx_mp3/${folder}/${prefix}_${i}.mp3`);
+  return out;
+}
+const SFX_BANK = {
+  sword_swing:    sfxList('sword_swing',    'sword_swing',    4),
+  damage_dealt:   sfxList('damage_dealt',   'damage_dealt',   4),
+  damage_taken:   sfxList('damage_taken',   'damage_taken',   4),
+  death_sting:    sfxList('death_sting',    'death_sting',    4),
+  descend_stairs: sfxList('descend_stairs', 'descend_stairs', 4),
+  door:           sfxList('door_open_shut', 'door_shut',      4),
+  footstep:       sfxList('footstep',       'footstep',       4),
+  gold_collect:   sfxList('gold_collect',   'gold_collect',   4),
+  herb_collect:   sfxList('herb_collect',   'herb_collect',   4),
+  herb_take:      sfxList('herb_take',      'herb_take',      4),
+};
+let audioMusicVolume = 0.125; // halved again from 0.25
+let audioSfxVolume   = 0.35; // half of previous 0.7
+let audioMusicEl     = null;
+let audioStarted     = false;
+
+function pickRandomMusicTrack(){
+  return MUSIC_TRACKS[Math.floor(Math.random()*MUSIC_TRACKS.length)];
+}
+const MUSIC_TAIL_FADE_SECONDS = 3.0;     // fade out over last 3s of a track
+const MUSIC_GAP_MIN_MS = 3000;           // 3..8s gap between tracks
+const MUSIC_GAP_MAX_MS = 8000;
+function startBackgroundMusic(){
+  if(audioMusicEl){
+    try { audioMusicEl.pause(); } catch(_){}
+  }
+  audioMusicEl = new Audio(pickRandomMusicTrack());
+  audioMusicEl.volume = audioMusicVolume;
+  audioMusicEl.ontimeupdate = ()=>{
+    if(!audioMusicEl) return;
+    const dur = audioMusicEl.duration;
+    if(!isFinite(dur)) return;
+    const remaining = dur - audioMusicEl.currentTime;
+    if(remaining <= MUSIC_TAIL_FADE_SECONDS){
+      const f = Math.max(0, remaining / MUSIC_TAIL_FADE_SECONDS);
+      audioMusicEl.volume = audioMusicVolume * f;
+    }
+  };
+  audioMusicEl.onended = ()=>{
+    if(!audioStarted) return;
+    const delayMs = MUSIC_GAP_MIN_MS +
+      Math.floor(Math.random() * (MUSIC_GAP_MAX_MS - MUSIC_GAP_MIN_MS + 1));
+    setTimeout(()=>{ if(audioStarted) startBackgroundMusic(); }, delayMs);
+  };
+  audioMusicEl.play().catch(()=>{});
+}
+function setMusicVolume(v){
+  audioMusicVolume = v;
+  if(audioMusicEl) audioMusicEl.volume = v;
+}
+function setSfxVolume(v){
+  audioSfxVolume = v;
+}
+// Quickly fade out background music, then fire the death sting once
+// it's silent. Used by triggerPlayerDeath so the music doesn't fight
+// the sting cue.
+function fadeOutMusicThenPlayDeathSting(){
+  const startVol = audioMusicEl ? audioMusicEl.volume : 0;
+  const fadeDurMs = 350;
+  const startTs = performance.now();
+  const tick = ()=>{
+    const t = (performance.now() - startTs) / fadeDurMs;
+    if(!audioMusicEl || t >= 1){
+      if(audioMusicEl){
+        audioMusicEl.volume = 0;
+        try { audioMusicEl.pause(); } catch(_){}
+        // Stop the auto-pick-next on ended.
+        audioMusicEl.onended = null;
+      }
+      playSfx('death_sting');
+      return;
+    }
+    audioMusicEl.volume = startVol * (1 - t);
+    requestAnimationFrame(tick);
+  };
+  tick();
+}
+function playSfx(category){
+  if(!audioStarted) return;
+  const list = SFX_BANK[category];
+  if(!list || !list.length) return;
+  const path = list[Math.floor(Math.random()*list.length)];
+  try {
+    const a = new Audio(path);
+    a.volume = audioSfxVolume;
+    a.play().catch(()=>{});
+  } catch(_){}
+}
+
+function dismissStartScreen(){
+  const ss = document.getElementById('startScreen');
+  if(!ss) return;
+  ss.hidden = true;
+  audioStarted = true;
+  startBackgroundMusic();
+}
+document.getElementById('btnStartGame').onclick = dismissStartScreen;
+function syncMusicSlidersToValue(v){
+  const b = document.getElementById('settingsMusicVolSlider');
+  if(b) b.value = String(v);
+}
+function syncSfxSlidersToValue(v){
+  const b = document.getElementById('settingsSfxVolSlider');
+  if(b) b.value = String(v);
+}
+document.getElementById('settingsMusicVolSlider').oninput = (e)=>{
+  const v = parseFloat(e.target.value); setMusicVolume(v); syncMusicSlidersToValue(v);
+};
+document.getElementById('settingsSfxVolSlider').oninput = (e)=>{
+  const v = parseFloat(e.target.value); setSfxVolume(v); syncSfxSlidersToValue(v);
+};
+function openSettingsOverlay(){
+  document.getElementById('settingsOverlay').hidden = false;
+}
+function closeSettingsOverlay(){
+  document.getElementById('settingsOverlay').hidden = true;
+}
+function toggleSettingsOverlay(){
+  const ov = document.getElementById('settingsOverlay');
+  if(ov.hidden) openSettingsOverlay(); else closeSettingsOverlay();
+}
+document.getElementById('hamburgerBtn').onclick = toggleSettingsOverlay;
+document.getElementById('btnSettingsClose').onclick = closeSettingsOverlay;
+
+// -------- main --------
+initThree();
+newLevel(1);
+fitWrapToViewport();
+// Fire-and-forget: enemy chatter library loads on its own; phrases will
+// start appearing once the JSON arrives. No-op if it can't be fetched.
+loadAllEnemyPhraseLibraries();
+function tickAnimation(now){
+  const a = state.anim;
+  if(!a) return;
+  const t = Math.min(1, (now - a.startTs) / a.durMs);
+  const e = smoothstep(t);
+  if(a.kind === 'rotate-arc'){
+    // The back-offset vector rotates around the cell center along an arc.
+    // Three.js camera default forward = -Z; rotated by yaw around Y, the
+    // back-from-camera direction is (sin yaw, 0, cos yaw).
+    const yaw = a.fromYaw + (a.toYaw - a.fromYaw) * e;
+    camera.position.set(
+      a.cellCenterX + Math.sin(yaw) * PLAYER_BACK_OFFSET,
+      WALL_H * 0.55,
+      a.cellCenterZ + Math.cos(yaw) * PLAYER_BACK_OFFSET
+    );
+    camera.rotation.set(0, yaw, 0);
+  } else {
+    camera.position.lerpVectors(a.fromPos, a.toPos, e);
+    const yaw = a.fromYaw + (a.toYaw - a.fromYaw) * e;
+    camera.rotation.set(0, yaw, 0);
+  }
+  const torch = scene.getObjectByName('torch');
+  if(torch) torch.position.copy(camera.position);
+  if(t >= 1){
+    const done = a.onDone;
+    state.anim = null;
+    if(done) done();
+    // Fire any queued action only after the full animation chain settles
+    // (e.g. back-step into-enemy-room queues a 180 spin in onDone, so
+    // wait until that finishes too before draining the buffer).
+    if(!state.anim && state.pendingAction){
+      const next = state.pendingAction;
+      state.pendingAction = null;
+      next();
+    }
+  }
+}
+
+// Per-frame ambient bob for enemies, the stairs-down arrow, and its label.
+// Skips an enemy that's currently driven by the lunge animation.
+// Time-gated flicker state: re-roll multipliers every 80..200ms so the
+// flicker reads as flame-paced (slower than 60fps) and stronger.
+// Held torch sprite flickers between FULLY DARK (filter brightness(0))
+// and its normal lit color. Hold each state long enough to be visible
+// (110..330ms) but not strobing. Ambient light pulses softly in time.
+const _flicker = { nextRollTs: 0, lightMul: 1, spriteDark: false };
+function _rollFlickerValues(now){
+  // Bias toward bright. ~35% of holds are the dark frame.
+  _flicker.spriteDark = (Math.random() < 0.35);
+  let lMul = 0.65 + Math.random() * 0.45;       // 0.65..1.10
+  if(_flicker.spriteDark && Math.random() < 0.6) lMul *= 0.55;
+  _flicker.lightMul = lMul;
+  _flicker.nextRollTs = now + 110 + Math.random() * 220; // 110..330ms hold
+}
+
+// Adjust the torch point light + scene fog + left-hand HUD based on
+// the player's remaining torch charges. Also flickers when low.
+function applyTorchLightingEffects(){
+  const torch = scene && scene.getObjectByName('torch');
+  const ambLight = scene && scene.getObjectByName('ambient');
+  const charges = state.player.torchCharges;
+  const lh = document.querySelector('.hand.left');
+  // Anchor the omnidirectional point light at the player's CELL CENTER.
+  // (The camera rides ~PLAYER_BACK_OFFSET behind center; pinning the
+  // light at center means the wall illumination doesn't slide around
+  // when the camera tweens or arcs through a rotation.)
+  // Position the omnidirectional point light at the player's cell
+  // center, at eye height. Intensity bumped high enough that adjacent
+  // rooms (visible through open passages) get enough light to read
+  // their walls. flame marker tracks the same position so the source
+  // is visible.
+  if(torch){
+    // Derive torch position FROM the camera so it tweens smoothly with
+    // the player during move/rotate animations instead of snapping to
+    // state.player.x/y (which updates to the destination cell at move
+    // start). Camera is offset PLAYER_BACK_OFFSET behind the visual
+    // room center along the facing direction; pushing the torch back
+    // toward the room center keeps it tethered ahead of the player.
+    const fwd = new THREE.Vector3();
+    camera.getWorldDirection(fwd);
+    fwd.y = 0; fwd.normalize();
+    torch.decay = 2;
+    torch.position.set(
+      camera.position.x + fwd.x * PLAYER_BACK_OFFSET,
+      WALL_H * 0.55,
+      camera.position.z + fwd.z * PLAYER_BACK_OFFSET
+    );
+    torch.intensity = 25;
+    torch.distance  = CELL * 2.5;
+  }
+  const flameMarker = scene && scene.getObjectByName('torchFlameMarker');
+  if(flameMarker){
+    flameMarker.visible = false;
+  }
+  const centerBias = PLAYER_BACK_OFFSET; // ~1.6 world units
+  const now = performance.now();
+  if(charges <= 0){
+    // Torch out: range 2, intensity 0.5, decay 2 (steep inverse-square).
+    if(torch){
+      torch.intensity = 1;
+      torch.distance  = 3;
+      torch.decay     = 2;
+    }
+    if(ambLight) ambLight.intensity = 0;
+    if(scene && scene.fog){
+      scene.fog.near = CELL * 0.95;
+      scene.fog.far  = CELL * 1.4;
+    }
+    if(lh){ lh.style.transition = ''; lh.style.opacity = '0'; lh.style.filter = ''; }
+    const vig = document.getElementById('darkVignette');
+    if(vig) vig.classList.add('active');
+    return;
+  }
+  // Torch lit — vignette off, ambient at fill level.
+  const vigOff = document.getElementById('darkVignette');
+  if(vigOff) vigOff.classList.remove('active');
+  if(ambLight) ambLight.intensity = 0;
+  // Lit. Flicker when charges < 10: ambient light HARD-SWAPS between
+  // 'lit' and 'no-torch' params in sync with the sprite's black/normal
+  // toggle, so the room dips to the torch-out look during dark frames.
+  if(charges < 10){
+    if(now >= _flicker.nextRollTs) _rollFlickerValues(now);
+    if(lh){
+      lh.style.transition = 'none';
+      lh.style.opacity = '1';
+      lh.style.filter = _flicker.spriteDark ? 'brightness(0)' : 'brightness(1)';
+    }
+    if(_flicker.spriteDark){
+      // Match the no-torch params one-for-one (dimmer).
+      if(torch){ torch.intensity = 8; torch.distance = CELL * 1.6; }
+      if(ambLight) ambLight.intensity = 0;
+      if(scene && scene.fog){
+        scene.fog.near = CELL * 0.95;
+        scene.fog.far  = CELL * 1.4;
+      }
+    } else {
+      // Lit frame.
+      if(torch){ torch.intensity = 3.5; torch.distance = CELL * 4; torch.decay = 1; }
+  // (line above also sets steady-lit branch)
+      if(ambLight) ambLight.intensity = 0;
+      if(scene && scene.fog){
+        scene.fog.near = CELL * 0.5 + centerBias;
+        scene.fog.far  = CELL * 2.6 + centerBias;
+      }
+    }
+    return;
+  }
+  // Steady lit (charges >= 10): full opacity, smooth fade transition restored.
+  if(lh){
+    lh.style.transition = '';
+    lh.style.opacity = '1';
+    lh.style.filter = '';
+  }
+  if(torch){ torch.intensity = 3.5; torch.distance = CELL * 4; torch.decay = 1; }
+  if(scene && scene.fog){
+    scene.fog.near = CELL * 0.5 + centerBias;
+    scene.fog.far  = CELL * 2.6 + centerBias;
+  }
+}
+
+function bobEnemiesInPlace(now){
+  if(!dungeonGroup) return;
+  const w = (Math.PI * 2) / ENEMY_BOB_PERIOD_MS;
+  const lungeEnemy = state.enemyLunge ? state.enemyLunge.enemyObj : null;
+  dungeonGroup.children.forEach(obj=>{
+    const u = obj.userData;
+    if(!u || typeof u.baseY !== 'number') return;
+    if(u.isEnemy || u.isNpc){
+      if(obj === lungeEnemy) return;
+      if(u.dying) return;
+      obj.position.y = u.baseY + Math.sin(now*w + u.bobPhase) * ENEMY_BOB_AMPLITUDE;
+    } else if(u.isStairsArrow || u.isStairsLabel){
+      obj.position.y = u.baseY + Math.sin(now*w + u.bobPhase) * 0.18;
+    }
+  });
+}
+
+// Find the sprite/mesh for the enemy in the given grid cell, if visible.
+function findEnemySpriteForCell(cellX, cellY){
+  if(!dungeonGroup) return null;
+  for(const obj of dungeonGroup.children){
+    const u = obj.userData;
+    if(u && u.isEnemy && u.cellX === cellX && u.cellY === cellY) return obj;
+  }
+  return null;
+}
+
+// Enemy attack lunge: moves enemy ~ENEMY_LUNGE_DEPTH world units toward
+// the player camera then back over ENEMY_LUNGE_DURATION_MS. Fires onPeak
+// at the closest point (t=0.5), and onDone when the lunge fully retracts.
+function startEnemyLungeAnimation(enemyObj, onPeak, onDone){
+  const basePos = enemyObj.position.clone();
+  // Direction "toward player" = opposite of player's facing dir vector.
+  const v = DIR_VEC[state.player.dir];
+  const peakPos = basePos.clone();
+  peakPos.x -= v[0] * ENEMY_LUNGE_DEPTH;
+  peakPos.z -= v[1] * ENEMY_LUNGE_DEPTH;
+  state.enemyLunge = {
+    startTs: performance.now(),
+    durMs: ENEMY_LUNGE_DURATION_MS,
+    enemyObj, basePos, peakPos,
+    peakFired: false,
+    onPeak: onPeak || null,
+    onDone: onDone || null
+  };
+}
+
+// ---------- enemy chatter (random phrases) ----------
+const ENEMY_PHRASE_FILE = {
+  'Giant Rat':  'enemies/giant_rat.json',
+  'Goblin':     'enemies/goblin.json',
+  'Skeleton':   'enemies/skeleton.json',
+  'Slime':      'enemies/slime.json',
+  'Cave Troll': 'enemies/cave_troll.json',
+  'Lich':       'enemies/lich.json',
+};
+// Friendly NPCs (no combat). Their phrase libraries share the same
+// loader/lookup as enemies; the bubble border is green at draw time.
+const NPC_PHRASE_FILE = {
+  'Vendor': 'npcs/vendor.json',
+};
+const NPC_SPRITE_PATH = {
+  'Vendor': 'sprites/npc_vendor.png',
+};
+// Library entries: {phrases:[...speech...], movements:[...action...]}.
+// Inline fallback covers the case when the JSON fetch fails. Async loader
+// below replaces values on success.
+const enemyPhraseLibrariesByName = {
+  'Giant Rat':  { phrases: ['Squeak!','Cheese?','Nibble nibble','My turf','Plague!','Tiny terror'],
+                  movements: ['scurries','sniffs','bares fangs'] },
+  'Goblin':     { phrases: ['Squishy human!','Get out!','I see you','My loot!','Stab stab','Tribe rule!'],
+                  movements: ['snickers','spits','picks nose'] },
+  'Skeleton':   { phrases: ['Bones rattle...','Cold grave','Endless duty','Forever still','Dust to dust'],
+                  movements: ['clatters','bones grind','creaks'] },
+  'Slime':      { phrases: ['Glorp!','Squish!','Wibble wobble','Goo goo','Sticky hello','Sploosh'],
+                  movements: ['jiggles','oozes','plops'] },
+  'Cave Troll': { phrases: ['GRRR!','Smash!','Hungry...','Crush!','Big mad','Tiny human'],
+                  movements: ['thuds','drools','stomps'] },
+  'Lich':       { phrases: ['Mortal worm','Bow.','Necromancy','Pitiful','Centuries old'],
+                  movements: ['drifts','weaves a sigil','staff thumps'] },
+  // NPCs use the same library shape; presence here also means the loader
+  // will pull a richer set from npcs/<name>.json when fetch succeeds.
+  'Vendor':     { phrases: ['Welcome, traveler','Best prices','Fresh wares!',
+                            'Press V, I trade','Stay a while','Trust me, friend'],
+                  movements: ['polishes a coin','smiles','bows slightly'] },
+};
+// Shared cross-enemy list of comical lines. 10% of every phrase emission
+// gets pulled from this instead of the enemy's own library, popped from
+// a per-enemy randomized copy that refreshes when emptied.
+const FUNNY_SHARED_PHRASES = [
+  "Is it break time yet?",
+  "I need tuesday off",
+  "I need a raise...",
+  "...arrow to the knee...",
+  "what has it gots?",
+  "Have you tried turning",
+  "off and on again?",
+  "Five more minutes...",
+  "Union meeting",
+  "Need coffee",
+  "Wrong dungeon",
+  "Did I leave the stove on?",
+  "Boss never visits",
+  "Mondays, amirite?",
+  "Hello, Dave.",
+  "Randy, makin copies",
+  "WASAAAAAAH",
+  "*dab*",
+  "*judging you*",
+  "I miss the sun...",
+];
+const FUNNY_PHRASE_CHANCE = 0.10;
+async function loadAllEnemyPhraseLibraries(){
+  const all = Object.entries(ENEMY_PHRASE_FILE).concat(Object.entries(NPC_PHRASE_FILE));
+  await Promise.all(all.map(async ([name, path])=>{
+    try{
+      const r = await fetch(path);
+      if(!r.ok) return;
+      const data = await r.json();
+      enemyPhraseLibrariesByName[name] = {
+        phrases:   Array.isArray(data.phrases)   ? data.phrases   : [],
+        movements: Array.isArray(data.movements) ? data.movements : [],
+      };
+    }catch(e){
+      console.warn('[gridiron] phrase fetch failed for', name, e);
+    }
+  }));
+}
+function shuffleInPlace(a){
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+// Returns {text, kind} or null. kind is 'speech' | 'movement' | 'funny'.
+function getNextPhraseForEnemy(enemy){
+  // 10% chance: pull from the shared funny list (per-enemy randomized
+  // queue, refreshed when exhausted).
+  if(Math.random() < FUNNY_PHRASE_CHANCE){
+    if(!enemy.funnyQueue || enemy.funnyQueue.length === 0){
+      enemy.funnyQueue = shuffleInPlace(FUNNY_SHARED_PHRASES.slice());
+    }
+    const t = enemy.funnyQueue.pop();
+    if(t) return { text: t, kind: 'funny' };
+  }
+  const lib = enemyPhraseLibrariesByName[enemy.name];
+  if(!lib) return null;
+  if(!enemy.phraseQueue || enemy.phraseQueue.length === 0){
+    const deck = [];
+    (lib.phrases   || []).forEach(t => deck.push({ text: t, kind: 'speech'   }));
+    (lib.movements || []).forEach(t => deck.push({ text: t, kind: 'movement' }));
+    if(deck.length === 0) return null;
+    enemy.phraseQueue = shuffleInPlace(deck);
+  }
+  return enemy.phraseQueue.pop() || null;
+}
+const PHRASE_SHOW_MIN_MS = 2000;
+const PHRASE_SHOW_MAX_MS = 4000;
+const PHRASE_FADE_MS     = 1000;
+const PHRASE_GAP_MIN_MS  = 2000;
+const PHRASE_GAP_MAX_MS  = 5000;
+
+// Defensive sweep: scene-level phrase bubbles whose owner enemy is dead
+// (hp<=0) or no longer placed in any cell get removed and disposed. Runs
+// once per frame so any orphan sprite gets cleaned up reliably.
+function reapOrphanedPhraseSprites(){
+  if(!scene) return;
+  const toRemove = [];
+  for(const obj of scene.children){
+    const u = obj.userData;
+    if(!u || !u.isEnemyPhrase) continue;
+    const owner = u.ownerEnemy;
+    // NPCs have no hp; treat them as alive as long as they still claim
+    // this sprite. Enemies must additionally have hp > 0.
+    const isNpcOwner = owner && owner.name === 'Vendor';
+    const ownerAlive = owner && owner.currentPhraseSprite === obj &&
+      (isNpcOwner || owner.hp > 0);
+    if(!ownerAlive) toRemove.push(obj);
+  }
+  for(const sp of toRemove){
+    scene.remove(sp);
+    if(sp.material){
+      if(sp.material.map) sp.material.map.dispose();
+      sp.material.dispose();
+    }
+    if(sp.userData.ownerEnemy && sp.userData.ownerEnemy.currentPhraseSprite === sp){
+      sp.userData.ownerEnemy.currentPhraseSprite = null;
+    }
+  }
+}
+
+function tickEnemyPhrases(now){
+  if(!dungeonGroup || !scene) return;
+  for(const obj of dungeonGroup.children){
+    const u = obj.userData;
+    if(!u || u.dying) continue;
+    if(!u.isEnemy && !u.isNpc) continue;
+    const enemy = u.enemyRef || u.npcRef;
+    if(!enemy) continue;
+
+    if(typeof enemy.nextPhraseAt !== 'number'){
+      enemy.nextPhraseAt = now + PHRASE_GAP_MIN_MS + Math.random()*(PHRASE_GAP_MAX_MS-PHRASE_GAP_MIN_MS);
+      enemy.phraseQueue = enemy.phraseQueue || [];
+    }
+
+    // Active phrase: keep the scene-parented sprite riding above the
+    // CURRENT enemy mesh's world position, so renderVisibleRooms (player
+    // moves/rotates) doesn't kill the bubble or restart the cycle.
+    if(enemy.currentPhraseSprite){
+      const sp = enemy.currentPhraseSprite;
+      sp.position.set(obj.position.x, obj.position.y + 1.25, obj.position.z);
+      if(now >= enemy.currentPhraseFadeStart){
+        const fadeT = Math.min(1, (now - enemy.currentPhraseFadeStart) / PHRASE_FADE_MS);
+        sp.material.opacity = 1 - fadeT;
+        if(fadeT >= 1){
+          scene.remove(sp);
+          if(sp.material){
+            if(sp.material.map) sp.material.map.dispose();
+            sp.material.dispose();
+          }
+          enemy.currentPhraseSprite = null;
+          enemy.nextPhraseAt = now + PHRASE_GAP_MIN_MS + Math.random()*(PHRASE_GAP_MAX_MS-PHRASE_GAP_MIN_MS);
+        }
+      } else {
+        sp.material.opacity = 1;
+      }
+      continue;
+    }
+
+    if(now >= enemy.nextPhraseAt){
+      const phrase = getNextPhraseForEnemy(enemy);
+      if(!phrase){ enemy.nextPhraseAt = now + 5000; continue; }
+      // Movements wrap with asterisks; speech and funny render plain.
+      const display = (phrase.kind === 'movement') ? `*${phrase.text}*` : phrase.text;
+      const friendly = !!u.isNpc;
+      const borderColor = friendly ? '#4f4' : '#f44';
+      const textColor   = friendly ? '#dfffdf' : '#ffd9d9';
+      const sp = makeTextSprite(display, { borderColor, textColor });
+      sp.position.set(obj.position.x, obj.position.y + 1.25, obj.position.z);
+      // depthTest stays true so walls / doors occlude the bubble like a
+      // real object in the world.
+      sp.material.opacity = 1;
+      sp.userData.isEnemyPhrase = true;
+      sp.userData.ownerEnemy   = enemy;
+      scene.add(sp);
+      enemy.currentPhraseSprite = sp;
+      const showMs = PHRASE_SHOW_MIN_MS + Math.random()*(PHRASE_SHOW_MAX_MS-PHRASE_SHOW_MIN_MS);
+      enemy.currentPhraseFadeStart = now + showMs;
+    }
+  }
+}
+
+// Death animation for an enemy sprite: blink red/black several times,
+// then fade alpha to 0. Calls onDone after the fade completes so the
+// caller can finally clear the cell.enemy reference and re-render.
+const ENEMY_DEATH_BLINK_MS = 600;
+const ENEMY_DEATH_FADE_MS  = 350;
+const ENEMY_DEATH_BLINK_CYCLES = 6; // total color toggles across blink window
+function playEnemyDeathAnimation(enemyObj, onDone){
+  const mat = enemyObj && enemyObj.material;
+  if(!mat || !mat.color){ if(onDone) onDone(); return; }
+  // If a lunge for THIS enemy was still in progress, snap it back to
+  // its base pose first — otherwise the death blink/fade can render
+  // at the lunge's mid-frame offset (the "enemy flashes closer to
+  // player on disappear" bug).
+  if(state.enemyLunge && state.enemyLunge.enemyObj === enemyObj){
+    enemyObj.position.copy(state.enemyLunge.basePos);
+    state.enemyLunge = null;
+  }
+  enemyObj.userData.dying = true;
+  const origColor = mat.color.getHex();
+  mat.transparent = true;
+  const startTs = performance.now();
+  const total = ENEMY_DEATH_BLINK_MS + ENEMY_DEATH_FADE_MS;
+  const tick = ()=>{
+    const elapsed = performance.now() - startTs;
+    if(elapsed < ENEMY_DEATH_BLINK_MS){
+      const phase = Math.floor((elapsed / ENEMY_DEATH_BLINK_MS) * ENEMY_DEATH_BLINK_CYCLES) % 2;
+      mat.color.setHex(phase === 0 ? 0xff3333 : 0x000000);
+      mat.opacity = 1;
+      requestAnimationFrame(tick);
+    } else if(elapsed < total){
+      mat.color.setHex(origColor);
+      mat.opacity = 1 - (elapsed - ENEMY_DEATH_BLINK_MS) / ENEMY_DEATH_FADE_MS;
+      requestAnimationFrame(tick);
+    } else {
+      mat.opacity = 0;
+      if(onDone) onDone();
+    }
+  };
+  tick();
+}
+
+// Spawn a red damage number above an enemy sprite that floats up and
+// fades out over ~700ms. Sprite is parented to the scene so it survives
+// re-renders.
+function spawnFloatingDamageNumberAboveEnemy(amount, enemyObj){
+  if(!enemyObj || !scene) return;
+  const sp = makeTextSprite(`-${amount}`, {
+    textColor: '#ff5050', noBorder: true, noBackground: true
+  });
+  // Bigger than a phrase: scale up.
+  sp.scale.multiplyScalar(1.6);
+  const baseX = enemyObj.position.x;
+  const baseY = enemyObj.position.y + 1.0;
+  const baseZ = enemyObj.position.z;
+  sp.position.set(baseX, baseY, baseZ);
+  sp.material.opacity = 1;
+  scene.add(sp);
+  const startTs = performance.now();
+  const durMs = 700;
+  const tick = ()=>{
+    const t = (performance.now() - startTs) / durMs;
+    if(t >= 1){
+      scene.remove(sp);
+      if(sp.material){
+        if(sp.material.map) sp.material.map.dispose();
+        sp.material.dispose();
+      }
+      return;
+    }
+    sp.position.y = baseY + t * 1.2;
+    sp.material.opacity = 1 - t;
+    requestAnimationFrame(tick);
+  };
+  tick();
+}
+
+// Show a big red damage number HUD overlay (player took dmg). Quick fade.
+function showPlayerDamageNumberHud(amount){
+  const el = document.getElementById('playerDamageNum');
+  if(!el) return;
+  el.textContent = String(amount);
+  el.classList.remove('show');
+  void el.offsetWidth;
+  el.classList.add('show');
+}
+
+// Briefly tint an enemy sprite red to indicate it took damage. Restores
+// the original color after ENEMY_HIT_FLASH_MS.
+function flashEnemyHurtTint(enemyObj){
+  if(!enemyObj || !enemyObj.material || !enemyObj.material.color) return;
+  const orig = enemyObj.material.color.getHex();
+  enemyObj.material.color.setHex(0xff3333);
+  setTimeout(()=>{
+    if(enemyObj.material && enemyObj.material.color){
+      enemyObj.material.color.setHex(orig);
+    }
+  }, ENEMY_HIT_FLASH_MS);
+}
+
+function tickEnemyLunge(now){
+  const l = state.enemyLunge;
+  if(!l) return;
+  const t = (now - l.startTs) / l.durMs;
+  if(t >= 1){
+    l.enemyObj.position.copy(l.basePos);
+    if(!l.peakFired && l.onPeak) l.onPeak();
+    if(l.onDone) l.onDone();
+    state.enemyLunge = null;
+    return;
+  }
+  // 0..0.5 forward, 0.5..1 back. smoothstep on each half.
+  const halfT = t < 0.5 ? smoothstep(t * 2) : smoothstep((1 - t) * 2);
+  l.enemyObj.position.lerpVectors(l.basePos, l.peakPos, halfT);
+  if(!l.peakFired && t >= 0.5){
+    l.peakFired = true;
+    if(l.onPeak) l.onPeak();
+  }
+}
+
+// 15-degree CCW-then-CW yaw bob layered on top of the camera's facing yaw.
+// Triggered on every player attack (hit or miss).
+function applyAttackSwingYawOffset(now){
+  const a = state.attackSwing;
+  if(!a) return;
+  const t = (now - a.startTs) / a.durMs;
+  if(t >= 1){ state.attackSwing = null; return; }
+  // +sin(2*pi*t)*15deg → 0,+15,0,-15,0 over t=[0,1] — quick CW then CCW
+  // (opposite of the previous -sin direction).
+  const offsetRad = Math.sin(2 * Math.PI * t) * (15 * Math.PI / 180);
+  camera.rotation.y += offsetRad;
+}
+
+// Screen shake: random offset on camera position, decays over duration.
+function applyScreenShake(now){
+  const s = state.screenShake;
+  if(!s) return;
+  if(now >= s.until){ state.screenShake = null; return; }
+  const remaining = (s.until - now) / s.durMs;
+  const mag = s.magnitude * remaining;
+  camera.position.x += (Math.random()*2 - 1) * mag;
+  camera.position.y += (Math.random()*2 - 1) * mag;
+  camera.position.z += (Math.random()*2 - 1) * mag;
+}
+
+// Per-frame manual dim for THREE.Sprite objects (enemies, items, phrase
+// bubbles, damage numbers). Sprites in three.js ignore PointLight, so
+// we tint material.color by distance from the torch using the same
+// intensity / d^decay formula three.js uses for the point light. Past
+// SPRITE_DIM_MAX_DISTANCE units from the torch we force pure black.
+const SPRITE_DIM_MAX_DISTANCE = 8;
+const _dimSpritesTmpVec = new THREE.Vector3();
+function dimSpritesByDistanceFromTorch(){
+  if(!scene) return;
+  const torch = scene.getObjectByName('torch');
+  if(!torch) return;
+  const tp = torch.position;
+  const intensity = torch.intensity || 0;
+  const decay = (typeof torch.decay === 'number') ? torch.decay : 2;
+  scene.traverse(obj => {
+    if(!obj.isSprite) return;
+    if(obj.userData && obj.userData.isTorchFlameMarker) return;
+    obj.getWorldPosition(_dimSpritesTmpVec);
+    const d = Math.max(0.001, _dimSpritesTmpVec.distanceTo(tp));
+    let f;
+    if(d > SPRITE_DIM_MAX_DISTANCE){
+      f = 0;
+    } else {
+      f = intensity / Math.pow(d, decay);
+      if(f > 1) f = 1;
+      if(f < 0) f = 0;
+    }
+    if(obj.material && obj.material.color){
+      obj.material.color.setRGB(f, f, f);
+    }
+  });
+}
+
+function loop(){
+  requestAnimationFrame(loop);
+  const now = performance.now();
+  // Anchor the camera to its canonical pose every frame so additive
+  // overlays (attack-swing yaw and screen shake) don't accumulate
+  // random walk drift. During an animation, tickAnimation owns the
+  // pose; otherwise we snap back to the player's cell+facing pose.
+  if(state.anim){
+    tickAnimation(now);
+  } else {
+    setCameraToCellAndDir(state.player.x, state.player.y, state.player.dir);
+  }
+  bobEnemiesInPlace(now);
+  tickEnemyLunge(now);
+  tickEnemyPhrases(now);
+  reapOrphanedPhraseSprites();
+  applyTorchLightingEffects();
+  dimSpritesByDistanceFromTorch();
+  applyAttackSwingYawOffset(now);
+  applyScreenShake(now);
+  // Smooth ASCII map pan: interpolate continuous cell coords during a
+  // move animation so the gray map slides under the player char.
+  let visX = state.player.x, visY = state.player.y;
+  if(state.anim && state.anim.kind === 'move' &&
+     typeof state.anim.fromCellX === 'number'){
+    const t = Math.min(1, (now - state.anim.startTs) / state.anim.durMs);
+    const e = smoothstep(t);
+    visX = state.anim.fromCellX + (state.anim.toCellX - state.anim.fromCellX) * e;
+    visY = state.anim.fromCellY + (state.anim.toCellY - state.anim.fromCellY) * e;
+  }
+  updateDiscoveredMapTranslate(visX, visY);
+  // (No camera tilt on death — keeps enemy sprites and phrase bubbles
+  // oriented with the level. The death overlay handles the visual end.)
+  renderer.render(scene, camera);
+}
+loop();
+</script>
+</body>
+</html>

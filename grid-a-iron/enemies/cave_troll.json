@@ -1,0 +1,17 @@
+{
+  "name": "Cave Troll",
+  "phrases": [
+    "GRRR!", "Smash!", "Hungry...", "Tiny human", "Crush!",
+    "Where food?", "Big rock!", "Owww!", "More!", "Stomp!",
+    "Trolly time", "Go away", "Loud here", "Dark good",
+    "Bash bash", "Big mad", "Little fast", "Hate light",
+    "Crunchy bones", "Make hat from skull", "Tribe sleeps",
+    "Hands big", "Stinky cave", "Big and slow",
+    "Nap nap", "Smell bad", "Drool", "Big foot down",
+    "Wake big mad", "Leave my cave"
+  ],
+  "movements": [
+    "thuds", "drools", "scratches", "huffs", "lumbers",
+    "cracks knuckles", "stomps", "snorts"
+  ]
+}

@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 600" width="1200" height="600" font-family="'Courier New','VT323',monospace">
+  <defs>
+    <!-- procedural brick pattern -->
+    <pattern id="brick" x="0" y="0" width="80" height="40" patternUnits="userSpaceOnUse">
+      <rect width="80" height="40" fill="#1c1410"/>
+      <rect x="2" y="2" width="76" height="36" fill="#5a4636"/>
+      <rect x="2" y="2" width="76" height="2" fill="#7a6450"/>
+    </pattern>
+    <pattern id="brickShift" x="40" y="40" width="80" height="40" patternUnits="userSpaceOnUse">
+      <rect width="80" height="40" fill="#1c1410"/>
+      <rect x="2" y="2" width="76" height="36" fill="#5a4636"/>
+      <rect x="2" y="2" width="76" height="2" fill="#7a6450"/>
+    </pattern>
+    <radialGradient id="torchGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#ffaa55" stop-opacity="0.85"/>
+      <stop offset="60%" stop-color="#ff6622" stop-opacity="0.25"/>
+      <stop offset="100%" stop-color="#000" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="floor" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#3a3024"/>
+      <stop offset="100%" stop-color="#0a0805"/>
+    </linearGradient>
+    <linearGradient id="ceil" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0a0805"/>
+      <stop offset="100%" stop-color="#1a1612"/>
+    </linearGradient>
+    <filter id="crt">
+      <feGaussianBlur stdDeviation="0.6"/>
+    </filter>
+  </defs>
+
+  <!-- background black -->
+  <rect width="1200" height="600" fill="#000"/>
+
+  <!-- left wall (rows 0..2, alternating shift) -->
+  <g>
+    <rect x="0" y="0" width="200" height="40" fill="url(#brick)"/>
+    <rect x="0" y="40" width="200" height="40" fill="url(#brickShift)"/>
+    <rect x="0" y="80" width="200" height="40" fill="url(#brick)"/>
+    <rect x="0" y="120" width="200" height="40" fill="url(#brickShift)"/>
+    <rect x="0" y="160" width="200" height="40" fill="url(#brick)"/>
+    <rect x="0" y="200" width="200" height="40" fill="url(#brickShift)"/>
+    <rect x="0" y="240" width="200" height="40" fill="url(#brick)"/>
+    <rect x="0" y="280" width="200" height="40" fill="url(#brickShift)"/>
+    <rect x="0" y="320" width="200" height="40" fill="url(#brick)"/>
+    <rect x="0" y="360" width="200" height="40" fill="url(#brickShift)"/>
+    <rect x="0" y="400" width="200" height="40" fill="url(#brick)"/>
+    <rect x="0" y="440" width="200" height="40" fill="url(#brickShift)"/>
+    <rect x="0" y="480" width="200" height="40" fill="url(#brick)"/>
+    <rect x="0" y="520" width="200" height="40" fill="url(#brickShift)"/>
+    <rect x="0" y="560" width="200" height="40" fill="url(#brick)"/>
+  </g>
+  <!-- right wall mirror -->
+  <g>
+    <rect x="1000" y="0" width="200" height="40" fill="url(#brick)"/>
+    <rect x="1000" y="40" width="200" height="40" fill="url(#brickShift)"/>
+    <rect x="1000" y="80" width="200" height="40" fill="url(#brick)"/>
+    <rect x="1000" y="120" width="200" height="40" fill="url(#brickShift)"/>
+    <rect x="1000" y="160" width="200" height="40" fill="url(#brick)"/>
+    <rect x="1000" y="200" width="200" height="40" fill="url(#brickShift)"/>
+    <rect x="1000" y="240" width="200" height="40" fill="url(#brick)"/>
+    <rect x="1000" y="280" width="200" height="40" fill="url(#brickShift)"/>
+    <rect x="1000" y="320" width="200" height="40" fill="url(#brick)"/>
+    <rect x="1000" y="360" width="200" height="40" fill="url(#brickShift)"/>
+    <rect x="1000" y="400" width="200" height="40" fill="url(#brick)"/>
+    <rect x="1000" y="440" width="200" height="40" fill="url(#brickShift)"/>
+    <rect x="1000" y="480" width="200" height="40" fill="url(#brick)"/>
+    <rect x="1000" y="520" width="200" height="40" fill="url(#brickShift)"/>
+    <rect x="1000" y="560" width="200" height="40" fill="url(#brick)"/>
+  </g>
+
+  <!-- corridor: trapezoidal floor + ceiling fading to a vanishing point -->
+  <polygon points="200,0 1000,0 800,180 400,180" fill="url(#ceil)"/>
+  <polygon points="200,600 1000,600 800,420 400,420" fill="url(#floor)"/>
+
+  <!-- mid-distance side walls (perspective) -->
+  <polygon points="200,0 400,180 400,420 200,600" fill="#3a2c20" opacity="0.85"/>
+  <polygon points="1000,0 800,180 800,420 1000,600" fill="#3a2c20" opacity="0.85"/>
+
+  <!-- second corridor segment (smaller) -->
+  <polygon points="400,180 800,180 700,260 500,260" fill="url(#ceil)"/>
+  <polygon points="400,420 800,420 700,340 500,340" fill="url(#floor)"/>
+  <polygon points="400,180 500,260 500,340 400,420" fill="#241a12"/>
+  <polygon points="800,180 700,260 700,340 800,420" fill="#241a12"/>
+
+  <!-- back wall with closed door -->
+  <rect x="500" y="260" width="200" height="80" fill="#1c1410"/>
+  <rect x="540" y="270" width="120" height="60" fill="#5a3420"/>
+  <rect x="544" y="272" width="112" height="2" fill="#7a4a30"/>
+  <circle cx="640" cy="300" r="4" fill="#bb8844"/>
+
+  <!-- torch glow lower-left -->
+  <circle cx="280" cy="500" r="220" fill="url(#torchGlow)"/>
+
+  <!-- title block, big retro letters -->
+  <g transform="translate(0,80)" filter="url(#crt)">
+    <text x="600" y="80" text-anchor="middle"
+          font-size="92" font-weight="900"
+          fill="#9bff9b" stroke="#003300" stroke-width="3"
+          letter-spacing="6">GRIDIRON</text>
+    <text x="600" y="170" text-anchor="middle"
+          font-size="74" font-weight="900"
+          fill="#ffd34d" stroke="#330000" stroke-width="3"
+          letter-spacing="8">DUNGEON</text>
+  </g>
+
+  <!-- subtitle scroll bar -->
+  <g transform="translate(0,500)">
+    <rect x="120" y="0" width="960" height="60" fill="rgba(0,0,0,0.55)" stroke="#0f0" stroke-width="2"/>
+    <text x="600" y="38" text-anchor="middle" font-size="22" fill="#bfffbf"
+          letter-spacing="2">A grid-based first-person dungeon crawler</text>
+  </g>
+
+  <!-- ascii compass corner -->
+  <g transform="translate(40,40)">
+    <rect width="120" height="100" fill="rgba(0,0,0,0.55)" stroke="#0f0" stroke-width="1"/>
+    <text x="60" y="22" font-size="14" fill="#9f9" text-anchor="middle">+-+</text>
+    <text x="60" y="40" font-size="14" fill="#9f9" text-anchor="middle">|^|</text>
+    <text x="60" y="58" font-size="14" fill="#9f9" text-anchor="middle">+=+</text>
+    <text x="60" y="80" font-size="11" fill="#7c7" text-anchor="middle">FACE N</text>
+  </g>
+
+  <!-- pixel-style enemy silhouette in distant doorway -->
+  <g transform="translate(610,290)" opacity="0.9">
+    <rect x="0" y="0" width="60" height="40" fill="#aa1f1f"/>
+    <rect x="20" y="-12" width="20" height="14" fill="#aa1f1f"/>
+    <rect x="22" y="-8" width="4" height="4" fill="#000"/>
+    <rect x="34" y="-8" width="4" height="4" fill="#000"/>
+  </g>
+</svg>
