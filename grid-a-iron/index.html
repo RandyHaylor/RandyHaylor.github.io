@@ -2040,6 +2040,30 @@ let audioMusicVolume = 0.125; // halved again from 0.25
 let audioSfxVolume   = 0.35; // half of previous 0.7
 let audioMusicEl     = null;
 let audioStarted     = false;
+// Web Audio routing: HTMLAudio.volume is read-only on iOS Chrome / Safari,
+// so we run music + sfx through GainNodes whose gain.value we control.
+let audioCtx         = null;
+let musicGainNode    = null;     // master music gain (slider-driven)
+let sfxGainNode      = null;     // master sfx gain (slider-driven)
+let musicTrackGain   = null;     // per-track gain (used for tail fade)
+function initAudioGraphIfNeeded(){
+  if(audioCtx) return;
+  const Ctor = window.AudioContext || window.webkitAudioContext;
+  if(!Ctor) return;
+  try {
+    audioCtx = new Ctor();
+    if(audioCtx.state === 'suspended') audioCtx.resume();
+    musicGainNode = audioCtx.createGain();
+    musicGainNode.gain.value = audioMusicVolume;
+    musicGainNode.connect(audioCtx.destination);
+    sfxGainNode = audioCtx.createGain();
+    sfxGainNode.gain.value = audioSfxVolume;
+    sfxGainNode.connect(audioCtx.destination);
+  } catch(e){
+    console.warn('[gridiron] AudioContext init failed', e);
+    audioCtx = null;
+  }
+}
 
 function pickRandomMusicTrack(){
   return MUSIC_TRACKS[Math.floor(Math.random()*MUSIC_TRACKS.length)];
@@ -2052,7 +2076,27 @@ function startBackgroundMusic(){
     try { audioMusicEl.pause(); } catch(_){}
   }
   audioMusicEl = new Audio(pickRandomMusicTrack());
-  audioMusicEl.volume = audioMusicVolume;
+  // Always 1; actual level is controlled by the master music GainNode
+  // (so iOS, where HTMLAudio.volume is read-only, still respects the slider).
+  audioMusicEl.volume = 1;
+  audioMusicEl.crossOrigin = 'anonymous';
+  if(audioCtx && musicGainNode){
+    if(musicTrackGain){
+      try { musicTrackGain.disconnect(); } catch(_){}
+    }
+    musicTrackGain = audioCtx.createGain();
+    musicTrackGain.gain.value = 1;
+    try {
+      const src = audioCtx.createMediaElementSource(audioMusicEl);
+      src.connect(musicTrackGain).connect(musicGainNode);
+    } catch(e){
+      // If routing fails (some browsers throw on cross-origin/file://),
+      // fall back to direct volume on the element.
+      audioMusicEl.volume = audioMusicVolume;
+    }
+  } else {
+    audioMusicEl.volume = audioMusicVolume;
+  }
   audioMusicEl.ontimeupdate = ()=>{
     if(!audioMusicEl) return;
     const dur = audioMusicEl.duration;
@@ -2060,7 +2104,8 @@ function startBackgroundMusic(){
     const remaining = dur - audioMusicEl.currentTime;
     if(remaining <= MUSIC_TAIL_FADE_SECONDS){
       const f = Math.max(0, remaining / MUSIC_TAIL_FADE_SECONDS);
-      audioMusicEl.volume = audioMusicVolume * f;
+      if(musicTrackGain) musicTrackGain.gain.value = f;
+      else               audioMusicEl.volume = audioMusicVolume * f;
     }
   };
   audioMusicEl.onended = ()=>{
@@ -2073,31 +2118,35 @@ function startBackgroundMusic(){
 }
 function setMusicVolume(v){
   audioMusicVolume = v;
-  if(audioMusicEl) audioMusicEl.volume = v;
+  if(musicGainNode) musicGainNode.gain.value = v;
+  else if(audioMusicEl) audioMusicEl.volume = v;
 }
 function setSfxVolume(v){
   audioSfxVolume = v;
+  if(sfxGainNode) sfxGainNode.gain.value = v;
 }
 // Quickly fade out background music, then fire the death sting once
 // it's silent. Used by triggerPlayerDeath so the music doesn't fight
 // the sting cue.
 function fadeOutMusicThenPlayDeathSting(){
-  const startVol = audioMusicEl ? audioMusicEl.volume : 0;
+  const startGain = musicTrackGain ? musicTrackGain.gain.value : 1;
   const fadeDurMs = 350;
   const startTs = performance.now();
   const tick = ()=>{
     const t = (performance.now() - startTs) / fadeDurMs;
     if(!audioMusicEl || t >= 1){
       if(audioMusicEl){
-        audioMusicEl.volume = 0;
+        if(musicTrackGain) musicTrackGain.gain.value = 0;
+        else audioMusicEl.volume = 0;
         try { audioMusicEl.pause(); } catch(_){}
-        // Stop the auto-pick-next on ended.
         audioMusicEl.onended = null;
       }
       playSfx('death_sting');
       return;
     }
-    audioMusicEl.volume = startVol * (1 - t);
+    const f = startGain * (1 - t);
+    if(musicTrackGain) musicTrackGain.gain.value = f;
+    else if(audioMusicEl) audioMusicEl.volume = audioMusicVolume * (1 - t);
     requestAnimationFrame(tick);
   };
   tick();
@@ -2109,7 +2158,18 @@ function playSfx(category){
   const path = list[Math.floor(Math.random()*list.length)];
   try {
     const a = new Audio(path);
-    a.volume = audioSfxVolume;
+    a.crossOrigin = 'anonymous';
+    if(audioCtx && sfxGainNode){
+      a.volume = 1;
+      try {
+        const src = audioCtx.createMediaElementSource(a);
+        src.connect(sfxGainNode);
+      } catch(_){
+        a.volume = audioSfxVolume;
+      }
+    } else {
+      a.volume = audioSfxVolume;
+    }
     a.play().catch(()=>{});
   } catch(_){}
 }
@@ -2119,6 +2179,13 @@ function dismissStartScreen(){
   if(!ss) return;
   ss.hidden = true;
   audioStarted = true;
+  // Must initialize Web Audio inside a user-gesture handler so iOS
+  // unlocks playback. If init succeeds, music+sfx route through gain
+  // nodes the slider can actually control on iOS.
+  initAudioGraphIfNeeded();
+  if(audioCtx && audioCtx.state === 'suspended'){
+    try { audioCtx.resume(); } catch(_){}
+  }
   startBackgroundMusic();
 }
 document.getElementById('btnStartGame').onclick = dismissStartScreen;
