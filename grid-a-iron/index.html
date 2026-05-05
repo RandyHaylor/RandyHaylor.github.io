@@ -148,7 +148,11 @@
   /* Landscape: #wrap is a 3-column CSS grid (outer padding removed):
        [1fr UI] [gameW 3D] [80 buffer]
      Only the UI column resizes. gameW is set inline from vh*4/3. */
-  body.landscape { justify-content: flex-start; background:#000; overflow:hidden; }
+  body.landscape {
+    justify-content: flex-start; background:#000; overflow:hidden;
+    -webkit-user-select:none; user-select:none;
+    -webkit-touch-callout:none;
+  }
   html:has(body.landscape) { overflow:hidden; }
   body.landscape #wrap {
     display:grid;
@@ -186,7 +190,7 @@
      with 2px L/R padding so nothing can ever truncate. */
   body.landscape #landscapeRightBuffer {
     display:flex; flex-direction:column; align-items:center;
-    justify-content:center; gap:10px; padding:20px 2px;
+    justify-content:center; gap:10px; padding:40px 2px 20px;
     position:relative; right:auto; top:auto;
     grid-column: 3; grid-row: 1;
     width:80px; height:100%;
@@ -243,7 +247,7 @@
   body.landscape #landscapeDpad {
     display:block; position:absolute;
     right:8px; bottom: calc(8px + env(safe-area-inset-bottom));
-    width:120px; height:120px; z-index:9; pointer-events:none;
+    width:160px; height:120px; z-index:9; pointer-events:none;
   }
   body.landscape #landscapeDpad[hidden] { display:none !important; }
   /* Chars only — no button box. Diamond placement of ^ < > v. */
@@ -258,9 +262,9 @@
   /* T-shape: < ^ > in upper-mid row (lowered ~1 char from the top so
      the row sits closer to v), v below center. */
   body.landscape #landscapeDpad .dpadLeft  { top:40px; left:0;    }
-  body.landscape #landscapeDpad .dpadUp    { top:40px; left:40px; }
+  body.landscape #landscapeDpad .dpadUp    { top:40px; left:60px; }
   body.landscape #landscapeDpad .dpadRight { top:40px; right:0;   }
-  body.landscape #landscapeDpad .dpadDown  { bottom:0; left:40px; }
+  body.landscape #landscapeDpad .dpadDown  { bottom:0; left:60px; }
   /* Help overlay: full-viewport in landscape only. */
   #helpOverlay { display:none; }
   #helpOverlay[hidden] { display:none !important; }
@@ -326,11 +330,9 @@
     overflow:hidden;
   }
   body.landscape #landscapeMapOverlay[hidden] { display:none !important; }
-  /* Hamburger overlays the top-left of #wrap, which in landscape now
-     starts at the viewport's left edge and is occupied by the info
-     (UI) panel. position:absolute keeps it from shrinking the panel. */
+  /* Hamburger pinned to the top-right tip of the icon column. */
   body.landscape #hamburgerBtn {
-    position:absolute; top:0; left:0; width:30px; padding:4px 0;
+    position:absolute; top:0; right:0; left:auto; width:48px; padding:4px 0;
     text-align:center; box-sizing:border-box;
     background:#000; border-color:#0a0;
     z-index:200;
@@ -2313,18 +2315,46 @@ const TOUCH_SWIPE_MIN_PX = 30;
 const _touchRaycaster = new THREE.Raycaster();
 const _touchNDC = new THREE.Vector2();
 let _touchStart = null;
+// Hold-to-attack: after HOLD_ATTACK_DELAY_MS of unbroken touch on the
+// 3D viewport, repeatedly fire combatAttack() every HOLD_ATTACK_REPEAT_MS
+// until release. The busy guard inside combatAttack prevents queueing,
+// so this just retries as fast as the cooldown allows.
+const HOLD_ATTACK_DELAY_MS  = 500;
+const HOLD_ATTACK_REPEAT_MS = 250;
+let _holdAttackTimeoutId = null;
+let _holdAttackIntervalId = null;
+let _holdAttackTriggered  = false;
+function _clearHoldAttackTimers(){
+  if(_holdAttackTimeoutId){ clearTimeout(_holdAttackTimeoutId); _holdAttackTimeoutId = null; }
+  if(_holdAttackIntervalId){ clearInterval(_holdAttackIntervalId); _holdAttackIntervalId = null; }
+}
 function _handleGameTouchStart(e){
   if(!e.touches || !e.touches[0]) return;
   const t = e.touches[0];
   _touchStart = { x: t.clientX, y: t.clientY };
+  _holdAttackTriggered = false;
+  _clearHoldAttackTimers();
+  _holdAttackTimeoutId = setTimeout(()=>{
+    _holdAttackTriggered = true;
+    if(state.combat) combatAttack();
+    _holdAttackIntervalId = setInterval(()=>{
+      if(state.combat) combatAttack();
+    }, HOLD_ATTACK_REPEAT_MS);
+  }, HOLD_ATTACK_DELAY_MS);
 }
 function _handleGameTouchEnd(e){
   if(!_touchStart) return;
   const t = (e.changedTouches && e.changedTouches[0]);
-  if(!t){ _touchStart = null; return; }
+  if(!t){ _touchStart = null; _clearHoldAttackTimers(); return; }
   const dx = t.clientX - _touchStart.x;
   const dy = t.clientY - _touchStart.y;
   _touchStart = null;
+  // If hold-attack already triggered, swallow this end — don't run
+  // the swipe/tap logic again on release.
+  const wasHoldAttack = _holdAttackTriggered;
+  _clearHoldAttackTimers();
+  _holdAttackTriggered = false;
+  if(wasHoldAttack){ e.preventDefault(); return; }
   if(document.getElementById('startScreen') &&
      !document.getElementById('startScreen').hidden) return;
   if(state.dead) return;
@@ -2375,8 +2405,9 @@ function _handleGameTouchEnd(e){
 function attachGameTouchHandlers(){
   const game = document.getElementById('game');
   if(!game) return;
-  game.addEventListener('touchstart', _handleGameTouchStart, { passive: true });
-  game.addEventListener('touchend',   _handleGameTouchEnd,   { passive: false });
+  game.addEventListener('touchstart',  _handleGameTouchStart, { passive: true });
+  game.addEventListener('touchend',    _handleGameTouchEnd,   { passive: false });
+  game.addEventListener('touchcancel', ()=>{ _touchStart = null; _clearHoldAttackTimers(); _holdAttackTriggered = false; }, { passive: true });
 }
 
 // Scale the fixed 400x800 wrap to fit the *visible* viewport (the
@@ -2738,21 +2769,46 @@ const _dpUp    = document.querySelector('#landscapeDpad .dpadUp');
 const _dpDown  = document.querySelector('#landscapeDpad .dpadDown');
 const _dpLeft  = document.querySelector('#landscapeDpad .dpadLeft');
 const _dpRight = document.querySelector('#landscapeDpad .dpadRight');
-// D-pad buttons live inside #game, so a click would bubble to the
+// D-pad buttons live inside #game, so a press would bubble to the
 // 3D-viewport tap handler (which opens/closes a faced door). Stop
 // propagation on every relevant phase so the dpad supersedes.
-function _wireDpadButton(buttonElement, handlerCallback){
+// Also support hold-to-repeat: initial fire on press, then auto-repeat
+// after a short delay until release.
+const DPAD_HOLD_DELAY_MS  = 350;
+const DPAD_HOLD_REPEAT_MS = 220;
+function _wireDpadHoldButton(buttonElement, handlerCallback){
   if(!buttonElement) return;
-  const block = (e)=>{ e.stopPropagation(); };
-  buttonElement.addEventListener('pointerdown', block, true);
-  buttonElement.addEventListener('touchstart',  block, true);
-  buttonElement.addEventListener('mousedown',   block, true);
-  buttonElement.onclick = (e)=>{ e.stopPropagation(); handlerCallback(); };
+  let holdTimeoutId  = null;
+  let holdIntervalId = null;
+  const stopHold = ()=>{
+    if(holdTimeoutId){ clearTimeout(holdTimeoutId); holdTimeoutId = null; }
+    if(holdIntervalId){ clearInterval(holdIntervalId); holdIntervalId = null; }
+  };
+  const startHold = (e)=>{
+    e.stopPropagation();
+    if(e.cancelable) e.preventDefault();
+    handlerCallback();
+    stopHold();
+    holdTimeoutId = setTimeout(()=>{
+      holdIntervalId = setInterval(handlerCallback, DPAD_HOLD_REPEAT_MS);
+    }, DPAD_HOLD_DELAY_MS);
+  };
+  buttonElement.addEventListener('pointerdown',  startHold, true);
+  buttonElement.addEventListener('pointerup',    stopHold,  true);
+  buttonElement.addEventListener('pointerleave', stopHold,  true);
+  buttonElement.addEventListener('pointercancel',stopHold,  true);
+  buttonElement.addEventListener('touchend',     stopHold,  true);
+  buttonElement.addEventListener('touchcancel',  stopHold,  true);
+  buttonElement.addEventListener('mouseup',      stopHold,  true);
+  buttonElement.addEventListener('mouseleave',   stopHold,  true);
+  // Suppress the synthetic click — startHold already fired the action
+  // and the hold loop owns subsequent calls.
+  buttonElement.onclick = (e)=>{ e.stopPropagation(); };
 }
-_wireDpadButton(_dpUp,    ()=> tryMoveForward());
-_wireDpadButton(_dpDown,  ()=> tryMoveBackward());
-_wireDpadButton(_dpLeft,  ()=> rotate(-1));
-_wireDpadButton(_dpRight, ()=> rotate(+1));
+_wireDpadHoldButton(_dpUp,    ()=> tryMoveForward());
+_wireDpadHoldButton(_dpDown,  ()=> tryMoveBackward());
+_wireDpadHoldButton(_dpLeft,  ()=> rotate(-1));
+_wireDpadHoldButton(_dpRight, ()=> rotate(+1));
 // Refresh the overlay map on every UI tick if it's visible.
 const _origRefreshUIForLandscape = refreshUI;
 refreshUI = function(){
