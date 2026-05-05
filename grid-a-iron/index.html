@@ -186,7 +186,7 @@
      with 2px L/R padding so nothing can ever truncate. */
   body.landscape #landscapeRightBuffer {
     display:flex; flex-direction:column; align-items:center;
-    justify-content:center; gap:18px; padding:50px 2px;
+    justify-content:center; gap:10px; padding:20px 2px;
     position:relative; right:auto; top:auto;
     grid-column: 4; grid-row: 1;
     width:80px; height:100%;
@@ -194,8 +194,10 @@
     color:#cfc; font-family:"VT323","Courier New",monospace;
     box-sizing:border-box; z-index:6;
   }
+  /* All children share a uniform width matching the compass (48px) so
+     no item is wider than another. */
   body.landscape #landscapeRightBuffer > * {
-    width:76px; max-width:76px; box-sizing:border-box;
+    width:48px; max-width:48px; box-sizing:border-box;
     display:flex; align-items:center; justify-content:center;
     flex-direction:column;
   }
@@ -229,7 +231,8 @@
   body.landscape #btnToggleHelpOverlay,
   body.landscape #btnToggleDpad {
     background:#020; color:#0f0; border:1px solid #0a0;
-    font-size:14px; padding:6px 10px; font-family:inherit;
+    font-size:11px; padding:4px 0; font-family:inherit;
+    width:48px; min-width:48px;
   }
   #btnToggleHelpOverlay, #btnToggleDpad { display:none; }
   body.landscape #btnToggleHelpOverlay,
@@ -238,21 +241,24 @@
   #landscapeDpad { display:none; }
   #landscapeDpad[hidden] { display:none !important; }
   body.landscape #landscapeDpad {
-    display:block; position:absolute; right:8px; bottom:8px;
-    width:140px; height:140px; z-index:9; pointer-events:none;
+    display:block; position:absolute;
+    right:8px; bottom: calc(8px + env(safe-area-inset-bottom));
+    width:120px; height:120px; z-index:9; pointer-events:none;
   }
   body.landscape #landscapeDpad[hidden] { display:none !important; }
+  /* Chars only — no button box. Diamond placement of ^ < > v. */
   body.landscape #landscapeDpad .dpadBtn {
-    position:absolute; width:44px; height:44px; pointer-events:auto;
-    background:rgba(0,32,0,0.7); color:#0f0; border:1px solid #0a0;
-    font-size:24px; line-height:1; padding:0;
+    position:absolute; width:40px; height:40px; pointer-events:auto;
+    background:transparent; color:#9bff9b; border:none;
+    font-size:42px; line-height:1; padding:0;
     font-family:"VT323","Courier New",monospace;
+    text-shadow:0 0 4px #000, 0 0 6px #060;
     display:flex; align-items:center; justify-content:center;
   }
-  body.landscape #landscapeDpad .dpadUp    { top:0;     left:48px; }
-  body.landscape #landscapeDpad .dpadLeft  { top:48px;  left:0;    }
-  body.landscape #landscapeDpad .dpadRight { top:48px;  right:0;   }
-  body.landscape #landscapeDpad .dpadDown  { bottom:0;  left:48px; }
+  body.landscape #landscapeDpad .dpadUp    { top:0;     left:40px; }
+  body.landscape #landscapeDpad .dpadLeft  { top:40px;  left:0;    }
+  body.landscape #landscapeDpad .dpadRight { top:40px;  right:0;   }
+  body.landscape #landscapeDpad .dpadDown  { bottom:0;  left:40px; }
   /* Help overlay: full-viewport in landscape only. */
   #helpOverlay { display:none; }
   #helpOverlay[hidden] { display:none !important; }
@@ -318,11 +324,13 @@
     overflow:hidden;
   }
   body.landscape #landscapeMapOverlay[hidden] { display:none !important; }
-  /* Hamburger lives in the top of the 30px left edge buffer column. */
+  /* Hamburger pinned to viewport top-left so it always sits inside the
+     30px left edge buffer column, regardless of grid auto-placement. */
   body.landscape #hamburgerBtn {
-    top:0; left:0; width:30px; padding:4px 0;
+    position:fixed; top:0; left:0; width:30px; padding:4px 0;
     text-align:center; box-sizing:border-box;
     background:#000; border-color:#0a0;
+    z-index:200;
   }
   body.landscape #landscapeMapOverlay pre {
     margin:0; padding:8px; opacity:0.5; color:#bff5b0;
@@ -2405,8 +2413,11 @@ function fitWrapToViewport(){
     el.style.width  = vw + 'px';
     el.style.height = vh + 'px';
     el.style.transform = 'none';
+    // 4-col grid (no right edge): icon bar abuts the right edge of
+    // wrap. wrap itself is margin'd inside the safe area. UI panel
+    // (1fr) absorbs the 30px previously held by the right edge column.
     el.style.gridTemplateColumns =
-      `${edgeBuffer}px 1fr ${gameW}px ${rightBufferW}px ${edgeBuffer}px`;
+      `${edgeBuffer}px 1fr ${gameW}px ${rightBufferW}px`;
     // Pull wrap inside the iOS safe area so the iPhone notch ear in
     // landscape doesn't leave invisible padding to the right of the
     // icon bar. Body bg fills the safe-area gutters (also #000).
