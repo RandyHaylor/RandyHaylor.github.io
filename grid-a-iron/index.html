@@ -860,13 +860,39 @@ function makeLevel(level){
     e => e.minLevel <= level && level <= (e.maxLevel || 99)
   );
   const enemyCount = 3 + level;
-  for(let i=0;i<enemyCount;i++){
-    const ex=ri(W_), ey=ri(H_);
-    if(ex===px && ey===py) continue;
-    const c=cellAt(ex,ey);
-    if(c.enemy || c.stairs) continue;
-    const t = choice(eligibleEnemies);
-    c.enemy = { ...t, hpMax:t.hp };
+  // Track how many of each name we've placed so we can respect maxcount.
+  const placedCountByName = {};
+  function tryPlaceEnemyTemplate(template){
+    for(let attempt=0; attempt<60; attempt++){
+      const ex=ri(W_), ey=ri(H_);
+      if(ex===px && ey===py) continue;
+      const c=cellAt(ex,ey);
+      if(c.enemy || c.stairs) continue;
+      c.enemy = { ...template, hpMax:template.hp };
+      placedCountByName[template.name] = (placedCountByName[template.name] || 0) + 1;
+      return true;
+    }
+    return false;
+  }
+  let enemiesPlaced = 0;
+  // PASS 1 — guaranteed mincount spawns (in pool declaration order so
+  // a designer can prioritize). These count toward enemyCount.
+  for(const t of eligibleEnemies){
+    const need = t.mincount || 0;
+    for(let k=0; k<need && enemiesPlaced<enemyCount; k++){
+      if(tryPlaceEnemyTemplate(t)) enemiesPlaced++;
+    }
+  }
+  // PASS 2 — random fill up to enemyCount, skipping templates already
+  // at their maxcount cap.
+  for(; enemiesPlaced<enemyCount; enemiesPlaced++){
+    const candidates = eligibleEnemies.filter(t => {
+      const cap = (typeof t.maxcount === 'number') ? t.maxcount : Infinity;
+      return (placedCountByName[t.name] || 0) < cap;
+    });
+    if(!candidates.length) break;
+    const t = choice(candidates);
+    if(!tryPlaceEnemyTemplate(t)) break;
   }
 
   // Vendor: only on even floors. Must be in a cell ORTHOGONALLY

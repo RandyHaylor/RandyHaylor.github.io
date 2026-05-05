@@ -1,18 +1,18 @@
 {
-  "_doc": "Spawn pool for newLevel(level). Filter rule: minLevel <= level && level <= maxLevel. firstStrike enemies attack the same turn the player enters their cell. See ENEMY_PLAN.md.",
+  "_doc": "Spawn pool for newLevel(level). Filter rule: minLevel <= level && level <= maxLevel. firstStrike enemies attack the same turn the player enters their cell. mincount: guaranteed spawns this floor (placed first, in order). maxcount: hard cap on this enemy per floor (default unlimited). See ENEMY_PLAN.md.",
   "enemies": [
-    { "name": "Bunny",            "hp": 3,  "atk": 1,  "minLevel": 1,  "maxLevel": 4 },
-    { "name": "Giant Rat",        "hp": 5,  "atk": 2,  "minLevel": 1,  "maxLevel": 5 },
-    { "name": "Slime",            "hp": 6,  "atk": 2,  "minLevel": 1,  "maxLevel": 5 },
-    { "name": "Goblin",           "hp": 8,  "atk": 3,  "minLevel": 1,  "maxLevel": 6 },
-    { "name": "Skeleton",         "hp": 12, "atk": 4,  "minLevel": 2,  "maxLevel": 7 },
-    { "name": "Floating Eyeball", "hp": 10, "atk": 4,  "minLevel": 3,  "maxLevel": 8,  "firstStrike": true },
-    { "name": "Cave Troll",       "hp": 22, "atk": 6,  "minLevel": 4,  "maxLevel": 9 },
-    { "name": "Lich",             "hp": 30, "atk": 7,  "minLevel": 5,  "maxLevel": 10 },
-    { "name": "Shadow Fiend",     "hp": 28, "atk": 8,  "minLevel": 6,  "maxLevel": 10 },
+    { "name": "Giant Rat",        "hp": 5,  "atk": 2,  "minLevel": 1,  "maxLevel": 3 },
+    { "name": "Slime",            "hp": 6,  "atk": 2,  "minLevel": 1,  "maxLevel": 4 },
+    { "name": "Goblin",           "hp": 8,  "atk": 3,  "minLevel": 1,  "maxLevel": 5 },
+    { "name": "Skeleton",         "hp": 12, "atk": 4,  "minLevel": 2,  "maxLevel": 5 },
+    { "name": "Floating Eyeball", "hp": 10, "atk": 4,  "minLevel": 3,  "maxLevel": 6,  "firstStrike": true },
+    { "name": "Cave Troll",       "hp": 22, "atk": 6,  "minLevel": 4,  "maxLevel": 7 },
+    { "name": "Lich",             "hp": 30, "atk": 7,  "minLevel": 5,  "maxLevel": 7 },
+    { "name": "Shadow Fiend",     "hp": 28, "atk": 8,  "minLevel": 6,  "maxLevel": 8 },
     { "name": "Vampire Bat",      "hp": 18, "atk": 7,  "minLevel": 7,  "maxLevel": 10 },
-    { "name": "Evil Vendor",      "hp": 40, "atk": 9,  "minLevel": 8,  "maxLevel": 10, "firstStrike": true },
+    { "name": "Bunny",            "hp": 3,  "atk": 1,  "minLevel": 9,  "maxLevel": 9,  "mincount": 1, "maxcount": 1 },
+    { "name": "Evil Vendor",      "hp": 40, "atk": 9,  "minLevel": 8,  "maxLevel": 8,  "mincount": 1, "maxcount": 1, "firstStrike": true },
     { "name": "Demon Lord",       "hp": 55, "atk": 11, "minLevel": 9,  "maxLevel": 10 },
-    { "name": "Dragon",           "hp": 90, "atk": 14, "minLevel": 10, "maxLevel": 10, "firstStrike": true }
+    { "name": "Dragon",           "hp": 90, "atk": 14, "minLevel": 10, "maxLevel": 10, "mincount": 1, "maxcount": 1, "firstStrike": true }
   ]
 }
