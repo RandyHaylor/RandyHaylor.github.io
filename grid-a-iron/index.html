@@ -320,6 +320,12 @@
     transform: rotate(-45deg) scaleX(1.6);
     transform-origin: 50% 50%;
     filter: drop-shadow(0 0 2px #000);
+    /* iOS Safari long-press otherwise opens a native image-save /
+       drag-to-copy menu over the sword. Block all of that. */
+    pointer-events:none;
+    -webkit-user-drag:none; user-drag:none;
+    -webkit-touch-callout:none;
+    -webkit-user-select:none; user-select:none;
   }
   /* Help overlay: full-viewport in landscape only. */
   #helpOverlay { display:none; }
@@ -640,7 +646,7 @@
     <button class="dpadBtn dpadRight" title="Turn right">&gt;</button>
     <button class="dpadBtn dpadDown"  title="Backward">v</button>
     <button class="dpadBtn dpadInv"   title="Inventory (I)">I</button>
-    <button class="dpadBtn dpadAttack" title="Attack"><img src="sprites/item_iron_sword.png" alt="atk"></button>
+    <button class="dpadBtn dpadAttack" title="Attack"><img src="sprites/item_iron_sword.png" alt="atk" draggable="false"></button>
   </div>
   <!-- Held items: clipped against game viewport bottom so only the
        upper portion of the held sprite peeks up like a Doom-era HUD. -->
@@ -2768,6 +2774,9 @@ function setAudioMuted(muted){
       // Game started while muted; kick off music now that we're audible.
       try { startBackgroundMusic(); } catch(_){}
     }
+    // Re-trigger SFX preload (idempotent — cached buffers are skipped).
+    // If the user muted before we ever decoded, this catches up now.
+    if(typeof preloadAllSfxBuffers === 'function') preloadAllSfxBuffers();
   }
   // Belt-and-suspenders gain control (covers the brief window
   // before suspend / after resume).
@@ -2881,10 +2890,15 @@ function dismissStartScreen(){
   // unlocks playback. If init succeeds, music+sfx route through gain
   // nodes the slider can actually control on iOS.
   initAudioGraphIfNeeded();
-  if(audioCtx && audioCtx.state === 'suspended'){
-    try { audioCtx.resume(); } catch(_){}
+  // Only resume / start music if NOT muted. Resuming a context we
+  // just suspended (because muted) re-acquires the iOS audio session
+  // and breaks the mute promise.
+  if(!_audioMuted){
+    if(audioCtx && audioCtx.state === 'suspended'){
+      try { audioCtx.resume(); } catch(_){}
+    }
+    startBackgroundMusic();
   }
-  startBackgroundMusic();
 }
 document.getElementById('btnStartGame').onclick = dismissStartScreen;
 const _btnStartMute = document.getElementById('btnStartMute');
