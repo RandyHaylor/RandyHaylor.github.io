@@ -149,11 +149,17 @@
        [1fr UI] [gameW 3D] [80 buffer]
      Only the UI column resizes. gameW is set inline from vh*4/3. */
   body.landscape {
-    justify-content: flex-start; background:#000; overflow:hidden;
+    justify-content: flex-start; background:#000;
+    /* Lock scroll: fix the body to viewport so iOS Safari can't
+       slide the document up under the address bar. */
+    position:fixed; left:0; right:0; top:0; bottom:0;
+    overflow:hidden;
     -webkit-user-select:none; user-select:none;
     -webkit-touch-callout:none;
+    overscroll-behavior:none;
+    touch-action:none;
   }
-  html:has(body.landscape) { overflow:hidden; }
+  html:has(body.landscape) { overflow:hidden; height:100%; }
   body.landscape #wrap {
     display:grid;
     grid-template-rows: 1fr;
@@ -173,7 +179,10 @@
     /* roomPanel is hidden in landscape; only combatPanel + overlays
        live here, so let combatPanel take the full UI column height. */
     grid-template-rows: 1fr;
-    border-top:none; border-right:2px solid #0f0;
+    border:none;
+    border-right:2px solid #0f0;
+    border-bottom:2px solid #0f0;
+    box-sizing:border-box;
   }
   body.landscape #combatPanel {
     height:100%; overflow:auto;
