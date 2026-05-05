@@ -249,7 +249,7 @@
   #landscapeDpad[hidden] { display:none !important; }
   body.landscape #landscapeDpad {
     display:block; position:absolute;
-    right:8px; bottom: calc(8px + env(safe-area-inset-bottom));
+    right:8px; bottom: calc(2px + env(safe-area-inset-bottom));
     width:160px; height:120px; z-index:9; pointer-events:none;
   }
   body.landscape #landscapeDpad[hidden] { display:none !important; }
@@ -267,7 +267,7 @@
   body.landscape #landscapeDpad .dpadLeft  { top:40px;  left:0;    }
   body.landscape #landscapeDpad .dpadUp    { top:40px;  left:60px; }
   body.landscape #landscapeDpad .dpadRight { top:40px;  right:0;   }
-  body.landscape #landscapeDpad .dpadDown  { bottom:-6px; left:60px; }
+  body.landscape #landscapeDpad .dpadDown  { bottom:0; left:60px; }
   /* Help overlay: full-viewport in landscape only. */
   #helpOverlay { display:none; }
   #helpOverlay[hidden] { display:none !important; }
