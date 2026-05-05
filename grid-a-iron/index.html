@@ -875,25 +875,27 @@ function makeLevel(level){
     return false;
   }
   let enemiesPlaced = 0;
-  // PASS 1 — one of every eligible species (in pool declaration order)
-  // so each enemy in the level's range is guaranteed to appear at
-  // least once. Skipped for any template already at maxcount (e.g.
-  // shouldn't happen here because we haven't placed anything yet).
-  for(const t of eligibleEnemies){
-    if(enemiesPlaced >= enemyCount) break;
-    const cap = (typeof t.maxcount === 'number') ? t.maxcount : Infinity;
-    if((placedCountByName[t.name] || 0) >= cap) continue;
-    if(tryPlaceEnemyTemplate(t)) enemiesPlaced++;
-  }
-  // PASS 2 — top up to each template's mincount (in pool declaration
-  // order). Pass 1 already placed one copy, so this is a no-op for
-  // mincount<=1 entries; mincount>=2 entries get the extras here.
+  // PASS 1 — for any template with mincount > 0, place exactly that
+  // many copies (honoring maxcount and the per-floor budget). Pool
+  // declaration order so designers can prioritize.
   for(const t of eligibleEnemies){
     const need = t.mincount || 0;
-    while((placedCountByName[t.name] || 0) < need && enemiesPlaced < enemyCount){
+    if(need <= 0) continue;
+    const cap = (typeof t.maxcount === 'number') ? t.maxcount : Infinity;
+    while((placedCountByName[t.name] || 0) < Math.min(need, cap)
+          && enemiesPlaced < enemyCount){
       if(!tryPlaceEnemyTemplate(t)) break;
       enemiesPlaced++;
     }
+  }
+  // PASS 2 — one of every OTHER eligible species (mincount === 0) so
+  // each species in the level's range still appears at least once.
+  for(const t of eligibleEnemies){
+    if(enemiesPlaced >= enemyCount) break;
+    if((t.mincount || 0) > 0) continue; // already handled in pass 1
+    const cap = (typeof t.maxcount === 'number') ? t.maxcount : Infinity;
+    if((placedCountByName[t.name] || 0) >= cap) continue;
+    if(tryPlaceEnemyTemplate(t)) enemiesPlaced++;
   }
   // PASS 3 — random fill the remaining budget, skipping templates
   // already at their maxcount cap.
