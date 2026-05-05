@@ -252,6 +252,16 @@
     right:8px; bottom: calc(2px + env(safe-area-inset-bottom));
     width:160px; height:120px; z-index:9; pointer-events:none;
   }
+  /* 15px no-passthrough buffer around the dpad: an invisible
+     pointer-events:auto pseudo-element that extends 15px past the
+     container on all sides, swallowing taps so they don't reach the
+     3D viewport tap handler (which would attack/open doors). */
+  body.landscape #landscapeDpad::before {
+    content:''; position:absolute;
+    left:-15px; right:-15px; top:-15px; bottom:-15px;
+    pointer-events:auto; background:transparent; z-index:0;
+  }
+  body.landscape #landscapeDpad .dpadBtn { z-index:1; }
   body.landscape #landscapeDpad[hidden] { display:none !important; }
   /* Chars only — no button box. Diamond placement of ^ < > v. */
   body.landscape #landscapeDpad .dpadBtn {
@@ -2817,6 +2827,18 @@ _wireDpadHoldButton(_dpUp,    ()=> tryMoveForward());
 _wireDpadHoldButton(_dpDown,  ()=> tryMoveBackward());
 _wireDpadHoldButton(_dpLeft,  ()=> rotate(-1));
 _wireDpadHoldButton(_dpRight, ()=> rotate(+1));
+// Eat any pointer/touch events landing on the dpad container or its
+// 15px ::before buffer so they don't bubble to the 3D viewport tap
+// handler.
+const _landscapeDpadEl = document.getElementById('landscapeDpad');
+if(_landscapeDpadEl){
+  const swallow = (e)=>{ e.stopPropagation(); };
+  _landscapeDpadEl.addEventListener('pointerdown', swallow, true);
+  _landscapeDpadEl.addEventListener('pointerup',   swallow, true);
+  _landscapeDpadEl.addEventListener('touchstart',  swallow, true);
+  _landscapeDpadEl.addEventListener('touchend',    swallow, true);
+  _landscapeDpadEl.addEventListener('click',       swallow, true);
+}
 // Refresh the overlay map on every UI tick if it's visible.
 const _origRefreshUIForLandscape = refreshUI;
 refreshUI = function(){
