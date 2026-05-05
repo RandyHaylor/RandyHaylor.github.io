@@ -103,14 +103,26 @@
      right with a 50px buffer; left bar is the UI. */
   #landscapeRightBuffer { display:none; }
   #landscapeMapOverlay { display:none; }
-  body.landscape { justify-content: flex-end; } /* tuck wrap to right edge */
-  body.landscape #wrap { width:800px; height:400px; transform-origin: top right; }
-  body.landscape #game {
-    left:167px; top:0; width:533px; height:400px;
+  /* Landscape: #wrap is a 7-column CSS grid:
+     [50 edge] [1fr UI] [50 gap] [gameW 3D] [50 gap] [80 buffer] [50 edge]
+     gameW is set inline in JS from vh*4/3. Grid prevents overlap. */
+  body.landscape { justify-content: flex-start; }
+  body.landscape #wrap {
+    display:grid;
+    grid-template-rows: 1fr;
+    align-items:stretch;
+    transform:none;
   }
-  body.landscape #game canvas { width:533px; height:400px; display:block; }
+  body.landscape #game {
+    position:relative; left:auto; top:auto;
+    grid-column: 4; grid-row: 1;
+    width:100%; height:100%;
+  }
+  body.landscape #game canvas { width:100%; height:100%; display:block; }
   body.landscape #ui {
-    left:0; top:0; width:167px; height:400px;
+    position:relative; left:auto; top:auto;
+    grid-column: 2; grid-row: 1;
+    width:100%; height:100%;
     grid-template-rows: 1fr auto auto;
     border-top:none; border-right:2px solid #0f0;
   }
@@ -130,7 +142,9 @@
   body.landscape #landscapeRightBuffer {
     display:flex; flex-direction:column; align-items:center;
     justify-content:center; gap:18px; padding:50px 6px;
-    position:absolute; right:0; top:0; width:100px; height:400px;
+    position:relative; right:auto; top:auto;
+    grid-column: 6; grid-row: 1;
+    width:100%; height:100%;
     background:rgba(0,0,0,0.55); border-left:1px solid #0a0;
     color:#cfc; font-family:"VT323","Courier New",monospace;
     box-sizing:border-box; z-index:6;
@@ -166,8 +180,9 @@
     font-size:14px; padding:6px 10px; font-family:inherit;
   }
   body.landscape #landscapeMapOverlay {
-    display:block; position:absolute; left:167px; top:0;
-    width:533px; height:400px; pointer-events:none; z-index:7;
+    display:block; position:relative; left:auto; top:auto;
+    grid-column: 4; grid-row: 1;
+    width:100%; height:100%; pointer-events:none; z-index:7;
     color:#cfc; font-family:'Courier New',monospace; font-size:14px;
     line-height:1.0;
     background:rgba(0,0,0,0.0);
@@ -2200,58 +2215,30 @@ function fitWrapToViewport(){
   const isLandscape = (vw / vh) > 2.0;
   document.body.classList.toggle('landscape', isLandscape);
   if(isLandscape){
-    // Use the visual viewport directly — no scale transform; layout is
-    // computed in real pixels so the left panel can grow to fill space.
-    el.style.width  = vw + 'px';
-    el.style.height = vh + 'px';
-    el.style.transform = 'none';
-    document.body.style.height = vh + 'px';
-    document.body.style.width  = vw + 'px';
-    // Layout from RIGHT to LEFT, all dynamically derived from vh:
-    //   [edge gap] [left panel] [side gap] [3D 4:3] [side gap]
-    //   [right buffer] [edge gap]
+    // CSS grid columns (left -> right):
+    //   [50 edge] [1fr UI] [50 gap] [gameW 3D] [50 gap] [80 buffer] [50 edge]
+    // gameW derived from vh (4:3 of viewport height). Grid prevents overlap.
     const gameH = vh;
     const gameW = Math.floor(vh * 4 / 3);
     const rightBufferW = 80;
-    const sideGap      = 50;   // gap on each side of the 3D view
-    const edgeBuffer   = 50;   // empty space against the viewport edges
-    const rightBufferLeft = vw - edgeBuffer - rightBufferW;
-    const gameRight = rightBufferLeft - sideGap;
-    const gameLeft  = gameRight - gameW;
-    const leftPanelLeft = edgeBuffer;
-    const leftPanelW    = Math.max(0, gameLeft - sideGap - leftPanelLeft);
-    const game = document.getElementById('game');
-    if(game){
-      game.style.left = gameLeft + 'px';
-      game.style.top = '0px';
-      game.style.width = gameW + 'px';
-      game.style.height = gameH + 'px';
-    }
-    const ui = document.getElementById('ui');
-    if(ui){
-      ui.style.left = leftPanelLeft + 'px';
-      ui.style.top = '0px';
-      ui.style.width = leftPanelW + 'px';
-      ui.style.height = vh + 'px';
-    }
-    const buf = document.getElementById('landscapeRightBuffer');
-    if(buf){
-      buf.style.right = edgeBuffer + 'px';
-      buf.style.top = '0px';
-      buf.style.width = rightBufferW + 'px';
-      buf.style.height = vh + 'px';
-    }
-    const mapOv = document.getElementById('landscapeMapOverlay');
-    if(mapOv){
-      mapOv.style.left = gameLeft + 'px';
-      mapOv.style.top = '0px';
-      mapOv.style.width = gameW + 'px';
-      mapOv.style.height = vh + 'px';
-    }
+    const sideGap      = 50;
+    const edgeBuffer   = 50;
+    el.style.width  = vw + 'px';
+    el.style.height = vh + 'px';
+    el.style.transform = 'none';
+    el.style.gridTemplateColumns =
+      `${edgeBuffer}px 1fr ${sideGap}px ${gameW}px ${sideGap}px ${rightBufferW}px ${edgeBuffer}px`;
+    document.body.style.height = vh + 'px';
+    document.body.style.width  = vw + 'px';
+    // Clear any per-element inline placement that might linger from
+    // the previous absolute-position approach. Grid handles all sizing.
+    ['game','ui','landscapeRightBuffer','landscapeMapOverlay'].forEach(id=>{
+      const e = document.getElementById(id);
+      if(!e) return;
+      e.style.left = ''; e.style.right = '';
+      e.style.top = '';  e.style.width = ''; e.style.height = '';
+    });
     if(typeof renderer !== 'undefined' && renderer && camera){
-      // setSize(..., true) ALSO updates the canvas inline width/height
-      // CSS — without that, the buffer grew but the visible canvas
-      // stayed at the portrait 400x300.
       renderer.setSize(gameW, gameH, true);
       camera.aspect = gameW / gameH;
       camera.updateProjectionMatrix();
@@ -2261,6 +2248,7 @@ function fitWrapToViewport(){
     el.style.height = '700px';
     const scale = Math.min(vw/400, vh/700);
     el.style.transform = `scale(${scale})`;
+    el.style.gridTemplateColumns = '';
     document.body.style.height = vh + 'px';
     document.body.style.width  = vw + 'px';
     // Clear any landscape inline overrides so the portrait CSS rules apply.
