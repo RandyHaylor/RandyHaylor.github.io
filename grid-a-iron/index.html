@@ -1040,16 +1040,19 @@ const ceilTex  = loadTilingTexture('sprites/tex_ceiling_dark_stone.png', 1);
 
 // Filename map for in-world sprites (enemies + items).
 const ENEMY_SPRITE_PATH = {
-  'Giant Rat':  'sprites/enemy_giant_rat.png',
-  'Goblin':     'sprites/enemy_goblin.png',
-  'Skeleton':   'sprites/enemy_skeleton.png',
-  'Slime':      'sprites/enemy_slime.png',
-  'Cave Troll': 'sprites/enemy_cave_troll.png',
-  'Lich':       'sprites/enemy_lich.png',
-  // Evil Vendor reuses the friendly vendor sprite. Sprite material
-  // gets a dark blue tint applied at construction time so it reads
-  // as a corrupted version of the merchant.
-  'Evil Vendor': 'sprites/npc_vendor.png',
+  'Giant Rat':        'sprites/enemy_giant_rat.png',
+  'Goblin':           'sprites/enemy_goblin.png',
+  'Skeleton':         'sprites/enemy_skeleton.png',
+  'Slime':            'sprites/enemy_slime.png',
+  'Cave Troll':       'sprites/enemy_cave_troll.png',
+  'Lich':             'sprites/enemy_lich.png',
+  'Bunny':            'sprites/enemy_bunny.png',
+  'Floating Eyeball': 'sprites/enemy_floating_eyeball.png',
+  'Shadow Fiend':     'sprites/enemy_shadow_fiend.png',
+  'Vampire Bat':      'sprites/enemy_vampire_bat.png',
+  'Evil Vendor':      'sprites/enemy_evil_vendor.png',
+  'Demon Lord':       'sprites/enemy_demon_lord.png',
+  'Dragon':           'sprites/enemy_dragon.png',
 };
 const ITEM_SPRITE_PATH = {
   'Rusty Sword':  'sprites/item_rusty_sword.png',
@@ -1308,11 +1311,6 @@ function drawRoom(c, gx, gy){
     let eObj;
     if(path){
       eObj = makeBillboardSprite(path, 1.6);
-      // Evil Vendor: tint the friendly vendor sprite dark blue so it
-      // reads as a corrupted version of the merchant.
-      if(c.enemy.name === 'Evil Vendor' && eObj.material){
-        eObj.material.color = new THREE.Color(0x3a4080);
-      }
       eObj.position.set(ex, 0.85, ez);
     } else if(typeof ENEMY_SPRITE_FACTORY === 'object' && ENEMY_SPRITE_FACTORY[c.enemy.name]){
       // Canvas-built sprite for new enemies that ship no PNG.
