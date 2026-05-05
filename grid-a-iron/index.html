@@ -326,12 +326,12 @@
     overflow:hidden;
   }
   body.landscape #landscapeMapOverlay[hidden] { display:none !important; }
-  /* Hamburger anchored to #wrap (position:relative) so it lands inside
-     the leftmost padding column, matter how the iOS safe area shifts
-     wrap rightward. position:fixed would have anchored to the viewport
-     (i.e. into the safe area), missing the cell. */
+  /* Hamburger pinned to viewport left:0 — INSIDE the iOS left safe
+     area (the "unsafe" notch/ear region). User wants it there because
+     the top of the screen is high enough that the home-bar swipe and
+     other system gestures aren't a concern. */
   body.landscape #hamburgerBtn {
-    position:absolute; top:0; left:0; width:30px; padding:4px 0;
+    position:fixed; top:0; left:0; width:30px; padding:4px 0;
     text-align:center; box-sizing:border-box;
     background:#000; border-color:#0a0;
     z-index:200;
