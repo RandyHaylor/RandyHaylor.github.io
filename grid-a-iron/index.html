@@ -130,8 +130,9 @@
     position:fixed; left:0; right:0; top:0; bottom:0;
     z-index:130;
   }
-  /* Landscape: #wrap is a 7-column CSS grid:
-     [50 edge] [1fr UI] [50 gap] [gameW 3D] [50 gap] [80 buffer] [50 edge]
+  /* Landscape: #wrap is a 5-column CSS grid (no side-gap columns —
+     the 3D abuts the UI panel and the right icon bar directly):
+       [30 edge] [1fr UI] [gameW 3D] [80 buffer] [30 edge]
      gameW is set inline in JS from vh*4/3. Grid prevents overlap. */
   body.landscape { justify-content: flex-start; }
   body.landscape #wrap {
@@ -142,7 +143,7 @@
   }
   body.landscape #game {
     position:relative; left:auto; top:auto;
-    grid-column: 4; grid-row: 1;
+    grid-column: 3; grid-row: 1;
     width:100%; height:100%;
   }
   body.landscape #game canvas { width:100%; height:100%; display:block; }
@@ -166,15 +167,22 @@
   body.landscape #movePanel { display:none; } /* movement via swipe in landscape */
   /* Right buffer: 100px wide, contents clustered toward middle with
      ~50px top/bottom padding to clear iPhone rounded corners. */
+  /* HARD: bar is 80px wide; child icons constrained to exactly 76px
+     with 2px L/R padding so nothing can ever truncate. */
   body.landscape #landscapeRightBuffer {
     display:flex; flex-direction:column; align-items:center;
-    justify-content:center; gap:18px; padding:50px 6px;
+    justify-content:center; gap:18px; padding:50px 2px;
     position:relative; right:auto; top:auto;
-    grid-column: 6; grid-row: 1;
-    width:100%; height:100%;
+    grid-column: 4; grid-row: 1;
+    width:80px; height:100%;
     background:rgba(0,0,0,0.55); border-left:1px solid #0a0;
     color:#cfc; font-family:"VT323","Courier New",monospace;
     box-sizing:border-box; z-index:6;
+  }
+  body.landscape #landscapeRightBuffer > * {
+    width:76px; max-width:76px; box-sizing:border-box;
+    display:flex; align-items:center; justify-content:center;
+    flex-direction:column;
   }
   /* HP stacked block: label / current / "/" / max — no rotation. */
   body.landscape #landscapeHp {
@@ -208,7 +216,7 @@
   }
   body.landscape #landscapeMapOverlay {
     display:block; position:relative; left:auto; top:auto;
-    grid-column: 4; grid-row: 1;
+    grid-column: 3; grid-row: 1;
     width:100%; height:100%; pointer-events:none; z-index:7;
     color:#cfc; font-family:'Courier New',monospace; font-size:14px;
     line-height:1.0;
@@ -216,6 +224,7 @@
     overflow:hidden;
   }
   body.landscape #landscapeMapOverlay[hidden] { display:none !important; }
+  body.landscape #hamburgerBtn { top:0; left:0; }
   body.landscape #landscapeMapOverlay pre {
     margin:0; padding:8px; opacity:0.5; color:#bff5b0;
     text-shadow:0 0 4px #000;
@@ -2244,19 +2253,18 @@ function fitWrapToViewport(){
   const isLandscape = (vw / vh) > 2.0;
   document.body.classList.toggle('landscape', isLandscape);
   if(isLandscape){
-    // CSS grid columns (left -> right):
-    //   [50 edge] [1fr UI] [50 gap] [gameW 3D] [50 gap] [80 buffer] [50 edge]
+    // CSS grid columns (left -> right, no side-gap columns):
+    //   [30 edge] [1fr UI] [gameW 3D] [80 buffer] [30 edge]
     // gameW derived from vh (4:3 of viewport height). Grid prevents overlap.
     const gameH = vh;
     const gameW = Math.floor(vh * 4 / 3);
-    const rightBufferW = 100;
-    const sideGap      = 50;
+    const rightBufferW = 80;
     const edgeBuffer   = 30;
     el.style.width  = vw + 'px';
     el.style.height = vh + 'px';
     el.style.transform = 'none';
     el.style.gridTemplateColumns =
-      `${edgeBuffer}px 1fr ${sideGap}px ${gameW}px ${sideGap}px ${rightBufferW}px ${edgeBuffer}px`;
+      `${edgeBuffer}px 1fr ${gameW}px ${rightBufferW}px ${edgeBuffer}px`;
     el.style.background = '#000';
     document.body.style.height = vh + 'px';
     document.body.style.width  = vw + 'px';
