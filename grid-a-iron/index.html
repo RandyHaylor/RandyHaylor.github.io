@@ -264,10 +264,10 @@
   }
   /* T-shape: < ^ > in upper-mid row (lowered ~1 char from the top so
      the row sits closer to v), v below center. */
-  body.landscape #landscapeDpad .dpadLeft  { top:40px; left:0;    }
-  body.landscape #landscapeDpad .dpadUp    { top:40px; left:60px; }
-  body.landscape #landscapeDpad .dpadRight { top:40px; right:0;   }
-  body.landscape #landscapeDpad .dpadDown  { bottom:0; left:60px; }
+  body.landscape #landscapeDpad .dpadLeft  { top:40px;  left:0;    }
+  body.landscape #landscapeDpad .dpadUp    { top:40px;  left:60px; }
+  body.landscape #landscapeDpad .dpadRight { top:40px;  right:0;   }
+  body.landscape #landscapeDpad .dpadDown  { bottom:-6px; left:60px; }
   /* Help overlay: full-viewport in landscape only. */
   #helpOverlay { display:none; }
   #helpOverlay[hidden] { display:none !important; }
@@ -329,9 +329,11 @@
     overflow:hidden;
   }
   body.landscape #landscapeMapOverlay[hidden] { display:none !important; }
-  /* Hamburger pinned to the top-right tip of the icon column. */
+  /* Hamburger sits at the top of the 80px icon column, horizontally
+     centered above the other icons (compass/MAP/?/WASD all 48px wide).
+     48 wide centered in the column at right:16. */
   body.landscape #hamburgerBtn {
-    position:absolute; top:0; right:0; left:auto; width:48px; padding:4px 0;
+    position:absolute; top:0; right:16px; left:auto; width:48px; padding:4px 0;
     text-align:center; box-sizing:border-box;
     background:#000; border-color:#0a0;
     z-index:200;
