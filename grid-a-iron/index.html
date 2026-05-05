@@ -309,7 +309,9 @@
   body.landscape #landscapeDpad .dpadInv     { bottom:-5px; left:0;    }
   body.landscape #landscapeDpad .dpadAttack  { bottom:-5px; right:0;   }
   body.landscape #landscapeDpad .dpadAttack img {
-    width:32px; height:32px; image-rendering:pixelated;
+    width:48px; height:48px; image-rendering:pixelated;
+    transform: rotate(-45deg) scaleX(1.6);
+    transform-origin: 50% 50%;
     filter: drop-shadow(0 0 2px #000);
   }
   /* Help overlay: full-viewport in landscape only. */
@@ -2650,6 +2652,7 @@ const MUSIC_TAIL_FADE_SECONDS = 3.0;     // fade out over last 3s of a track
 const MUSIC_GAP_MIN_MS = 3000;           // 3..8s gap between tracks
 const MUSIC_GAP_MAX_MS = 8000;
 function startBackgroundMusic(){
+  if(_audioMuted) return; // muted: don't start a new track / hold session
   if(audioMusicEl){
     try { audioMusicEl.pause(); } catch(_){}
   }
@@ -2714,6 +2717,28 @@ let _audioMuted = false;
 function isAudioMuted(){ return _audioMuted; }
 function setAudioMuted(muted){
   _audioMuted = !!muted;
+  // iOS Safari grabs the system audio session as soon as ANY audio
+  // is playing — even at gain 0 — and pauses other apps' music.
+  // To actually release the session: pause the music element AND
+  // suspend the AudioContext when muted; resume both on unmute.
+  if(_audioMuted){
+    if(audioMusicEl){ try { audioMusicEl.pause(); } catch(_){} }
+    if(audioCtx && audioCtx.state === 'running'){
+      try { audioCtx.suspend(); } catch(_){}
+    }
+  } else {
+    if(audioCtx && audioCtx.state === 'suspended'){
+      try { audioCtx.resume(); } catch(_){}
+    }
+    if(audioMusicEl && audioMusicEl.paused && audioStarted){
+      try { audioMusicEl.play().catch(()=>{}); } catch(_){}
+    } else if(audioStarted && !audioMusicEl){
+      // Game started while muted; kick off music now that we're audible.
+      try { startBackgroundMusic(); } catch(_){}
+    }
+  }
+  // Belt-and-suspenders gain control (covers the brief window
+  // before suspend / after resume).
   if(musicGainNode) musicGainNode.gain.value = _audioMuted ? 0 : audioMusicVolume;
   else if(audioMusicEl) audioMusicEl.volume = _audioMuted ? 0 : audioMusicVolume;
   if(sfxGainNode) sfxGainNode.gain.value = _audioMuted ? 0 : audioSfxVolume;
@@ -2784,6 +2809,7 @@ function preloadAllSfxBuffers(){
 }
 function playSfx(category){
   if(!audioStarted) return;
+  if(_audioMuted) return; // don't even touch audio while muted
   const list = SFX_BANK[category];
   if(!list || !list.length) return;
   const path = list[Math.floor(Math.random()*list.length)];
@@ -2971,9 +2997,12 @@ if(_dpInv){
   _dpInv.addEventListener('pointerdown', inv, true);
   _dpInv.onclick = (e)=>{ e.stopPropagation(); };
 }
-// Attack: hold-to-repeat like the d-pad arrows so the bottom-right
-// button matches the existing hold-to-attack semantics.
-_wireDpadHoldButton(_dpAttack, ()=> { if(state.combat) combatAttack(); });
+// Attack: hold-to-repeat. In combat → real attack with damage; out
+// of combat → just the swing animation (matches F-key semantics).
+_wireDpadHoldButton(_dpAttack, ()=> {
+  if(state.combat) combatAttack();
+  else triggerAttackSwingAnimation();
+});
 // Eat events landing on the dpad container or its 15px ::before
 // buffer so they don't bubble to the 3D viewport tap handler. Listen
 // in BUBBLE phase (no `true`) so the button's own capture-phase
