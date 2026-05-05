@@ -2625,6 +2625,10 @@ function initAudioGraphIfNeeded(){
     console.warn('[gridiron] AudioContext init failed', e);
     audioCtx = null;
   }
+  // If the user pressed Mute on the title screen BEFORE this graph
+  // existed, _audioMuted is true but the gain nodes are at the
+  // remembered volumes. Reapply now so init respects mute state.
+  if(typeof setAudioMuted === 'function') setAudioMuted(_audioMuted);
 }
 
 function pickRandomMusicTrack(){
@@ -2677,6 +2681,10 @@ function startBackgroundMusic(){
     setTimeout(()=>{ if(audioStarted) startBackgroundMusic(); }, delayMs);
   };
   audioMusicEl.play().catch(()=>{});
+  // Reapply mute state in case the user toggled it before this track
+  // started (each track init writes audioMusicVolume, overriding the
+  // muted gain).
+  if(typeof setAudioMuted === 'function') setAudioMuted(_audioMuted);
 }
 function setMusicVolume(v){
   audioMusicVolume = v;
