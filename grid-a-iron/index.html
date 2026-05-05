@@ -481,20 +481,22 @@ function makeLevel(level){
     c.enemy = { ...t, hpMax:t.hp };
   }
 
-  // Vendor: only on even floors (2, 4, 6, ...). Placed in the 3x3
-  // around the player's start cell, never on the start cell itself,
-  // never on stairs, and not on any enemy cell.
+  // Vendor: only on even floors. Must be in a cell ORTHOGONALLY
+  // adjacent to the player's start with NO wall (i.e., the wall
+  // between is an open passage or open door), so the player can
+  // reach it without combat. Never on stairs or an enemy cell.
   if(level % 2 === 0){
+    const startCell = cellAt(px, py);
     const candidates = [];
-    for(let dy=-1; dy<=1; dy++){
-      for(let dx=-1; dx<=1; dx++){
-        if(dx===0 && dy===0) continue;
-        const vx = px+dx, vy = py+dy;
-        if(vx<0 || vy<0 || vx>=W_ || vy>=H_) continue;
-        const c = cellAt(vx, vy);
-        if(!c || c.stairs || c.enemy) continue;
-        candidates.push(c);
-      }
+    for(let d=0; d<4; d++){
+      const w = startCell.walls[d];
+      const passable = (w.type === 'open') || (w.type === 'door' && w.open);
+      if(!passable) continue;
+      const nx = px + DIR_VEC[d][0], ny = py + DIR_VEC[d][1];
+      if(nx<0 || ny<0 || nx>=W_ || ny>=H_) continue;
+      const c = cellAt(nx, ny);
+      if(!c || c.stairs || c.enemy) continue;
+      candidates.push(c);
     }
     if(candidates.length){
       const pick = candidates[ri(candidates.length)];
