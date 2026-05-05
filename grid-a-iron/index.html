@@ -103,6 +103,22 @@
      right with a 50px buffer; left bar is the UI. */
   #landscapeRightBuffer { display:none; }
   #landscapeMapOverlay { display:none; }
+  #landscapeTitleBar { display:none; }
+  body.landscape #landscapeTitleBar {
+    display:flex; align-items:center; justify-content:center; gap:14px;
+    position:absolute; left:0; right:0; top:0; height:34px;
+    z-index:80; pointer-events:none;
+    background:linear-gradient(to bottom, rgba(0,0,0,0.85), rgba(0,0,0,0.0));
+    font-family:"VT323","Courier New",monospace; letter-spacing:3px;
+  }
+  body.landscape #landscapeTitleBar .lscTitleBig {
+    color:#9bff9b; font-size:22px;
+    text-shadow: 0 0 4px #060, 0 0 10px #030;
+  }
+  body.landscape #landscapeTitleBar .lscTitleSub {
+    color:#ffd34d; font-size:18px;
+    text-shadow: 0 0 4px #420, 0 0 10px #210;
+  }
   /* Landscape: #wrap is a 7-column CSS grid:
      [50 edge] [1fr UI] [50 gap] [gameW 3D] [50 gap] [80 buffer] [50 edge]
      gameW is set inline in JS from vh*4/3. Grid prevents overlap. */
@@ -358,6 +374,8 @@
 <body>
 <div id="wrap">
 <button id="hamburgerBtn" title="Settings" aria-label="Settings">&#9776;</button>
+<!-- Landscape-only title bar overlaying the very top of the wrap. -->
+<div id="landscapeTitleBar"><span class="lscTitleBig">GRID-A-IRON</span> <span class="lscTitleSub">DUNGEON</span></div>
 <!-- Landscape-only: 50px right buffer with vertical HP bar, mini compass,
      and a map-toggle button. Hidden in portrait via CSS. -->
 <div id="landscapeRightBuffer">
@@ -2220,14 +2238,15 @@ function fitWrapToViewport(){
     // gameW derived from vh (4:3 of viewport height). Grid prevents overlap.
     const gameH = vh;
     const gameW = Math.floor(vh * 4 / 3);
-    const rightBufferW = 80;
+    const rightBufferW = 100;
     const sideGap      = 50;
-    const edgeBuffer   = 50;
+    const edgeBuffer   = 30;
     el.style.width  = vw + 'px';
     el.style.height = vh + 'px';
     el.style.transform = 'none';
     el.style.gridTemplateColumns =
       `${edgeBuffer}px 1fr ${sideGap}px ${gameW}px ${sideGap}px ${rightBufferW}px ${edgeBuffer}px`;
+    el.style.background = '#000';
     document.body.style.height = vh + 'px';
     document.body.style.width  = vw + 'px';
     // Clear any per-element inline placement that might linger from
@@ -2249,6 +2268,7 @@ function fitWrapToViewport(){
     const scale = Math.min(vw/400, vh/700);
     el.style.transform = `scale(${scale})`;
     el.style.gridTemplateColumns = '';
+    el.style.background = '';
     document.body.style.height = vh + 'px';
     document.body.style.width  = vw + 'px';
     // Clear any landscape inline overrides so the portrait CSS rules apply.
