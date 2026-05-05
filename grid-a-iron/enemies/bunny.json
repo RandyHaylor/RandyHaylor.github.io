@@ -5,10 +5,18 @@
     "Flop", "Tiny stomp", "Where lettuce?", "Boop?",
     "Soft attack", "I bite ankles", "Don't tell mom",
     "Cottontail menace", "I am fast", "Too cute to kill",
-    "Wiggle", "I dig holes", "Big ears, hear all"
+    "Wiggle", "I dig holes", "Big ears, hear all",
+    "Squeak!", "Binky!", "Thump thump", "Fuzzy justice",
+    "Munch crunch", "Pounce!", "Escape artist", "Nom nom",
+    "Can't catch me", "Adorably vicious", "Hops away", "Puffy tail"
   ],
   "movements": [
     "hops", "wiggles nose", "flicks ear", "thumps foot",
-    "twitches tail", "nibbles air"
+    "twitches tail", "nibbles air", "binkies wildly",
+    "scratches playfully", "darts sideways", "zooms in circles",
+    "spins and hops", "stamps tiny feet", "bounces erratically",
+    "flattens against ground", "does backflip", "hops backwards",
+    "ears twitch frantically", "sits up adorably", "sniffs suspiciously",
+    "does combat roll", "hops directly at you"
   ]
 }

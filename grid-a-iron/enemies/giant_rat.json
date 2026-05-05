@@ -6,14 +6,13 @@
     "Tiny terror", "Crumb thief", "Dark scurry", "Sniff sniff", "Fur fluff",
     "Whisker tickle", "Claw claw", "Old cheese!", "Underground!", "Pestilence",
     "Run run run", "Furry fury", "Fang flash", "Mine!", "Greedy",
-    "Cellar lord", "Twitchy nose", "Eat your toes", "Disease vector", "Brown menace",
-    "Feast time", "Tunnel master", "Garbage king", "Plague time", "Squeak attack",
-    "Many of us", "Hungry always", "Skitter skitter", "Black death", "Smelly socks",
-    "Nest defender", "Crumb guardian", "Filth lord", "Whisker twitch", "Chunk chunk",
-    "Devour", "Gnaw gnaw", "Tail whip", "Greasy", "Pellet army"
+    "Cellar lord", "Twitchy nose", "Eat your toes", "Disease vector", "Brown menace"
   ],
   "movements": [
     "scurries", "sniffs", "bares fangs", "twitches whiskers",
-    "lashes tail", "hunches low", "scratches floor", "shuffles paws"
+    "lashes tail", "hunches low", "scratches floor", "shuffles paws",
+    "squeaks loudly", "gnaws fiercely", "darts sideways", "skitters away",
+    "chitters nervously", "rears on hind legs", "clicks teeth", "shakes fur",
+    "pads softly", "crouches ready", "hisses quietly", "scrabbles frantically"
   ]
 }

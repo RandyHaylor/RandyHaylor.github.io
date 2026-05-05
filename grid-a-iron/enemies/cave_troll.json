@@ -8,10 +8,16 @@
     "Crunchy bones", "Make hat from skull", "Tribe sleeps",
     "Hands big", "Stinky cave", "Big and slow",
     "Nap nap", "Smell bad", "Drool", "Big foot down",
-    "Wake big mad", "Leave my cave"
+    "Wake big mad", "Leave my cave", "Rock throw good",
+    "Ugh grunt", "Belly hurt", "Me no think", "Hit it all"
   ],
   "movements": [
     "thuds", "drools", "scratches", "huffs", "lumbers",
-    "cracks knuckles", "stomps", "snorts"
+    "cracks knuckles", "stomps", "snorts", "grunts loudly",
+    "drags heavy club", "pounds ground", "sniffs air",
+    "scratches hairy chest", "sways side to side",
+    "flexes massive arms", "bellows in rage",
+    "kicks loose rocks", "blocks cave entrance",
+    "yawns showing fangs", "smacks forehead"
   ]
 }

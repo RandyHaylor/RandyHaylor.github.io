@@ -6,14 +6,13 @@
     "Filthy elf", "Worm food!", "Greedy, mine!", "Ratface!", "Boogeyman!",
     "I see you", "Loot loot loot", "Pretty shiny", "Stab stab stab", "Hate you",
     "Gimme!", "Boss says kill", "Dungeon dweller", "Garbage hero", "Cave king",
-    "Tribe forever", "Spit on you", "Snot rocket", "Smelly!", "I hungry",
-    "Mine mine mine", "Run, hero!", "Goblin gang", "Stinky pits", "Punching time",
-    "Cudgel time", "Headbash!", "Snicker snicker", "Pointy stick!", "Yummmm",
-    "Dance for me!", "Brain food!", "Crunch crunch", "Tribe fight!", "Bloodtime",
-    "Eat your shoes", "Yikes shiny!", "Goblin gambit", "Sneaky goblin!", "Trip trip!"
+    "Tribe forever", "Spit on you", "Snot rocket", "Smelly!", "I hungry"
   ],
   "movements": [
     "snickers", "spits", "picks nose", "scratches butt",
-    "bares teeth", "cracks knuckles", "hops", "leers"
+    "bares teeth", "cracks knuckles", "hops", "leers",
+    "snarls menacingly", "paces in circles", "pounds chest", "drools",
+    "grabs at air", "jumps up and down", "shoves forward", "sneers wickedly",
+    "swings club", "stomps foot", "jabs with spear", "cackles shrilly"
   ]
 }

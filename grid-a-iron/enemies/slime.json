@@ -6,14 +6,13 @@
     "Squelch", "Drip drip", "Jelly jiggle", "Goo goo", "Sticky hello",
     "Engulf!", "Wibble", "Plop pop", "Boing boing", "Slosh",
     "Acid time", "Burble burble", "Sweet goo", "Splooge!", "Sploosh",
-    "Watch your step", "Soft and ouch", "Glop glop", "Bouncy boy", "Melty memo",
-    "Goo gang", "Drip", "Slimy hug?", "Pudding!", "Foam time",
-    "Burble", "Spit splash", "Liquid friend", "Acid kiss", "Engulfing",
-    "Watery doom", "Slither slither", "Goo to you", "Squelchy", "Glub glub",
-    "Splatter", "Cold ooze", "Goo or me?", "Suck and slurp", "Jiggle"
+    "Watch your step", "Soft and ouch", "Glop glop", "Bouncy boy", "Melty memo"
   ],
   "movements": [
     "jiggles", "oozes", "plops", "burbles",
-    "bubbles", "ripples", "stretches", "splatters"
+    "bubbles", "ripples", "stretches", "splatters",
+    "quivers", "undulates", "wobbles forward", "contracts sharply",
+    "expands slowly", "globs together", "seeps outward", "trembles",
+    "engulfs nearby", "glistens wetly", "froths slightly", "drips steadily"
   ]
 }

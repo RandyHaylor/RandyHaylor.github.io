@@ -6,10 +6,19 @@
     "Pupils dilate", "Optic terror", "Behold!", "I'm watching",
     "Iris widens", "Twenty-twenty doom", "Unblinking",
     "I dream of you", "No corneas in here", "I see weakness",
-    "Glass on glass", "All seeing"
+    "Glass on glass", "All seeing", "Sclera burns red",
+    "Your thoughts exposed", "Locked eyes now", "I see your soul",
+    "Stare contest lost", "Eyelid falls never", "Pupil void darkness",
+    "Vision bores deep", "Eye of truth", "Sight pierces all"
   ],
   "movements": [
     "stares unblinking", "rotates iris", "tear forms",
-    "drifts closer", "pupils flicker", "veins pulse"
+    "drifts closer", "pupils flicker", "veins pulse",
+    "bloodshot intensifies", "lens focuses sharply",
+    "whites spread wide", "lashes curl inward", "floats menacingly",
+    "iris spirals inward", "aqueous humor glows", "shifts angle to view you",
+    "pupils constrict to pins", "rolls sideways slowly",
+    "blinks with wet sound", "tears leak crimson", "floats upward ominously",
+    "eye twitches knowingly", "retinas reflect light", "hovers directly overhead"
   ]
 }

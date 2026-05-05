@@ -6,14 +6,13 @@
     "March, march", "Lord called me", "Eternal vigil", "I forget warmth", "Eternal cold",
     "Click clack", "No fear left", "I serve still", "Soul sealed", "Dust to dust",
     "Ribs ache?", "Without lungs", "Old, old, old", "Corpse king", "Bones know",
-    "Hollow hunger", "Ash and dust", "I crave nothing", "Cold guard", "Death's pawn",
-    "Forever post", "Crypt warden", "Tomb echoes", "Whisper of war", "Rusted blade",
-    "Grave dust", "Unwelcome guest", "Tomb voice", "Bones rise", "Resurrect me",
-    "Endless watch", "Marrow gone", "Empty skull", "Forever still", "Pale guardian",
-    "Lifeless servant", "Cold steel", "Eternal march", "Crypt crawler", "Sleep, sleep"
+    "Hollow hunger", "Ash and dust", "I crave nothing", "Cold guard", "Death's pawn"
   ],
   "movements": [
     "clatters", "bones grind", "creaks", "rattles",
-    "raises blade", "tilts skull", "exhales dust", "stiffens"
+    "raises blade", "tilts skull", "exhales dust", "stiffens",
+    "shuffles forward", "swings limbs wide", "pivots slowly", "lunges",
+    "heaves chest", "stamps heavily", "spins sharply", "settles with a click",
+    "bones scrape together", "jaws click open", "extends bony hand", "collapses slightly"
   ]
 }

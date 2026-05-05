@@ -11,10 +11,17 @@
     "Scribe of doom", "Skip the prayer",
     "Spellfire", "Whisper to bones", "Ancient grudge",
     "Power flows", "Step closer", "Time bends here",
-    "Curse spoken"
+    "Curse spoken", "Death knocks thrice", "Cold rises",
+    "No escape now", "Mummified screams", "I remember you"
   ],
   "movements": [
     "drifts", "weaves a sigil", "intones", "raises hand",
-    "robe rustles", "eyes flare", "staff thumps", "exhales chill"
+    "robe rustles", "eyes flare", "staff thumps", "exhales chill",
+    "traces rune in air", "skull laughs silently", "extends bony finger",
+    "leans on staff", "aura darkens", "raises the dead nearby",
+    "chants in void tongue", "spins robes dramatically",
+    "gestures binding spell", "breathes death mist",
+    "hovers closer menacingly", "summons spectral flame",
+    "points at victim", "laughs coldly"
   ]
 }
