@@ -149,7 +149,8 @@
      the 3D abuts the UI panel and the right icon bar directly):
        [30 edge] [1fr UI] [gameW 3D] [80 buffer] [30 edge]
      gameW is set inline in JS from vh*4/3. Grid prevents overlap. */
-  body.landscape { justify-content: flex-start; background:#000; }
+  body.landscape { justify-content: flex-start; background:#000; overflow:hidden; }
+  html:has(body.landscape) { overflow:hidden; }
   body.landscape #wrap {
     display:grid;
     grid-template-rows: 1fr;
