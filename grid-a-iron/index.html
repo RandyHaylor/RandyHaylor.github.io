@@ -170,8 +170,13 @@
     position:relative; left:auto; top:auto;
     grid-column: 1; grid-row: 1;
     width:100%; height:100%;
-    grid-template-rows: 1fr auto auto;
+    /* roomPanel is hidden in landscape; only combatPanel + overlays
+       live here, so let combatPanel take the full UI column height. */
+    grid-template-rows: 1fr;
     border-top:none; border-right:2px solid #0f0;
+  }
+  body.landscape #combatPanel {
+    height:100%; overflow:auto;
   }
   body.landscape #log,
   body.landscape #roomDesc,
@@ -1966,14 +1971,20 @@ function refreshUI(){
     if(max) max.textContent = String(p.hpMax);
     lscHpEl.classList.toggle('low', p.hp < 6);
   }
+  // Compass needle: track an UNBOUNDED accumulated angle so CSS
+  // transition rotates the short way around (N->W = -90, not +270).
+  const targetDirDeg = [0,90,180,270][p.dir];
+  if(typeof window._compassDisplayDeg !== 'number'){
+    window._compassDisplayDeg = targetDirDeg;
+  }
+  const _normalized = ((window._compassDisplayDeg % 360) + 360) % 360;
+  const _signedDelta = ((targetDirDeg - _normalized + 540) % 360) - 180;
+  window._compassDisplayDeg += _signedDelta;
+  const dirDeg = window._compassDisplayDeg;
   const lscNeedle = document.getElementById('landscapeNeedle');
   if(lscNeedle){
-    const ldeg = [0,90,180,270][p.dir];
-    lscNeedle.style.transform = `translate(-50%,-100%) rotate(${ldeg}deg)`;
+    lscNeedle.style.transform = `translate(-50%,-100%) rotate(${dirDeg}deg)`;
   }
-  // Compass: rotate red needle to point in player's facing dir.
-  // CSS rotation: needle base points up (= North). N=0deg, E=90, S=180, W=270.
-  const dirDeg = [0,90,180,270][p.dir];
   document.getElementById('compassNeedle').style.transform =
     `translate(-50%,-100%) rotate(${dirDeg}deg)`;
   document.getElementById('compassTail').style.transform =
@@ -2784,7 +2795,21 @@ function _renderLandscapeMapOverlay(){
   const ov = document.getElementById('landscapeMapOverlay');
   if(!ov) return;
   if(!state.dungeon){ ov.innerHTML = ''; return; }
-  ov.innerHTML = `<pre>${buildDiscoveredLevelAsciiMap()}</pre>`;
+  // Bake the player ^>v< into the ASCII at the player's cell. The
+  // portrait flow uses a separate centered marker; landscape doesn't,
+  // so the arrow needs to be in the rendered text directly.
+  const lines = buildDiscoveredLevelAsciiMap().split('\n');
+  const p = state.player;
+  const arrow = ['^','>','v','<'][p.dir];
+  const cx = p.x * 2 + 1;
+  const cy = p.y * 2 + 1;
+  if(cy < lines.length){
+    const row = lines[cy];
+    if(cx < row.length){
+      lines[cy] = row.slice(0, cx) + arrow + row.slice(cx + 1);
+    }
+  }
+  ov.innerHTML = `<pre>${lines.join('\n')}</pre>`;
 }
 function toggleLandscapeMapOverlay(){
   const ov = document.getElementById('landscapeMapOverlay');
