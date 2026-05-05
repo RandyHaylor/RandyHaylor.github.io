@@ -256,11 +256,11 @@
     text-shadow:0 0 4px #000, 0 0 6px #060;
     display:flex; align-items:center; justify-content:center;
   }
-  /* T-shape: < ^ > in the middle row (forward squarely between turn
-     buttons for fast thumb access), v below center. */
-  body.landscape #landscapeDpad .dpadLeft  { top:0;    left:0;    }
-  body.landscape #landscapeDpad .dpadUp    { top:0;    left:40px; }
-  body.landscape #landscapeDpad .dpadRight { top:0;    right:0;   }
+  /* T-shape: < ^ > in upper-mid row (lowered ~1 char from the top so
+     the row sits closer to v), v below center. */
+  body.landscape #landscapeDpad .dpadLeft  { top:40px; left:0;    }
+  body.landscape #landscapeDpad .dpadUp    { top:40px; left:40px; }
+  body.landscape #landscapeDpad .dpadRight { top:40px; right:0;   }
   body.landscape #landscapeDpad .dpadDown  { bottom:0; left:40px; }
   /* Help overlay: full-viewport in landscape only. */
   #helpOverlay { display:none; }
@@ -2743,10 +2743,21 @@ const _dpUp    = document.querySelector('#landscapeDpad .dpadUp');
 const _dpDown  = document.querySelector('#landscapeDpad .dpadDown');
 const _dpLeft  = document.querySelector('#landscapeDpad .dpadLeft');
 const _dpRight = document.querySelector('#landscapeDpad .dpadRight');
-if(_dpUp)    _dpUp.onclick    = ()=> tryMoveForward();
-if(_dpDown)  _dpDown.onclick  = ()=> tryMoveBackward();
-if(_dpLeft)  _dpLeft.onclick  = ()=> rotate(-1);
-if(_dpRight) _dpRight.onclick = ()=> rotate(+1);
+// D-pad buttons live inside #game, so a click would bubble to the
+// 3D-viewport tap handler (which opens/closes a faced door). Stop
+// propagation on every relevant phase so the dpad supersedes.
+function _wireDpadButton(buttonElement, handlerCallback){
+  if(!buttonElement) return;
+  const block = (e)=>{ e.stopPropagation(); };
+  buttonElement.addEventListener('pointerdown', block, true);
+  buttonElement.addEventListener('touchstart',  block, true);
+  buttonElement.addEventListener('mousedown',   block, true);
+  buttonElement.onclick = (e)=>{ e.stopPropagation(); handlerCallback(); };
+}
+_wireDpadButton(_dpUp,    ()=> tryMoveForward());
+_wireDpadButton(_dpDown,  ()=> tryMoveBackward());
+_wireDpadButton(_dpLeft,  ()=> rotate(-1));
+_wireDpadButton(_dpRight, ()=> rotate(+1));
 // Refresh the overlay map on every UI tick if it's visible.
 const _origRefreshUIForLandscape = refreshUI;
 refreshUI = function(){
