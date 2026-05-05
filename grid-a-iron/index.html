@@ -2180,9 +2180,22 @@ function attachGameTouchHandlers(){
 function fitWrapToViewport(){
   const el = document.getElementById('wrap');
   if(!el) return;
+  // iOS reports stale or partial viewport dimensions during rotation,
+  // particularly visualViewport which can briefly shrink to a tiny
+  // height while the URL bar resizes. Take the max with innerHeight
+  // / innerWidth and the document element's client size so we never
+  // commit to a too-small layout.
   const vv = window.visualViewport;
-  const vw = vv ? vv.width  : window.innerWidth;
-  const vh = vv ? vv.height : window.innerHeight;
+  const vw = Math.max(
+    vv ? vv.width  : 0,
+    window.innerWidth || 0,
+    document.documentElement ? document.documentElement.clientWidth : 0
+  );
+  const vh = Math.max(
+    vv ? vv.height : 0,
+    window.innerHeight || 0,
+    document.documentElement ? document.documentElement.clientHeight : 0
+  );
   // Landscape mode trigger: aspect ratio (width / height) > 2.0.
   const isLandscape = (vw / vh) > 2.0;
   document.body.classList.toggle('landscape', isLandscape);
@@ -2264,8 +2277,18 @@ function fitWrapToViewport(){
     }
   }
 }
-window.addEventListener('resize', fitWrapToViewport);
-window.addEventListener('orientationchange', fitWrapToViewport);
+// Debounced re-fits: iOS doesn't always have final viewport dimensions
+// at the instant 'orientationchange' or 'resize' fires. Re-run after
+// short delays so we settle on the real values once the URL bar /
+// safe-area / window finish animating.
+function _scheduleFitRetries(){
+  fitWrapToViewport();
+  setTimeout(fitWrapToViewport, 100);
+  setTimeout(fitWrapToViewport, 300);
+  setTimeout(fitWrapToViewport, 700);
+}
+window.addEventListener('resize', _scheduleFitRetries);
+window.addEventListener('orientationchange', _scheduleFitRetries);
 if(window.visualViewport){
   window.visualViewport.addEventListener('resize', fitWrapToViewport);
   window.visualViewport.addEventListener('scroll', fitWrapToViewport);
