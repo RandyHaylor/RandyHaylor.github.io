@@ -217,9 +217,67 @@
     transition: transform .15s ease-out;
     filter: drop-shadow(0 0 2px #f00);
   }
-  body.landscape #btnToggleMapOverlay {
+  body.landscape #btnToggleMapOverlay,
+  body.landscape #btnToggleHelpOverlay {
     background:#020; color:#0f0; border:1px solid #0a0;
     font-size:14px; padding:6px 10px; font-family:inherit;
+  }
+  #btnToggleHelpOverlay { display:none; }
+  body.landscape #btnToggleHelpOverlay { display:inline-block; }
+  /* Help overlay: full-viewport in landscape only. */
+  #helpOverlay { display:none; }
+  #helpOverlay[hidden] { display:none !important; }
+  body.landscape #helpOverlay {
+    display:flex; position:fixed; left:0; right:0; top:0; bottom:0;
+    z-index:140; background:rgba(0,0,0,0.96);
+    align-items:center; justify-content:center;
+    color:#cfc; font-family:"VT323","Courier New",monospace;
+    padding:20px; box-sizing:border-box;
+  }
+  body.landscape #helpOverlay[hidden] { display:none !important; }
+  #helpOverlay .helpInner {
+    display:flex; flex-direction:column; gap:14px;
+    max-width:720px; width:100%;
+  }
+  #helpOverlay .helpHeader {
+    font-size:28px; color:#9bff9b; letter-spacing:3px;
+    text-align:center; text-shadow:0 0 4px #060;
+    border-bottom:1px solid #0a0; padding-bottom:6px;
+  }
+  #helpOverlay .helpSection { display:flex; flex-direction:column; gap:6px; }
+  #helpOverlay .helpSectionTitle {
+    font-size:18px; color:#ffd34d; letter-spacing:2px;
+  }
+  #helpOverlay .helpRows {
+    display:grid; grid-template-columns: 1fr 1fr; gap:4px 18px;
+    font-size:18px;
+  }
+  #helpOverlay .helpRow { display:flex; align-items:center; gap:10px; }
+  #helpOverlay .helpKey {
+    display:inline-block; width:28px; text-align:center;
+    color:#9bff9b; font-size:22px;
+  }
+  #helpOverlay .helpTapDemos {
+    display:flex; gap:30px; justify-content:center; padding-top:10px;
+  }
+  #helpOverlay .helpDemo {
+    display:flex; flex-direction:column; align-items:center; gap:6px;
+    width:140px;
+  }
+  #helpOverlay .helpDemo img {
+    width:64px; height:64px; image-rendering:pixelated;
+    background:rgba(0,0,0,0.4); border:1px solid #0a0; padding:4px;
+  }
+  #helpOverlay .helpBubble {
+    background:rgba(0,0,0,0.6); border:1px solid #0a0;
+    padding:4px 8px; font-size:14px; color:#cfc;
+    text-align:center; line-height:1.1;
+  }
+  #btnHelpClose {
+    align-self:center; margin-top:6px;
+    font-size:18px; padding:6px 18px;
+    background:#020; color:#0f0; border:1px solid #0a0;
+    font-family:inherit;
   }
   body.landscape #landscapeMapOverlay {
     display:block; position:relative; left:auto; top:auto;
@@ -422,10 +480,44 @@
     <div class="lscNeedle" id="landscapeNeedle"></div>
   </div>
   <button id="btnToggleMapOverlay" title="Toggle map">MAP</button>
+  <button id="btnToggleHelpOverlay" title="How to play">?</button>
 </div>
 <!-- Landscape-only: half-transparent ASCII map overlaid on the 3D view.
      Toggled visible via the MAP button. Hidden in portrait. -->
 <div id="landscapeMapOverlay" hidden></div>
+<!-- Landscape-only help overlay: how to play with swipes/taps. -->
+<div id="helpOverlay" hidden>
+  <div class="helpInner">
+    <div class="helpHeader">HOW TO PLAY</div>
+    <div class="helpSection">
+      <div class="helpSectionTitle">Swipe gestures</div>
+      <div class="helpRows">
+        <div class="helpRow"><span class="helpKey">↑</span><span>swipe up — move forward</span></div>
+        <div class="helpRow"><span class="helpKey">↓</span><span>swipe down — move backward</span></div>
+        <div class="helpRow"><span class="helpKey">⇒</span><span>swipe right — turn right</span></div>
+        <div class="helpRow"><span class="helpKey">⇐</span><span>swipe left — turn left</span></div>
+      </div>
+    </div>
+    <div class="helpSection">
+      <div class="helpSectionTitle">Tap on the 3D view</div>
+      <div class="helpTapDemos">
+        <div class="helpDemo">
+          <div class="helpBubble">tap here to attack</div>
+          <img src="sprites/enemy_slime.png" alt="slime">
+        </div>
+        <div class="helpDemo">
+          <div class="helpBubble">tap here to equip</div>
+          <img src="sprites/item_iron_sword.png" alt="sword">
+        </div>
+        <div class="helpDemo">
+          <div class="helpBubble">tap here to take</div>
+          <img src="sprites/item_healing_herb.png" alt="herb">
+        </div>
+      </div>
+    </div>
+    <button id="btnHelpClose">Close</button>
+  </div>
+</div>
 <div id="settingsOverlay" hidden>
   <div id="settingsHeader">SETTINGS <span style="font-size:11px;opacity:.7;">(Close to dismiss)</span></div>
   <div class="settings-row">Music
@@ -2580,6 +2672,14 @@ function toggleLandscapeMapOverlay(){
 }
 const _btnToggleMap = document.getElementById('btnToggleMapOverlay');
 if(_btnToggleMap) _btnToggleMap.onclick = toggleLandscapeMapOverlay;
+const _btnToggleHelp = document.getElementById('btnToggleHelpOverlay');
+const _btnHelpClose  = document.getElementById('btnHelpClose');
+function setHelpOverlayHidden(hide){
+  const ov = document.getElementById('helpOverlay');
+  if(ov) ov.hidden = !!hide;
+}
+if(_btnToggleHelp) _btnToggleHelp.onclick = ()=> setHelpOverlayHidden(false);
+if(_btnHelpClose)  _btnHelpClose.onclick  = ()=> setHelpOverlayHidden(true);
 // Refresh the overlay map on every UI tick if it's visible.
 const _origRefreshUIForLandscape = refreshUI;
 refreshUI = function(){
