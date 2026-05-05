@@ -105,19 +105,30 @@
   #landscapeMapOverlay { display:none; }
   #landscapeTitleBar { display:none; }
   body.landscape #landscapeTitleBar {
-    display:flex; align-items:center; justify-content:center; gap:14px;
-    position:absolute; left:0; right:0; top:0; height:34px;
+    display:flex; align-items:center; justify-content:center; gap:22px;
+    position:fixed; left:0; right:0; top:0; height:64px;
     z-index:80; pointer-events:none;
-    background:linear-gradient(to bottom, rgba(0,0,0,0.85), rgba(0,0,0,0.0));
-    font-family:"VT323","Courier New",monospace; letter-spacing:3px;
+    background:linear-gradient(to bottom, rgba(0,0,0,0.9), rgba(0,0,0,0.0));
+    font-family:"VT323","Courier New",monospace; letter-spacing:5px;
   }
   body.landscape #landscapeTitleBar .lscTitleBig {
-    color:#9bff9b; font-size:22px;
-    text-shadow: 0 0 4px #060, 0 0 10px #030;
+    color:#9bff9b; font-size:44px; line-height:1;
+    text-shadow: 0 0 6px #060, 0 0 14px #030;
   }
   body.landscape #landscapeTitleBar .lscTitleSub {
-    color:#ffd34d; font-size:18px;
-    text-shadow: 0 0 4px #420, 0 0 10px #210;
+    color:#ffd34d; font-size:36px; line-height:1;
+    text-shadow: 0 0 6px #420, 0 0 14px #210;
+  }
+  /* Start/death/inventory/vendor overlays live inside #ui, which in
+     landscape is only the left column — pin them to the full viewport
+     so they cover everything (3D + buffer + title bar). */
+  body.landscape #startScreen,
+  body.landscape #deathOverlay,
+  body.landscape #inventoryOverlay,
+  body.landscape #vendorOverlay,
+  body.landscape #settingsOverlay {
+    position:fixed; left:0; right:0; top:0; bottom:0;
+    z-index:130;
   }
   /* Landscape: #wrap is a 7-column CSS grid:
      [50 edge] [1fr UI] [50 gap] [gameW 3D] [50 gap] [80 buffer] [50 edge]
