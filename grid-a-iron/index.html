@@ -143,7 +143,7 @@
   body.landscape #vendorOverlay,
   body.landscape #settingsOverlay {
     position:fixed; left:0; right:0; top:0; bottom:0;
-    z-index:130;
+    z-index:300; background:#000;
   }
   /* Landscape: #wrap is a 3-column CSS grid (outer padding removed):
        [1fr UI] [gameW 3D] [80 buffer]
@@ -190,7 +190,7 @@
      with 2px L/R padding so nothing can ever truncate. */
   body.landscape #landscapeRightBuffer {
     display:flex; flex-direction:column; align-items:center;
-    justify-content:center; gap:10px; padding:40px 2px 20px;
+    justify-content:space-evenly; gap:0; padding:40px 2px 20px;
     position:relative; right:auto; top:auto;
     grid-column: 3; grid-row: 1;
     width:80px; height:100%;
@@ -198,10 +198,12 @@
     color:#cfc; font-family:"VT323","Courier New",monospace;
     box-sizing:border-box; z-index:150;
   }
-  /* All children share a uniform width matching the compass (48px) so
-     no item is wider than another. */
+  /* All children: square 48x48 boxes, no item wider/taller than
+     another. Combined with justify-content:space-evenly above this
+     gives uniform vertical spacing. */
   body.landscape #landscapeRightBuffer > * {
-    width:48px; max-width:48px; box-sizing:border-box;
+    width:48px; height:48px; max-width:48px; max-height:48px;
+    box-sizing:border-box; flex:0 0 48px;
     display:flex; align-items:center; justify-content:center;
     flex-direction:column;
   }
@@ -258,7 +260,10 @@
      3D viewport tap handler (which would attack/open doors). */
   body.landscape #landscapeDpad::before {
     content:''; position:absolute;
-    left:-15px; right:-15px; top:-15px; bottom:-15px;
+    /* < ^ > row sits at top:40 of container; align backdrop top to
+       15px above that (container y=25). Other sides extend 15px
+       past container as before. */
+    left:-15px; right:-15px; top:25px; bottom:-15px;
     pointer-events:auto;
     background:rgba(0,0,0,0.3); /* black, 70% transparent */
     border-radius:8px;
@@ -382,9 +387,10 @@
   #startScreen[hidden] { display:none !important; }
   /* Text-only title on the start screen (no splash image). */
   #startTitle { text-align:center; line-height:1.05; }
-  #startTitle .big { font-size:48px; color:#9bff9b;
-                      text-shadow: 0 0 6px #060, 0 0 14px #030;
-                      letter-spacing:2px; }
+  #startTitle .big { font-size:48px; letter-spacing:2px; }
+  #startTitle .big .tg { color:#9bff9b; text-shadow: 0 0 6px #060, 0 0 14px #030; }
+  #startTitle .big .tr { color:#ff5252; text-shadow: 0 0 6px #600, 0 0 14px #300; }
+  #startTitle .big .tw { color:#ffffff; text-shadow: 0 0 6px #444, 0 0 14px #222; }
   #startTitle .sub { font-size:38px; color:#ffd34d;
                       text-shadow: 0 0 6px #420, 0 0 14px #210;
                       letter-spacing:6px; margin-top:4px; }
@@ -583,6 +589,9 @@
   <div class="settings-row">SFX
     <input type="range" id="settingsSfxVolSlider"   min="0" max="1" step="0.01" value="0.35" />
   </div>
+  <div class="settings-row">
+    <button id="btnSettingsMute" type="button">🔊 Mute</button>
+  </div>
   <button id="btnSettingsClose" style="margin-top:8px;">Close</button>
 </div>
 <div id="game">
@@ -646,10 +655,11 @@
   </div>
   <div id="startScreen">
     <div id="startTitle">
-      <div class="big">grid-A-Iron</div>
+      <div class="big"><span class="tg">g</span><span class="tg">r</span><span class="tr">i</span><span class="tg">d</span><span class="tw">-</span><span class="tr">A</span><span class="tw">-</span><span class="tr">I</span><span class="tg">r</span><span class="tg">o</span><span class="tg">n</span></div>
       <div class="sub">DUNGEON</div>
     </div>
     <button id="btnStartGame">Enter</button>
+    <button id="btnStartMute" type="button" style="margin-top:6px; font-size:18px; padding:6px 18px; background:#020; color:#0f0; border:1px solid #0a0; font-family:inherit;">🔊 Mute</button>
   </div>
   <div id="vendorOverlay" hidden>
     <div id="vendorHeader">VENDOR <span style="font-size:11px;opacity:.7;">(V or Close to dismiss)</span></div>
@@ -2650,6 +2660,24 @@ function setSfxVolume(v){
   audioSfxVolume = v;
   if(sfxGainNode) sfxGainNode.gain.value = v;
 }
+// Single mute state shared by the title-screen and settings buttons.
+// Mutes BOTH music and sfx by zeroing the live gain nodes / element
+// volumes; remembered volumes are unchanged so unmute restores.
+let _audioMuted = false;
+function isAudioMuted(){ return _audioMuted; }
+function setAudioMuted(muted){
+  _audioMuted = !!muted;
+  if(musicGainNode) musicGainNode.gain.value = _audioMuted ? 0 : audioMusicVolume;
+  else if(audioMusicEl) audioMusicEl.volume = _audioMuted ? 0 : audioMusicVolume;
+  if(sfxGainNode) sfxGainNode.gain.value = _audioMuted ? 0 : audioSfxVolume;
+  // Sync both mute buttons' labels.
+  const labelText = _audioMuted ? '🔇 Unmute' : '🔊 Mute';
+  const a = document.getElementById('btnStartMute');
+  const b = document.getElementById('btnSettingsMute');
+  if(a) a.textContent = labelText;
+  if(b) b.textContent = labelText;
+}
+function toggleAudioMute(){ setAudioMuted(!_audioMuted); }
 // Quickly fade out background music, then fire the death sting once
 // it's silent. Used by triggerPlayerDeath so the music doesn't fight
 // the sting cue.
@@ -2714,6 +2742,10 @@ function dismissStartScreen(){
   startBackgroundMusic();
 }
 document.getElementById('btnStartGame').onclick = dismissStartScreen;
+const _btnStartMute = document.getElementById('btnStartMute');
+if(_btnStartMute) _btnStartMute.onclick = (e)=>{ e.stopPropagation(); toggleAudioMute(); };
+const _btnSettingsMute = document.getElementById('btnSettingsMute');
+if(_btnSettingsMute) _btnSettingsMute.onclick = (e)=>{ e.stopPropagation(); toggleAudioMute(); };
 function syncMusicSlidersToValue(v){
   const b = document.getElementById('settingsMusicVolSlider');
   if(b) b.value = String(v);
