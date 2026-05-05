@@ -120,7 +120,8 @@
   body.landscape #discoveredMap,
   body.landscape #playerArrowMarker,
   body.landscape #compass,
-  body.landscape #topHud {
+  body.landscape #topHud,
+  body.landscape #roomPanel {
     display:none !important;
   }
   body.landscape #movePanel { display:none; } /* movement via swipe in landscape */
@@ -2184,27 +2185,77 @@ function fitWrapToViewport(){
   const vh = vv ? vv.height : window.innerHeight;
   // Landscape mode trigger: aspect ratio (width / height) > 2.0.
   const isLandscape = (vw / vh) > 2.0;
-  const wasLandscape = document.body.classList.contains('landscape');
   document.body.classList.toggle('landscape', isLandscape);
-  const logicalW = isLandscape ? 800 : 400;
-  const logicalH = isLandscape ? 400 : 700;
-  el.style.width  = logicalW + 'px';
-  el.style.height = logicalH + 'px';
-  const scale = Math.min(vw/logicalW, vh/logicalH);
-  el.style.transform = `scale(${scale})`;
-  document.body.style.height = vh + 'px';
-  document.body.style.width  = vw + 'px';
-  // Resize the Three.js renderer + camera to match the landscape vs
-  // portrait 3D viewport so the canvas actually fills its allotted box.
-  if(typeof renderer !== 'undefined' && renderer && camera){
-    if(isLandscape){
-      renderer.setSize(533, 400, false);
-      camera.aspect = 533 / 400;
-    } else {
-      renderer.setSize(400, 300, false);
-      camera.aspect = 400 / 300;
+  if(isLandscape){
+    // Use the visual viewport directly — no scale transform; layout is
+    // computed in real pixels so the left panel can grow to fill space.
+    el.style.width  = vw + 'px';
+    el.style.height = vh + 'px';
+    el.style.transform = 'none';
+    document.body.style.height = vh + 'px';
+    document.body.style.width  = vw + 'px';
+    const gameH = vh;
+    const gameW = Math.floor(vh * 4 / 3);
+    const rightBufferW = 100;
+    const sideGap = 50;
+    const gameRight = vw - rightBufferW - sideGap;
+    const gameLeft  = gameRight - gameW;
+    const leftPanelW = Math.max(0, gameLeft - sideGap);
+    const game = document.getElementById('game');
+    if(game){
+      game.style.left = gameLeft + 'px';
+      game.style.top = '0px';
+      game.style.width = gameW + 'px';
+      game.style.height = gameH + 'px';
     }
-    camera.updateProjectionMatrix();
+    const ui = document.getElementById('ui');
+    if(ui){
+      ui.style.left = '0px';
+      ui.style.top = '0px';
+      ui.style.width = leftPanelW + 'px';
+      ui.style.height = vh + 'px';
+    }
+    const buf = document.getElementById('landscapeRightBuffer');
+    if(buf){
+      buf.style.right = '0px';
+      buf.style.top = '0px';
+      buf.style.width = rightBufferW + 'px';
+      buf.style.height = vh + 'px';
+    }
+    const mapOv = document.getElementById('landscapeMapOverlay');
+    if(mapOv){
+      mapOv.style.left = gameLeft + 'px';
+      mapOv.style.top = '0px';
+      mapOv.style.width = gameW + 'px';
+      mapOv.style.height = vh + 'px';
+    }
+    if(typeof renderer !== 'undefined' && renderer && camera){
+      // setSize(..., true) ALSO updates the canvas inline width/height
+      // CSS — without that, the buffer grew but the visible canvas
+      // stayed at the portrait 400x300.
+      renderer.setSize(gameW, gameH, true);
+      camera.aspect = gameW / gameH;
+      camera.updateProjectionMatrix();
+    }
+  } else {
+    el.style.width  = '400px';
+    el.style.height = '700px';
+    const scale = Math.min(vw/400, vh/700);
+    el.style.transform = `scale(${scale})`;
+    document.body.style.height = vh + 'px';
+    document.body.style.width  = vw + 'px';
+    // Clear any landscape inline overrides so the portrait CSS rules apply.
+    ['game','ui','landscapeRightBuffer','landscapeMapOverlay'].forEach(id=>{
+      const e = document.getElementById(id);
+      if(!e) return;
+      e.style.left = ''; e.style.right = '';
+      e.style.top = '';  e.style.width = ''; e.style.height = '';
+    });
+    if(typeof renderer !== 'undefined' && renderer && camera){
+      renderer.setSize(400, 300, true);
+      camera.aspect = 400/300;
+      camera.updateProjectionMatrix();
+    }
   }
 }
 window.addEventListener('resize', fitWrapToViewport);
