@@ -104,8 +104,15 @@
   #landscapeRightBuffer { display:none; }
   #landscapeMapOverlay { display:none; }
   #landscapeTitleBar { display:none; }
+  /* Title bar only visible when the start screen is up (and we're in
+     landscape). When the user hits Enter the start screen gets hidden,
+     and the :has() selector below stops matching — so the title bar
+     hides too. */
+  body.landscape:has(#startScreen:not([hidden])) #landscapeTitleBar {
+    display:flex;
+  }
   body.landscape #landscapeTitleBar {
-    display:flex; align-items:center; justify-content:center; gap:22px;
+    align-items:center; justify-content:center; gap:22px;
     position:fixed; left:0; right:0; top:0; height:64px;
     z-index:80; pointer-events:none;
     background:linear-gradient(to bottom, rgba(0,0,0,0.9), rgba(0,0,0,0.0));
@@ -134,7 +141,7 @@
      the 3D abuts the UI panel and the right icon bar directly):
        [30 edge] [1fr UI] [gameW 3D] [80 buffer] [30 edge]
      gameW is set inline in JS from vh*4/3. Grid prevents overlap. */
-  body.landscape { justify-content: flex-start; }
+  body.landscape { justify-content: flex-start; background:#000; }
   body.landscape #wrap {
     display:grid;
     grid-template-rows: 1fr;
@@ -224,7 +231,12 @@
     overflow:hidden;
   }
   body.landscape #landscapeMapOverlay[hidden] { display:none !important; }
-  body.landscape #hamburgerBtn { top:0; left:0; }
+  /* Hamburger lives in the top of the 30px left edge buffer column. */
+  body.landscape #hamburgerBtn {
+    top:0; left:0; width:30px; padding:4px 0;
+    text-align:center; box-sizing:border-box;
+    background:#000; border-color:#0a0;
+  }
   body.landscape #landscapeMapOverlay pre {
     margin:0; padding:8px; opacity:0.5; color:#bff5b0;
     text-shadow:0 0 4px #000;
@@ -2265,6 +2277,12 @@ function fitWrapToViewport(){
     el.style.transform = 'none';
     el.style.gridTemplateColumns =
       `${edgeBuffer}px 1fr ${gameW}px ${rightBufferW}px ${edgeBuffer}px`;
+    // Pull wrap inside the iOS safe area so the iPhone notch ear in
+    // landscape doesn't leave invisible padding to the right of the
+    // icon bar. Body bg fills the safe-area gutters (also #000).
+    el.style.marginLeft  = 'env(safe-area-inset-left)';
+    el.style.marginRight = 'env(safe-area-inset-right)';
+    el.style.width = `calc(${vw}px - env(safe-area-inset-left) - env(safe-area-inset-right))`;
     el.style.background = '#000';
     document.body.style.height = vh + 'px';
     document.body.style.width  = vw + 'px';
@@ -2288,6 +2306,8 @@ function fitWrapToViewport(){
     el.style.transform = `scale(${scale})`;
     el.style.gridTemplateColumns = '';
     el.style.background = '';
+    el.style.marginLeft = '';
+    el.style.marginRight = '';
     document.body.style.height = vh + 'px';
     document.body.style.width  = vw + 'px';
     // Clear any landscape inline overrides so the portrait CSS rules apply.
