@@ -1,0 +1,15 @@
+{
+  "name": "Demon Lord",
+  "phrases": [
+    "KNEEL", "Brimstone", "Your soul, mine", "Burn",
+    "I rule the deep", "Sulfur on the wind", "Hellfire",
+    "Pact unwritten", "Devour", "Cower, mortal",
+    "Crown of horn", "Step into pyre", "Damned be thee",
+    "Throne of cinders", "Witness wrath", "Sigil burns",
+    "Iron hooves", "I command shadow"
+  ],
+  "movements": [
+    "stomps", "claws ground", "laughs", "horns lower",
+    "embers fall", "flame breathes"
+  ]
+}

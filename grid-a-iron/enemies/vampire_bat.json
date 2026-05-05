@@ -1,0 +1,15 @@
+{
+  "name": "Vampire Bat",
+  "phrases": [
+    "Screee!", "Bloooood", "Echoes...", "Skitter", "Night meal",
+    "Wing beat", "Sonar lock", "Nibble nibble nibble",
+    "Tasty neck", "Caves are home", "Flap flap",
+    "I hang upside down", "Daylight burns", "Shadows hide me",
+    "Bite quickly", "Drink swiftly", "Rise of the bats",
+    "Echo back", "Dive!"
+  ],
+  "movements": [
+    "flutters", "dives", "squeaks", "wings beat",
+    "circles overhead", "hangs briefly"
+  ]
+}

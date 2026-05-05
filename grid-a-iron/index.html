@@ -3410,6 +3410,13 @@ function startEnemyLungeAnimation(enemyObj, onPeak, onDone){
 
 // ---------- enemy chatter (random phrases) ----------
 const ENEMY_PHRASE_FILE = {
+  'Bunny':            'enemies/bunny.json',
+  'Floating Eyeball': 'enemies/floating_eyeball.json',
+  'Shadow Fiend':     'enemies/shadow_fiend.json',
+  'Vampire Bat':      'enemies/vampire_bat.json',
+  'Evil Vendor':      'enemies/evil_vendor.json',
+  'Demon Lord':       'enemies/demon_lord.json',
+  'Dragon':           'enemies/dragon.json',
   'Giant Rat':  'enemies/giant_rat.json',
   'Goblin':     'enemies/goblin.json',
   'Skeleton':   'enemies/skeleton.json',
@@ -3426,41 +3433,11 @@ const NPC_SPRITE_PATH = {
   'Vendor': 'sprites/npc_vendor.png',
 };
 // Library entries: {phrases:[...speech...], movements:[...action...]}.
-// Inline fallback covers the case when the JSON fetch fails. Async loader
-// below replaces values on success.
-const enemyPhraseLibrariesByName = {
-  'Giant Rat':  { phrases: ['Squeak!','Cheese?','Nibble nibble','My turf','Plague!','Tiny terror'],
-                  movements: ['scurries','sniffs','bares fangs'] },
-  'Goblin':     { phrases: ['Squishy human!','Get out!','I see you','My loot!','Stab stab','Tribe rule!'],
-                  movements: ['snickers','spits','picks nose'] },
-  'Skeleton':   { phrases: ['Bones rattle...','Cold grave','Endless duty','Forever still','Dust to dust'],
-                  movements: ['clatters','bones grind','creaks'] },
-  'Slime':      { phrases: ['Glorp!','Squish!','Wibble wobble','Goo goo','Sticky hello','Sploosh'],
-                  movements: ['jiggles','oozes','plops'] },
-  'Cave Troll': { phrases: ['GRRR!','Smash!','Hungry...','Crush!','Big mad','Tiny human'],
-                  movements: ['thuds','drools','stomps'] },
-  'Lich':       { phrases: ['Mortal worm','Bow.','Necromancy','Pitiful','Centuries old'],
-                  movements: ['drifts','weaves a sigil','staff thumps'] },
-  'Bunny':            { phrases: ['Hop','Sniff sniff','Carrot?','Nibble','Twitch'],
-                        movements: ['hops','wiggles nose','flicks ear'] },
-  'Floating Eyeball': { phrases: ['I SEE YOU','Stare into me','...blink...','GAZE!','Witnessed'],
-                        movements: ['stares unblinking','rotates iris','tear forms'] },
-  'Shadow Fiend':     { phrases: ['Hssss','Your light fades','I am dusk','Fear me','From the corners'],
-                        movements: ['slithers in shadow','dims the room','fingers extend'] },
-  'Vampire Bat':      { phrases: ['Screee!','Bloooood','Echoes...','Skitter','Night meal'],
-                        movements: ['flutters','dives','squeaks'] },
-  'Evil Vendor':      { phrases: ['Final sale...','You owe me','No refunds','SURPRISE','Trust... was a mistake'],
-                        movements: ['draws hidden blade','smiles wrong','flips a coin'] },
-  'Demon Lord':       { phrases: ['KNEEL','Brimstone','Your soul, mine','Burn','I rule the deep'],
-                        movements: ['stomps','claws ground','laughs'] },
-  'Dragon':           { phrases: ['ROARRR!','Tiny morsel','Treasure-thief','Burn to ash','Behold the wyrm'],
-                        movements: ['unfurls wings','breathes smoke','tail thrashes'] },
-  // NPCs use the same library shape; presence here also means the loader
-  // will pull a richer set from npcs/<name>.json when fetch succeeds.
-  'Vendor':     { phrases: ['Welcome, traveler','Best prices','Fresh wares!',
-                            'Press V, I trade','Stay a while','Trust me, friend'],
-                  movements: ['polishes a coin','smiles','bows slightly'] },
-};
+// Populated entirely by loadAllEnemyPhraseLibraries() from the
+// enemies/*.json + npcs/*.json files shipped in the same deploy.
+// Same-origin static fetch — no offline / partial-deploy story to
+// worry about, so no inline fallback duplication.
+const enemyPhraseLibrariesByName = {};
 // Shared cross-enemy list of comical lines. 10% of every phrase emission
 // gets pulled from this instead of the enemy's own library, popped from
 // a per-enemy randomized copy that refreshes when emptied.

@@ -1,0 +1,15 @@
+{
+  "name": "Dragon",
+  "phrases": [
+    "ROARRR!", "Tiny morsel", "Treasure-thief", "Burn to ash",
+    "Behold the wyrm", "Scales of legend", "Winged death",
+    "Mountain shall fall", "I hoard your bones",
+    "Inhale...", "EXHALE.", "Adventurer? Dessert.",
+    "Wing-storm", "I see eons", "My fire, your end",
+    "Coiled doom", "Hatchling rose", "Smoke fills the hall"
+  ],
+  "movements": [
+    "unfurls wings", "breathes smoke", "tail thrashes",
+    "scales shimmer", "claws splay", "head dips"
+  ]
+}

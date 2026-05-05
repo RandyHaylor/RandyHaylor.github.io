@@ -1,0 +1,14 @@
+{
+  "name": "Bunny",
+  "phrases": [
+    "Hop", "Sniff sniff", "Carrot?", "Nibble", "Twitch",
+    "Flop", "Tiny stomp", "Where lettuce?", "Boop?",
+    "Soft attack", "I bite ankles", "Don't tell mom",
+    "Cottontail menace", "I am fast", "Too cute to kill",
+    "Wiggle", "I dig holes", "Big ears, hear all"
+  ],
+  "movements": [
+    "hops", "wiggles nose", "flicks ear", "thumps foot",
+    "twitches tail", "nibbles air"
+  ]
+}
