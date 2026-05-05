@@ -2492,15 +2492,8 @@ function _handleGameTouchEnd(e){
       }
     }
   }
-  // Fallback: tap with a door directly ahead → toggle it. If standing
-  // on stairs and the tap didn't hit a sprite (e.g. the player is too
-  // close), still descend on tap.
+  // Fallback: tap with a door directly ahead → toggle it.
   const c = cellAt(state.player.x, state.player.y);
-  if(c && c.stairs){
-    descendStairs();
-    e.preventDefault();
-    return;
-  }
   if(c && c.walls[state.player.dir].type === 'door'){
     toggleDoor();
     e.preventDefault();
