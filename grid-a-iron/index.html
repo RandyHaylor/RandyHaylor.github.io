@@ -2418,17 +2418,15 @@ function fitWrapToViewport(){
     el.style.width  = vw + 'px';
     el.style.height = vh + 'px';
     el.style.transform = 'none';
-    // 4-col grid (no right edge): icon bar abuts the right edge of
-    // wrap. wrap itself is margin'd inside the safe area. UI panel
-    // (1fr) absorbs the 30px previously held by the right edge column.
+    el.style.marginLeft  = '0';
+    el.style.marginRight = '0';
+    // 5-col grid: the 30px outer columns deliberately occupy the iOS
+    // unsafe area (notch/ear). Wrap spans full vw, no env() margins.
+    //   [30 unsafe-pad] [1fr UI] [gameW 3D] [80 buffer] [30 unsafe-pad]
+    // 1fr UI is the ONLY thing that stretches to fit; everything else
+    // is fixed. Right side is rigid: 30 + 80 + gameW from the right.
     el.style.gridTemplateColumns =
-      `${edgeBuffer}px 1fr ${gameW}px ${rightBufferW}px`;
-    // Pull wrap inside the iOS safe area so the iPhone notch ear in
-    // landscape doesn't leave invisible padding to the right of the
-    // icon bar. Body bg fills the safe-area gutters (also #000).
-    el.style.marginLeft  = 'env(safe-area-inset-left)';
-    el.style.marginRight = 'env(safe-area-inset-right)';
-    el.style.width = `calc(${vw}px - env(safe-area-inset-left) - env(safe-area-inset-right))`;
+      `${edgeBuffer}px minmax(0,1fr) ${gameW}px ${rightBufferW}px ${edgeBuffer}px`;
     el.style.background = '#000';
     document.body.style.height = vh + 'px';
     document.body.style.width  = vw + 'px';
