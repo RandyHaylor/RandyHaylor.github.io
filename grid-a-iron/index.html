@@ -259,7 +259,10 @@
   body.landscape #landscapeDpad::before {
     content:''; position:absolute;
     left:-15px; right:-15px; top:-15px; bottom:-15px;
-    pointer-events:auto; background:transparent; z-index:0;
+    pointer-events:auto;
+    background:rgba(0,0,0,0.3); /* black, 70% transparent */
+    border-radius:8px;
+    z-index:0;
   }
   body.landscape #landscapeDpad .dpadBtn { z-index:1; }
   body.landscape #landscapeDpad[hidden] { display:none !important; }
@@ -277,7 +280,7 @@
   body.landscape #landscapeDpad .dpadLeft  { top:40px;  left:0;    }
   body.landscape #landscapeDpad .dpadUp    { top:40px;  left:60px; }
   body.landscape #landscapeDpad .dpadRight { top:40px;  right:0;   }
-  body.landscape #landscapeDpad .dpadDown  { bottom:0; left:60px; }
+  body.landscape #landscapeDpad .dpadDown  { bottom:-5px; left:60px; }
   /* Help overlay: full-viewport in landscape only. */
   #helpOverlay { display:none; }
   #helpOverlay[hidden] { display:none !important; }
@@ -2827,17 +2830,19 @@ _wireDpadHoldButton(_dpUp,    ()=> tryMoveForward());
 _wireDpadHoldButton(_dpDown,  ()=> tryMoveBackward());
 _wireDpadHoldButton(_dpLeft,  ()=> rotate(-1));
 _wireDpadHoldButton(_dpRight, ()=> rotate(+1));
-// Eat any pointer/touch events landing on the dpad container or its
-// 15px ::before buffer so they don't bubble to the 3D viewport tap
-// handler.
+// Eat events landing on the dpad container or its 15px ::before
+// buffer so they don't bubble to the 3D viewport tap handler. Listen
+// in BUBBLE phase (no `true`) so the button's own capture-phase
+// pointerdown handlers fire first; if I used capture here it would
+// stopPropagation before reaching the buttons (ate the dpad presses).
 const _landscapeDpadEl = document.getElementById('landscapeDpad');
 if(_landscapeDpadEl){
   const swallow = (e)=>{ e.stopPropagation(); };
-  _landscapeDpadEl.addEventListener('pointerdown', swallow, true);
-  _landscapeDpadEl.addEventListener('pointerup',   swallow, true);
-  _landscapeDpadEl.addEventListener('touchstart',  swallow, true);
-  _landscapeDpadEl.addEventListener('touchend',    swallow, true);
-  _landscapeDpadEl.addEventListener('click',       swallow, true);
+  _landscapeDpadEl.addEventListener('pointerdown', swallow);
+  _landscapeDpadEl.addEventListener('pointerup',   swallow);
+  _landscapeDpadEl.addEventListener('touchstart',  swallow);
+  _landscapeDpadEl.addEventListener('touchend',    swallow);
+  _landscapeDpadEl.addEventListener('click',       swallow);
 }
 // Refresh the overlay map on every UI tick if it's visible.
 const _origRefreshUIForLandscape = refreshUI;
