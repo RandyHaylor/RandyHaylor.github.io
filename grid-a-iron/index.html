@@ -1949,6 +1949,10 @@ function extinguishPlayerTorch(){
       state.player.inv.splice(idx, 1);
       state.player.torchCharges = freshTorchCharges();
       log("You light a fresh torch.");
+      // Rebuild the visible-rooms scene graph too — torch-out had
+      // pruned distant rooms / fog; re-lighting needs to put them
+      // back without waiting for the player to rotate.
+      if(typeof renderVisibleRooms === 'function') renderVisibleRooms();
       refreshUI();
     }, TORCH_RELIGHT_DELAY_MS);
   } else {
