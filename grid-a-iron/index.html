@@ -206,12 +206,16 @@
   /* All children: square 48x48 boxes, no item wider/taller than
      another. Combined with justify-content:space-evenly above this
      gives uniform vertical spacing. */
-  body.landscape #landscapeRightBuffer > * {
-    width:48px; height:48px; max-width:48px; max-height:48px;
-    box-sizing:border-box; flex:0 0 48px;
+  /* HP block is multi-line stacked text, not a 40x40 icon. Constrain
+     only the actual icons (compass + buttons). */
+  body.landscape #landscapeRightBuffer > *:not(#landscapeHp) {
+    width:40px; height:40px; max-width:40px; max-height:40px;
+    box-sizing:border-box; flex:0 0 40px;
     display:flex; align-items:center; justify-content:center;
     flex-direction:column;
   }
+  body.landscape #landscapeRightBuffer #landscapeHp { width:auto; }
+  body.landscape #landscapeCompassMini { width:40px; height:40px; }
   /* HP stacked block: label / current / "/" / max — no rotation. */
   body.landscape #landscapeHp {
     display:flex; flex-direction:column; align-items:center;
@@ -242,8 +246,9 @@
   body.landscape #btnToggleHelpOverlay,
   body.landscape #btnToggleDpad {
     background:#020; color:#0f0; border:1px solid #0a0;
-    font-size:11px; padding:4px 0; font-family:inherit;
-    width:48px; min-width:48px;
+    font-size:14px; padding:0; font-family:inherit;
+    width:40px; height:40px; min-width:40px;
+    line-height:1;
   }
   /* Help (?) toggle button must sit above the help overlay so it can
      close the overlay (which now uses ? as its toggle, no Close btn). */
@@ -291,6 +296,13 @@
   body.landscape #landscapeDpad .dpadUp    { top:40px;  left:60px; }
   body.landscape #landscapeDpad .dpadRight { top:40px;  right:0;   }
   body.landscape #landscapeDpad .dpadDown  { bottom:-5px; left:60px; }
+  /* Bottom row companions for v: I (inventory) under <, sword under >. */
+  body.landscape #landscapeDpad .dpadInv     { bottom:-5px; left:0;    }
+  body.landscape #landscapeDpad .dpadAttack  { bottom:-5px; right:0;   }
+  body.landscape #landscapeDpad .dpadAttack img {
+    width:32px; height:32px; image-rendering:pixelated;
+    filter: drop-shadow(0 0 2px #000);
+  }
   /* Help overlay: full-viewport in landscape only. */
   #helpOverlay { display:none; }
   #helpOverlay[hidden] { display:none !important; }
@@ -352,13 +364,15 @@
     overflow:hidden;
   }
   body.landscape #landscapeMapOverlay[hidden] { display:none !important; }
-  /* Hamburger sits at the top of the 80px icon column, horizontally
-     centered above the other icons (compass/MAP/?/WASD all 48px wide).
-     48 wide centered in the column at right:16. */
+  /* Hamburger sits at the top of the 80px icon column, square 40x40
+     centered horizontally to match the other 40x40 icons below. */
   body.landscape #hamburgerBtn {
-    position:absolute; top:0; right:16px; left:auto; width:48px; padding:4px 0;
+    position:absolute; top:0; right:20px; left:auto;
+    width:40px; height:40px; padding:0; line-height:1;
     text-align:center; box-sizing:border-box;
     background:#000; border-color:#0a0;
+    font-size:18px;
+    display:flex; align-items:center; justify-content:center;
     z-index:200;
   }
   body.landscape #landscapeMapOverlay pre {
@@ -532,7 +546,7 @@
 <div id="wrap">
 <button id="hamburgerBtn" title="Settings" aria-label="Settings">&#9776;</button>
 <!-- Landscape-only title bar overlaying the very top of the wrap. -->
-<div id="landscapeTitleBar"><span class="lscTitleBig"><span class="tg">G</span><span class="tg">R</span><span class="tr">I</span><span class="tg">D</span><span class="tw">-</span><span class="tr">A</span><span class="tw">-</span><span class="tr">I</span><span class="tg">R</span><span class="tg">O</span><span class="tg">N</span></span> <span class="lscTitleSub">DUNGEON</span></div>
+<div id="landscapeTitleBar"><span class="lscTitleBig"><span class="tg">G</span><span class="tg">R</span><span class="tg">I</span><span class="tg">D</span><span class="tw">-</span><span class="tr">A</span><span class="tw">-</span><span class="tr">I</span><span class="tg">R</span><span class="tg">O</span><span class="tg">N</span></span> <span class="lscTitleSub">DUNGEON</span></div>
 <!-- Landscape-only: 50px right buffer with vertical HP bar, mini compass,
      and a map-toggle button. Hidden in portrait via CSS. -->
 <div id="landscapeRightBuffer">
@@ -607,6 +621,8 @@
     <button class="dpadBtn dpadLeft"  title="Turn left">&lt;</button>
     <button class="dpadBtn dpadRight" title="Turn right">&gt;</button>
     <button class="dpadBtn dpadDown"  title="Backward">v</button>
+    <button class="dpadBtn dpadInv"   title="Inventory (I)">I</button>
+    <button class="dpadBtn dpadAttack" title="Attack"><img src="sprites/item_iron_sword.png" alt="atk"></button>
   </div>
   <!-- Held items: clipped against game viewport bottom so only the
        upper portion of the held sprite peeks up like a Doom-era HUD. -->
@@ -660,7 +676,7 @@
   </div>
   <div id="startScreen">
     <div id="startTitle">
-      <div class="big"><span class="tg">g</span><span class="tg">r</span><span class="tr">i</span><span class="tg">d</span><span class="tw">-</span><span class="tr">A</span><span class="tw">-</span><span class="tr">I</span><span class="tg">r</span><span class="tg">o</span><span class="tg">n</span></div>
+      <div class="big"><span class="tg">g</span><span class="tg">r</span><span class="tg">i</span><span class="tg">d</span><span class="tw">-</span><span class="tr">A</span><span class="tw">-</span><span class="tr">I</span><span class="tg">r</span><span class="tg">o</span><span class="tg">n</span></div>
       <div class="sub">DUNGEON</div>
     </div>
     <button id="btnStartGame">Enter</button>
@@ -2887,6 +2903,17 @@ _wireDpadHoldButton(_dpUp,    ()=> tryMoveForward());
 _wireDpadHoldButton(_dpDown,  ()=> tryMoveBackward());
 _wireDpadHoldButton(_dpLeft,  ()=> rotate(-1));
 _wireDpadHoldButton(_dpRight, ()=> rotate(+1));
+const _dpInv    = document.querySelector('#landscapeDpad .dpadInv');
+const _dpAttack = document.querySelector('#landscapeDpad .dpadAttack');
+// Inventory: single-tap toggle (no hold-repeat).
+if(_dpInv){
+  const inv = (e)=>{ e.stopPropagation(); if(e.cancelable) e.preventDefault(); toggleInventoryOverlay(); };
+  _dpInv.addEventListener('pointerdown', inv, true);
+  _dpInv.onclick = (e)=>{ e.stopPropagation(); };
+}
+// Attack: hold-to-repeat like the d-pad arrows so the bottom-right
+// button matches the existing hold-to-attack semantics.
+_wireDpadHoldButton(_dpAttack, ()=> { if(state.combat) combatAttack(); });
 // Eat events landing on the dpad container or its 15px ::before
 // buffer so they don't bubble to the 3D viewport tap handler. Listen
 // in BUBBLE phase (no `true`) so the button's own capture-phase
