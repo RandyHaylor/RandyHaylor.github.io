@@ -1,12 +1,12 @@
 {
   "name": "Slime",
   "phrases": [
-    "Glorp!", "Squish!", "Wibble wobble", "I am goo!", "Bubble bubble",
-    "Cold and wet", "Glob me!", "Acid bath?", "Slurp", "Plop",
-    "Squelch", "Drip drip", "Jelly jiggle", "Goo goo", "Sticky hello",
-    "Engulf!", "Wibble", "Plop pop", "Boing boing", "Slosh",
-    "Acid time", "Burble burble", "Sweet goo", "Splooge!", "Sploosh",
-    "Watch your step", "Soft and ouch", "Glop glop", "Bouncy boy", "Melty memo"
+    "Glorp!", "Squish!", "I'm all wibbly wobbly!", "I'm goo!", "Bubble bubble bubble!",
+    "I'm cold and wet!", "Come glob me!", "Ready for an acid bath?", "Slurrrp!", "Plop plop!",
+    "Squelch squelch!", "Drip drip drip!", "I'm jelly and jiggly!", "Goo goo goo!", "Hello, sticky hello!",
+    "I'll engulf you!", "Wibble wibble!", "Plop pop plop!", "Boing boing boing!", "Sloshhhhh!",
+    "Time for acid!", "Burble burble!", "Sweet goo, that's me!", "Splooge!", "Sploosh!",
+    "Watch your step!", "I'm soft AND damaging!", "Glop glop glop!", "I'm bouncy!", "I'm melting!"
   ],
   "movements": [
     "jiggles", "oozes", "plops", "burbles",

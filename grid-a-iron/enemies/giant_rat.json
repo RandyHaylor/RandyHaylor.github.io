@@ -1,12 +1,12 @@
 {
   "name": "Giant Rat",
   "phrases": [
-    "Squeak!", "Cheese please?", "My turf", "Plague carrier", "Nibble nibble",
-    "Tail twitch", "Beady eyes", "Bite bite", "Hide here", "Rat king",
-    "Tiny terror", "Crumb thief", "Dark scurry", "Sniff sniff", "Fur fluff",
-    "Whisker tickle", "Claw claw", "Old cheese!", "Underground!", "Pestilence",
-    "Run run run", "Furry fury", "Fang flash", "Mine!", "Greedy",
-    "Cellar lord", "Twitchy nose", "Eat your toes", "Disease vector", "Brown menace"
+    "Squeak! Squeak!", "I want cheese!", "This is MY turf!", "I'm spreading plague!", "Nibble nibble!",
+    "My tail twitches!", "Look at my beady eyes!", "I'm gonna bite!", "This is my hiding spot!", "I'm the rat king!",
+    "I'm tiny but terrifying!", "That's my crumb!", "I'll scurry in the dark!", "Sniff sniff!", "My fur is fluffed up!",
+    "My whiskers tickle!", "Claw claw!", "Old cheese, my favorite!", "Underground is where I live!", "I'm pestilence!",
+    "Run run run!", "I'm furious!", "Fang flash!", "That's MINE!", "I'm greedy!",
+    "I'm the cellar lord!", "My nose twitches!", "I'll eat your toes!", "I'm a disease vector!", "The brown menace approaches!"
   ],
   "movements": [
     "scurries", "sniffs", "bares fangs", "twitches whiskers",

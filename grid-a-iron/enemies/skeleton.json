@@ -1,12 +1,12 @@
 {
   "name": "Skeleton",
   "phrases": [
-    "Bones rattle...", "Cold grave", "Endless duty", "Stand again!", "Hollow sigh",
-    "I once breathed", "Empty sockets", "Thy turn comes", "Forgotten name", "Brittle still",
-    "March, march", "Lord called me", "Eternal vigil", "I forget warmth", "Eternal cold",
-    "Click clack", "No fear left", "I serve still", "Soul sealed", "Dust to dust",
-    "Ribs ache?", "Without lungs", "Old, old, old", "Corpse king", "Bones know",
-    "Hollow hunger", "Ash and dust", "I crave nothing", "Cold guard", "Death's pawn"
+    "My bones rattle...", "This grave is so cold.", "My duty is endless.", "I stand again!", "I sigh so hollow.",
+    "I once breathed air.", "My sockets are empty.", "Your turn comes soon.", "I've forgotten my name.", "My bones are brittle.",
+    "March, march, march.", "My lord called me.", "I keep eternal vigil.", "I forget what warmth is.", "This cold is eternal.",
+    "Click clack click!", "I have no fear left.", "I serve still.", "My soul is sealed away.", "Dust to dust.",
+    "Do my ribs ache? Yes.", "I have no lungs.", "I'm old, old, old.", "I'm the corpse king.", "My bones know all.",
+    "I have hollow hunger.", "Ash and dust.", "I crave nothing.", "I'm a cold guard.", "I'm death's pawn."
   ],
   "movements": [
     "clatters", "bones grind", "creaks", "rattles",

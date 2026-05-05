@@ -1,22 +1,21 @@
 {
   "name": "Bunny",
   "phrases": [
-    "Hop", "Sniff sniff", "Carrot?", "Nibble", "Twitch",
-    "Flop", "Tiny stomp", "Where lettuce?", "Boop?",
-    "Soft attack", "I bite ankles", "Don't tell mom",
-    "Cottontail menace", "I am fast", "Too cute to kill",
-    "Wiggle", "I dig holes", "Big ears, hear all",
-    "Squeak!", "Binky!", "Thump thump", "Fuzzy justice",
-    "Munch crunch", "Pounce!", "Escape artist", "Nom nom",
-    "Can't catch me", "Adorably vicious", "Hops away", "Puffy tail"
+    "Watch me hop!", "Sniff sniff!", "Got any carrots?", "I'm gonna nibble you!", "Twitch twitch!",
+    "Oof, I flopped!", "Don't step on me!", "Where's the lettuce hiding?", "Boop your nose!",
+    "I bite ankles, you know!", "Don't tell my mom!", "I'm small but deadly!", "I'm fast, I swear!",
+    "Too cute to kill, right?", "Wiggle wiggle!", "I'll dig a hole right here!", "These ears hear EVERYTHING!",
+    "Squeak! Squeak!", "BINKY!", "Thump thump thump!", "I'm cute AND fierce!",
+    "Munch munch crunch crunch!", "Pounce!", "Can't catch me!", "Nom nom nom!",
+    "Catch me if you can!", "You can't harm this fluffball!", "Here I go, zooming away!", "Look at my puffy tail!"
   ],
   "movements": [
     "hops", "wiggles nose", "flicks ear", "thumps foot",
     "twitches tail", "nibbles air", "binkies wildly",
     "scratches playfully", "darts sideways", "zooms in circles",
-    "spins and hops", "stamps tiny feet", "bounces erratically",
+    "spins and hops", "stamps tiny feet", "chews on a human femur",
     "flattens against ground", "does backflip", "hops backwards",
     "ears twitch frantically", "sits up adorably", "sniffs suspiciously",
-    "does combat roll", "hops directly at you"
+    "does combat roll", "hops threateningly at you"
   ]
 }
