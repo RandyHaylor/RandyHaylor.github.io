@@ -49,6 +49,13 @@
   #topHudLvl { flex:0 0 auto; }
   #topHudHp  { flex:1; text-align:center; }
   #topHudHp.low { color:#ff3030; }
+  /* Descend fade: black veil over the 3D viewport that fades up
+     while the descend SFX plays, then fades back down on the new
+     level. opacity is animated by JS, transition durations are
+     swapped per phase so we don't need keyframes. */
+  #descendFade { position:absolute; inset:0; background:#000;
+                  pointer-events:none; opacity:0; z-index:99;
+                  transition: opacity 1500ms linear; }
   /* Damage flash: full red veil over the 3D viewport, fades out fast. */
   #hitFlash { position:absolute; inset:0; background:rgba(220,30,30,0.55);
               pointer-events:none; opacity:0; z-index:8; }
@@ -378,7 +385,7 @@
   /* Hamburger sits at the top of the 80px icon column, square 40x40
      centered horizontally to match the other 40x40 icons below. */
   body.landscape #hamburgerBtn {
-    position:absolute; top:0; right:24px; left:auto;
+    position:absolute; top:4px; right:24px; left:auto;
     width:32px; height:32px; padding:0; line-height:1;
     text-align:center; box-sizing:border-box;
     background:#000; border-color:#0a0;
@@ -641,6 +648,8 @@
   <div class="hand right" id="rightHand" hidden><img src="sprites/item_rusty_sword.png" alt="weapon" /></div>
   <!-- Red flash overlay: pulsed when an enemy hit lands. -->
   <div id="hitFlash"></div>
+  <!-- Black descend-stairs fade. -->
+  <div id="descendFade"></div>
   <!-- Big red damage number when the player gets hit. -->
   <div id="playerDamageNum"></div>
   <!-- Radial vignette: shown only when torch is out, gives a fuzzy
@@ -1537,10 +1546,27 @@ function toggleDoor(){
 function descendStairs(){
   const c = cellAt(state.player.x, state.player.y);
   if(!c.stairs){ log("No stairs here."); return; }
+  if(state._descending) return; // ignore re-taps mid-fade
+  state._descending = true;
   playSfx('descend_stairs');
-  state.level++;
   log(`You descend deeper into the dungeon...`);
-  newLevel(state.level);
+  const fade = document.getElementById('descendFade');
+  if(fade){
+    fade.style.transition = 'opacity 1500ms linear';
+    // Force a reflow so the transition picks up from 0 reliably.
+    void fade.offsetWidth;
+    fade.style.opacity = '1';
+  }
+  setTimeout(()=>{
+    state.level++;
+    newLevel(state.level);
+    if(fade){
+      fade.style.transition = 'opacity 500ms linear';
+      void fade.offsetWidth;
+      fade.style.opacity = '0';
+    }
+    setTimeout(()=>{ state._descending = false; }, 520);
+  }, 1500);
 }
 
 // Weapons table: name -> attack value. Anything in here is treated as a weapon
@@ -2458,10 +2484,23 @@ function _handleGameTouchEnd(e){
         e.preventDefault();
         return;
       }
+      // Tap on the stairs arrow or its 'Descend' label — descend.
+      if(u.isStairsArrow || u.isStairsLabel){
+        descendStairs();
+        e.preventDefault();
+        return;
+      }
     }
   }
-  // Fallback: tap with a door directly ahead → toggle it.
+  // Fallback: tap with a door directly ahead → toggle it. If standing
+  // on stairs and the tap didn't hit a sprite (e.g. the player is too
+  // close), still descend on tap.
   const c = cellAt(state.player.x, state.player.y);
+  if(c && c.stairs){
+    descendStairs();
+    e.preventDefault();
+    return;
+  }
   if(c && c.walls[state.player.dir].type === 'door'){
     toggleDoor();
     e.preventDefault();
