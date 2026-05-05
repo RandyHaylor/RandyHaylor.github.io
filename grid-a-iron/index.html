@@ -103,13 +103,14 @@
      right with a 50px buffer; left bar is the UI. */
   #landscapeRightBuffer { display:none; }
   #landscapeMapOverlay { display:none; }
-  body.landscape #wrap { width:800px; height:400px; }
+  body.landscape { justify-content: flex-end; } /* tuck wrap to right edge */
+  body.landscape #wrap { width:800px; height:400px; transform-origin: top right; }
   body.landscape #game {
-    left:217px; top:0; width:533px; height:400px;
+    left:167px; top:0; width:533px; height:400px;
   }
-  body.landscape #game canvas { width:533px; height:400px; }
+  body.landscape #game canvas { width:533px; height:400px; display:block; }
   body.landscape #ui {
-    left:0; top:0; width:217px; height:400px;
+    left:0; top:0; width:167px; height:400px;
     grid-template-rows: 1fr auto auto;
     border-top:none; border-right:2px solid #0f0;
   }
@@ -123,41 +124,48 @@
     display:none !important;
   }
   body.landscape #movePanel { display:none; } /* movement via swipe in landscape */
+  /* Right buffer: 100px wide, contents clustered toward middle with
+     ~50px top/bottom padding to clear iPhone rounded corners. */
   body.landscape #landscapeRightBuffer {
     display:flex; flex-direction:column; align-items:center;
-    justify-content:space-between; gap:8px; padding:6px 4px;
-    position:absolute; right:0; top:0; width:50px; height:400px;
+    justify-content:center; gap:18px; padding:50px 6px;
+    position:absolute; right:0; top:0; width:100px; height:400px;
     background:rgba(0,0,0,0.55); border-left:1px solid #0a0;
     color:#cfc; font-family:"VT323","Courier New",monospace;
     box-sizing:border-box; z-index:6;
   }
+  /* HP stacked block: label / current / "/" / max — no rotation. */
   body.landscape #landscapeHp {
-    writing-mode:vertical-rl; transform:rotate(180deg);
-    font-size:16px; letter-spacing:1px; color:#fff;
-    text-shadow:0 0 4px #000;
+    display:flex; flex-direction:column; align-items:center;
+    line-height:1.05; color:#fff; text-shadow:0 0 4px #000;
+    font-size:13px; letter-spacing:1px;
   }
-  body.landscape #landscapeHp.low { color:#ff3030; }
+  body.landscape #landscapeHp .lscHpLabel { font-size:13px; opacity:.85; }
+  body.landscape #landscapeHp .lscHpCur   { font-size:30px; font-weight:bold; }
+  body.landscape #landscapeHp .lscHpSep   { font-size:14px; opacity:.6; }
+  body.landscape #landscapeHp .lscHpMax   { font-size:18px; opacity:.85; }
+  body.landscape #landscapeHp.low .lscHpCur { color:#ff3030; }
   body.landscape #landscapeCompassMini {
-    width:34px; height:34px; position:relative;
+    width:48px; height:48px; position:relative;
     border:1px solid #0a0; border-radius:50%;
     background:rgba(0,0,0,0.5);
   }
   body.landscape #landscapeCompassMini .lscNeedle {
     position:absolute; left:50%; top:50%;
     width:0; height:0;
-    border-left:3px solid transparent; border-right:3px solid transparent;
-    border-bottom:14px solid #ff4444;
+    border-left:5px solid transparent; border-right:5px solid transparent;
+    border-bottom:20px solid #ff4444;
     transform-origin:50% 100%;
     transform:translate(-50%, -100%) rotate(0deg);
     transition: transform .15s ease-out;
-    filter: drop-shadow(0 0 1px #f00);
+    filter: drop-shadow(0 0 2px #f00);
   }
   body.landscape #btnToggleMapOverlay {
     background:#020; color:#0f0; border:1px solid #0a0;
-    font-size:11px; padding:4px 4px; font-family:inherit;
+    font-size:14px; padding:6px 10px; font-family:inherit;
   }
   body.landscape #landscapeMapOverlay {
-    display:block; position:absolute; left:217px; top:0;
+    display:block; position:absolute; left:167px; top:0;
     width:533px; height:400px; pointer-events:none; z-index:7;
     color:#cfc; font-family:'Courier New',monospace; font-size:14px;
     line-height:1.0;
@@ -337,7 +345,12 @@
 <!-- Landscape-only: 50px right buffer with vertical HP bar, mini compass,
      and a map-toggle button. Hidden in portrait via CSS. -->
 <div id="landscapeRightBuffer">
-  <div id="landscapeHp">HP 20/20</div>
+  <div id="landscapeHp">
+    <span class="lscHpLabel">HP</span>
+    <span class="lscHpCur">20</span>
+    <span class="lscHpSep">/</span>
+    <span class="lscHpMax">20</span>
+  </div>
   <div id="landscapeCompassMini">
     <div class="lscRing"></div>
     <div class="lscNeedle" id="landscapeNeedle"></div>
@@ -1711,7 +1724,10 @@ function refreshUI(){
   }
   const lscHpEl = document.getElementById('landscapeHp');
   if(lscHpEl){
-    lscHpEl.textContent = `HP ${p.hp}/${p.hpMax}`;
+    const cur = lscHpEl.querySelector('.lscHpCur');
+    const max = lscHpEl.querySelector('.lscHpMax');
+    if(cur) cur.textContent = String(p.hp);
+    if(max) max.textContent = String(p.hpMax);
     lscHpEl.classList.toggle('low', p.hp < 6);
   }
   const lscNeedle = document.getElementById('landscapeNeedle');
@@ -2168,6 +2184,7 @@ function fitWrapToViewport(){
   const vh = vv ? vv.height : window.innerHeight;
   // Landscape mode trigger: aspect ratio (width / height) > 2.0.
   const isLandscape = (vw / vh) > 2.0;
+  const wasLandscape = document.body.classList.contains('landscape');
   document.body.classList.toggle('landscape', isLandscape);
   const logicalW = isLandscape ? 800 : 400;
   const logicalH = isLandscape ? 400 : 700;
@@ -2177,6 +2194,18 @@ function fitWrapToViewport(){
   el.style.transform = `scale(${scale})`;
   document.body.style.height = vh + 'px';
   document.body.style.width  = vw + 'px';
+  // Resize the Three.js renderer + camera to match the landscape vs
+  // portrait 3D viewport so the canvas actually fills its allotted box.
+  if(typeof renderer !== 'undefined' && renderer && camera){
+    if(isLandscape){
+      renderer.setSize(533, 400, false);
+      camera.aspect = 533 / 400;
+    } else {
+      renderer.setSize(400, 300, false);
+      camera.aspect = 400 / 300;
+    }
+    camera.updateProjectionMatrix();
+  }
 }
 window.addEventListener('resize', fitWrapToViewport);
 window.addEventListener('orientationchange', fitWrapToViewport);
