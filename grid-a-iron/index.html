@@ -875,16 +875,28 @@ function makeLevel(level){
     return false;
   }
   let enemiesPlaced = 0;
-  // PASS 1 — guaranteed mincount spawns (in pool declaration order so
-  // a designer can prioritize). These count toward enemyCount.
+  // PASS 1 — one of every eligible species (in pool declaration order)
+  // so each enemy in the level's range is guaranteed to appear at
+  // least once. Skipped for any template already at maxcount (e.g.
+  // shouldn't happen here because we haven't placed anything yet).
+  for(const t of eligibleEnemies){
+    if(enemiesPlaced >= enemyCount) break;
+    const cap = (typeof t.maxcount === 'number') ? t.maxcount : Infinity;
+    if((placedCountByName[t.name] || 0) >= cap) continue;
+    if(tryPlaceEnemyTemplate(t)) enemiesPlaced++;
+  }
+  // PASS 2 — top up to each template's mincount (in pool declaration
+  // order). Pass 1 already placed one copy, so this is a no-op for
+  // mincount<=1 entries; mincount>=2 entries get the extras here.
   for(const t of eligibleEnemies){
     const need = t.mincount || 0;
-    for(let k=0; k<need && enemiesPlaced<enemyCount; k++){
-      if(tryPlaceEnemyTemplate(t)) enemiesPlaced++;
+    while((placedCountByName[t.name] || 0) < need && enemiesPlaced < enemyCount){
+      if(!tryPlaceEnemyTemplate(t)) break;
+      enemiesPlaced++;
     }
   }
-  // PASS 2 — random fill up to enemyCount, skipping templates already
-  // at their maxcount cap.
+  // PASS 3 — random fill the remaining budget, skipping templates
+  // already at their maxcount cap.
   for(; enemiesPlaced<enemyCount; enemiesPlaced++){
     const candidates = eligibleEnemies.filter(t => {
       const cap = (typeof t.maxcount === 'number') ? t.maxcount : Infinity;
