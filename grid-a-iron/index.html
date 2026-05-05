@@ -145,10 +145,9 @@
     position:fixed; left:0; right:0; top:0; bottom:0;
     z-index:130;
   }
-  /* Landscape: #wrap is a 5-column CSS grid (no side-gap columns —
-     the 3D abuts the UI panel and the right icon bar directly):
-       [30 edge] [1fr UI] [gameW 3D] [80 buffer] [30 edge]
-     gameW is set inline in JS from vh*4/3. Grid prevents overlap. */
+  /* Landscape: #wrap is a 3-column CSS grid (outer padding removed):
+       [1fr UI] [gameW 3D] [80 buffer]
+     Only the UI column resizes. gameW is set inline from vh*4/3. */
   body.landscape { justify-content: flex-start; background:#000; overflow:hidden; }
   html:has(body.landscape) { overflow:hidden; }
   body.landscape #wrap {
@@ -159,13 +158,13 @@
   }
   body.landscape #game {
     position:relative; left:auto; top:auto;
-    grid-column: 3; grid-row: 1;
+    grid-column: 2; grid-row: 1;
     width:100%; height:100%;
   }
   body.landscape #game canvas { width:100%; height:100%; display:block; }
   body.landscape #ui {
     position:relative; left:auto; top:auto;
-    grid-column: 2; grid-row: 1;
+    grid-column: 1; grid-row: 1;
     width:100%; height:100%;
     grid-template-rows: 1fr auto auto;
     border-top:none; border-right:2px solid #0f0;
@@ -189,7 +188,7 @@
     display:flex; flex-direction:column; align-items:center;
     justify-content:center; gap:10px; padding:20px 2px;
     position:relative; right:auto; top:auto;
-    grid-column: 4; grid-row: 1;
+    grid-column: 3; grid-row: 1;
     width:80px; height:100%;
     background:rgba(0,0,0,0.55); border-left:1px solid #0a0;
     color:#cfc; font-family:"VT323","Courier New",monospace;
@@ -319,7 +318,7 @@
   }
   body.landscape #landscapeMapOverlay {
     display:block; position:relative; left:auto; top:auto;
-    grid-column: 3; grid-row: 1;
+    grid-column: 2; grid-row: 1;
     width:100%; height:100%; pointer-events:none; z-index:7;
     color:#cfc; font-family:'Courier New',monospace; font-size:14px;
     line-height:1.0;
@@ -327,12 +326,11 @@
     overflow:hidden;
   }
   body.landscape #landscapeMapOverlay[hidden] { display:none !important; }
-  /* Hamburger pinned to viewport left:0 — INSIDE the iOS left safe
-     area (the "unsafe" notch/ear region). User wants it there because
-     the top of the screen is high enough that the home-bar swipe and
-     other system gestures aren't a concern. */
+  /* Hamburger overlays the top-left of #wrap, which in landscape now
+     starts at the viewport's left edge and is occupied by the info
+     (UI) panel. position:absolute keeps it from shrinking the panel. */
   body.landscape #hamburgerBtn {
-    position:fixed; top:0; left:0; width:30px; padding:4px 0;
+    position:absolute; top:0; left:0; width:30px; padding:4px 0;
     text-align:center; box-sizing:border-box;
     background:#000; border-color:#0a0;
     z-index:200;
@@ -2414,19 +2412,16 @@ function fitWrapToViewport(){
     const gameH = vh;
     const gameW = Math.floor(vh * 4 / 3);
     const rightBufferW = 80;
-    const edgeBuffer   = 30;
     el.style.width  = vw + 'px';
     el.style.height = vh + 'px';
     el.style.transform = 'none';
     el.style.marginLeft  = '0';
     el.style.marginRight = '0';
-    // 5-col grid: the 30px outer columns deliberately occupy the iOS
-    // unsafe area (notch/ear). Wrap spans full vw, no env() margins.
-    //   [30 unsafe-pad] [1fr UI] [gameW 3D] [80 buffer] [30 unsafe-pad]
-    // 1fr UI is the ONLY thing that stretches to fit; everything else
-    // is fixed. Right side is rigid: 30 + 80 + gameW from the right.
+    // 3-col grid (no outer padding columns — unsafe areas not usable):
+    //   [1fr UI] [gameW 3D] [80 buffer]
+    // UI is the only resizable column; 3D and buffer are fixed.
     el.style.gridTemplateColumns =
-      `${edgeBuffer}px minmax(0,1fr) ${gameW}px ${rightBufferW}px ${edgeBuffer}px`;
+      `minmax(0,1fr) ${gameW}px ${rightBufferW}px`;
     el.style.background = '#000';
     document.body.style.height = vh + 'px';
     document.body.style.width  = vw + 'px';
