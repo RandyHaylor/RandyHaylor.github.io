@@ -119,8 +119,16 @@
     font-family:"VT323","Courier New",monospace; letter-spacing:5px;
   }
   body.landscape #landscapeTitleBar .lscTitleBig {
-    color:#9bff9b; font-size:44px; line-height:1;
-    text-shadow: 0 0 6px #060, 0 0 14px #030;
+    font-size:44px; line-height:1;
+  }
+  body.landscape #landscapeTitleBar .lscTitleBig .tg {
+    color:#9bff9b; text-shadow: 0 0 6px #060, 0 0 14px #030;
+  }
+  body.landscape #landscapeTitleBar .lscTitleBig .tr {
+    color:#ff5252; text-shadow: 0 0 6px #600, 0 0 14px #300;
+  }
+  body.landscape #landscapeTitleBar .lscTitleBig .tw {
+    color:#ffffff; text-shadow: 0 0 6px #444, 0 0 14px #222;
   }
   body.landscape #landscapeTitleBar .lscTitleSub {
     color:#ffd34d; font-size:36px; line-height:1;
@@ -218,12 +226,33 @@
     filter: drop-shadow(0 0 2px #f00);
   }
   body.landscape #btnToggleMapOverlay,
-  body.landscape #btnToggleHelpOverlay {
+  body.landscape #btnToggleHelpOverlay,
+  body.landscape #btnToggleDpad {
     background:#020; color:#0f0; border:1px solid #0a0;
     font-size:14px; padding:6px 10px; font-family:inherit;
   }
-  #btnToggleHelpOverlay { display:none; }
-  body.landscape #btnToggleHelpOverlay { display:inline-block; }
+  #btnToggleHelpOverlay, #btnToggleDpad { display:none; }
+  body.landscape #btnToggleHelpOverlay,
+  body.landscape #btnToggleDpad { display:inline-block; }
+  /* On-screen D-pad: diamond layout in the bottom-right of #game. */
+  #landscapeDpad { display:none; }
+  #landscapeDpad[hidden] { display:none !important; }
+  body.landscape #landscapeDpad {
+    display:block; position:absolute; right:8px; bottom:8px;
+    width:140px; height:140px; z-index:9; pointer-events:none;
+  }
+  body.landscape #landscapeDpad[hidden] { display:none !important; }
+  body.landscape #landscapeDpad .dpadBtn {
+    position:absolute; width:44px; height:44px; pointer-events:auto;
+    background:rgba(0,32,0,0.7); color:#0f0; border:1px solid #0a0;
+    font-size:24px; line-height:1; padding:0;
+    font-family:"VT323","Courier New",monospace;
+    display:flex; align-items:center; justify-content:center;
+  }
+  body.landscape #landscapeDpad .dpadUp    { top:0;     left:48px; }
+  body.landscape #landscapeDpad .dpadLeft  { top:48px;  left:0;    }
+  body.landscape #landscapeDpad .dpadRight { top:48px;  right:0;   }
+  body.landscape #landscapeDpad .dpadDown  { bottom:0;  left:48px; }
   /* Help overlay: full-viewport in landscape only. */
   #helpOverlay { display:none; }
   #helpOverlay[hidden] { display:none !important; }
@@ -274,7 +303,7 @@
     text-align:center; line-height:1.1;
   }
   #btnHelpClose {
-    align-self:center; margin-top:6px;
+    position:absolute; left:24px; bottom:24px;
     font-size:18px; padding:6px 18px;
     background:#020; color:#0f0; border:1px solid #0a0;
     font-family:inherit;
@@ -465,7 +494,7 @@
 <div id="wrap">
 <button id="hamburgerBtn" title="Settings" aria-label="Settings">&#9776;</button>
 <!-- Landscape-only title bar overlaying the very top of the wrap. -->
-<div id="landscapeTitleBar"><span class="lscTitleBig">GRID-A-IRON</span> <span class="lscTitleSub">DUNGEON</span></div>
+<div id="landscapeTitleBar"><span class="lscTitleBig"><span class="tg">G</span><span class="tg">R</span><span class="tr">I</span><span class="tg">D</span><span class="tw">-</span><span class="tr">A</span><span class="tw">-</span><span class="tr">I</span><span class="tg">R</span><span class="tg">O</span><span class="tg">N</span></span> <span class="lscTitleSub">DUNGEON</span></div>
 <!-- Landscape-only: 50px right buffer with vertical HP bar, mini compass,
      and a map-toggle button. Hidden in portrait via CSS. -->
 <div id="landscapeRightBuffer">
@@ -481,6 +510,7 @@
   </div>
   <button id="btnToggleMapOverlay" title="Toggle map">MAP</button>
   <button id="btnToggleHelpOverlay" title="How to play">?</button>
+  <button id="btnToggleDpad" title="Toggle on-screen D-pad">WASD</button>
 </div>
 <!-- Landscape-only: half-transparent ASCII map overlaid on the 3D view.
      Toggled visible via the MAP button. Hidden in portrait. -->
@@ -529,6 +559,14 @@
   <button id="btnSettingsClose" style="margin-top:8px;">Close</button>
 </div>
 <div id="game">
+  <!-- Landscape-only on-screen D-pad in the bottom-right of #game.
+       Hidden by default; toggled via the WASD button. -->
+  <div id="landscapeDpad" hidden>
+    <button class="dpadBtn dpadUp"    title="Forward">^</button>
+    <button class="dpadBtn dpadLeft"  title="Turn left">&lt;</button>
+    <button class="dpadBtn dpadRight" title="Turn right">&gt;</button>
+    <button class="dpadBtn dpadDown"  title="Backward">v</button>
+  </div>
   <!-- Held items: clipped against game viewport bottom so only the
        upper portion of the held sprite peeks up like a Doom-era HUD. -->
   <div class="hand left"><img src="sprites/item_torch.png" alt="torch" /></div>
@@ -2680,6 +2718,21 @@ function setHelpOverlayHidden(hide){
 }
 if(_btnToggleHelp) _btnToggleHelp.onclick = ()=> setHelpOverlayHidden(false);
 if(_btnHelpClose)  _btnHelpClose.onclick  = ()=> setHelpOverlayHidden(true);
+const _btnToggleDpad = document.getElementById('btnToggleDpad');
+if(_btnToggleDpad){
+  _btnToggleDpad.onclick = ()=> {
+    const dp = document.getElementById('landscapeDpad');
+    if(dp) dp.hidden = !dp.hidden;
+  };
+}
+const _dpUp    = document.querySelector('#landscapeDpad .dpadUp');
+const _dpDown  = document.querySelector('#landscapeDpad .dpadDown');
+const _dpLeft  = document.querySelector('#landscapeDpad .dpadLeft');
+const _dpRight = document.querySelector('#landscapeDpad .dpadRight');
+if(_dpUp)    _dpUp.onclick    = ()=> tryMoveForward();
+if(_dpDown)  _dpDown.onclick  = ()=> tryMoveBackward();
+if(_dpLeft)  _dpLeft.onclick  = ()=> rotate(-1);
+if(_dpRight) _dpRight.onclick = ()=> rotate(+1);
 // Refresh the overlay map on every UI tick if it's visible.
 const _origRefreshUIForLandscape = refreshUI;
 refreshUI = function(){
