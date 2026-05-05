@@ -98,6 +98,77 @@
                        padding:10px; box-sizing:border-box; z-index:50;
                        display:flex; flex-direction:column; gap:6px; }
   #inventoryOverlay[hidden] { display:none !important; }
+  /* ====== Landscape mode (triggered by aspect > 2:1) ======
+     800x400 logical layout. 3D view is 4:3 (533x400) anchored to the
+     right with a 50px buffer; left bar is the UI. */
+  #landscapeRightBuffer { display:none; }
+  #landscapeMapOverlay { display:none; }
+  body.landscape #wrap { width:800px; height:400px; }
+  body.landscape #game {
+    left:217px; top:0; width:533px; height:400px;
+  }
+  body.landscape #game canvas { width:533px; height:400px; }
+  body.landscape #ui {
+    left:0; top:0; width:217px; height:400px;
+    grid-template-rows: 1fr auto auto;
+    border-top:none; border-right:2px solid #0f0;
+  }
+  body.landscape #log,
+  body.landscape #roomDesc,
+  body.landscape #itemList,
+  body.landscape #discoveredMap,
+  body.landscape #playerArrowMarker,
+  body.landscape #compass,
+  body.landscape #topHud {
+    display:none !important;
+  }
+  body.landscape #movePanel { display:none; } /* movement via swipe in landscape */
+  body.landscape #landscapeRightBuffer {
+    display:flex; flex-direction:column; align-items:center;
+    justify-content:space-between; gap:8px; padding:6px 4px;
+    position:absolute; right:0; top:0; width:50px; height:400px;
+    background:rgba(0,0,0,0.55); border-left:1px solid #0a0;
+    color:#cfc; font-family:"VT323","Courier New",monospace;
+    box-sizing:border-box; z-index:6;
+  }
+  body.landscape #landscapeHp {
+    writing-mode:vertical-rl; transform:rotate(180deg);
+    font-size:16px; letter-spacing:1px; color:#fff;
+    text-shadow:0 0 4px #000;
+  }
+  body.landscape #landscapeHp.low { color:#ff3030; }
+  body.landscape #landscapeCompassMini {
+    width:34px; height:34px; position:relative;
+    border:1px solid #0a0; border-radius:50%;
+    background:rgba(0,0,0,0.5);
+  }
+  body.landscape #landscapeCompassMini .lscNeedle {
+    position:absolute; left:50%; top:50%;
+    width:0; height:0;
+    border-left:3px solid transparent; border-right:3px solid transparent;
+    border-bottom:14px solid #ff4444;
+    transform-origin:50% 100%;
+    transform:translate(-50%, -100%) rotate(0deg);
+    transition: transform .15s ease-out;
+    filter: drop-shadow(0 0 1px #f00);
+  }
+  body.landscape #btnToggleMapOverlay {
+    background:#020; color:#0f0; border:1px solid #0a0;
+    font-size:11px; padding:4px 4px; font-family:inherit;
+  }
+  body.landscape #landscapeMapOverlay {
+    display:block; position:absolute; left:217px; top:0;
+    width:533px; height:400px; pointer-events:none; z-index:7;
+    color:#cfc; font-family:'Courier New',monospace; font-size:14px;
+    line-height:1.0;
+    background:rgba(0,0,0,0.0);
+    overflow:hidden;
+  }
+  body.landscape #landscapeMapOverlay[hidden] { display:none !important; }
+  body.landscape #landscapeMapOverlay pre {
+    margin:0; padding:8px; opacity:0.5; color:#bff5b0;
+    text-shadow:0 0 4px #000;
+  }
   /* Hamburger settings button: top-left of the wrap, always present
      above all other UI (below only the start screen / death overlay). */
   #hamburgerBtn { position:absolute; top:6px; left:6px; z-index:90;
@@ -263,6 +334,19 @@
 <body>
 <div id="wrap">
 <button id="hamburgerBtn" title="Settings" aria-label="Settings">&#9776;</button>
+<!-- Landscape-only: 50px right buffer with vertical HP bar, mini compass,
+     and a map-toggle button. Hidden in portrait via CSS. -->
+<div id="landscapeRightBuffer">
+  <div id="landscapeHp">HP 20/20</div>
+  <div id="landscapeCompassMini">
+    <div class="lscRing"></div>
+    <div class="lscNeedle" id="landscapeNeedle"></div>
+  </div>
+  <button id="btnToggleMapOverlay" title="Toggle map">MAP</button>
+</div>
+<!-- Landscape-only: half-transparent ASCII map overlaid on the 3D view.
+     Toggled visible via the MAP button. Hidden in portrait. -->
+<div id="landscapeMapOverlay" hidden></div>
 <div id="settingsOverlay" hidden>
   <div id="settingsHeader">SETTINGS <span style="font-size:11px;opacity:.7;">(Close to dismiss)</span></div>
   <div class="settings-row">Music
@@ -1625,6 +1709,16 @@ function refreshUI(){
     hpEl.textContent = `HP ${p.hp}/${p.hpMax}`;
     hpEl.classList.toggle('low', p.hp < 6);
   }
+  const lscHpEl = document.getElementById('landscapeHp');
+  if(lscHpEl){
+    lscHpEl.textContent = `HP ${p.hp}/${p.hpMax}`;
+    lscHpEl.classList.toggle('low', p.hp < 6);
+  }
+  const lscNeedle = document.getElementById('landscapeNeedle');
+  if(lscNeedle){
+    const ldeg = [0,90,180,270][p.dir];
+    lscNeedle.style.transform = `translate(-50%,-100%) rotate(${ldeg}deg)`;
+  }
   // Compass: rotate red needle to point in player's facing dir.
   // CSS rotation: needle base points up (= North). N=0deg, E=90, S=180, W=270.
   const dirDeg = [0,90,180,270][p.dir];
@@ -2072,9 +2166,15 @@ function fitWrapToViewport(){
   const vv = window.visualViewport;
   const vw = vv ? vv.width  : window.innerWidth;
   const vh = vv ? vv.height : window.innerHeight;
-  const scale = Math.min(vw/400, vh/700);
+  // Landscape mode trigger: aspect ratio (width / height) > 2.0.
+  const isLandscape = (vw / vh) > 2.0;
+  document.body.classList.toggle('landscape', isLandscape);
+  const logicalW = isLandscape ? 800 : 400;
+  const logicalH = isLandscape ? 400 : 700;
+  el.style.width  = logicalW + 'px';
+  el.style.height = logicalH + 'px';
+  const scale = Math.min(vw/logicalW, vh/logicalH);
   el.style.transform = `scale(${scale})`;
-  // Lock body to the visible area so iOS doesn't expose dead space below.
   document.body.style.height = vh + 'px';
   document.body.style.width  = vw + 'px';
 }
@@ -2303,6 +2403,33 @@ initThree();
 newLevel(1);
 fitWrapToViewport();
 attachGameTouchHandlers();
+// Landscape map-overlay toggle wiring.
+let _landscapeMapVisible = false;
+function _renderLandscapeMapOverlay(){
+  const ov = document.getElementById('landscapeMapOverlay');
+  if(!ov) return;
+  if(!state.dungeon){ ov.innerHTML = ''; return; }
+  ov.innerHTML = `<pre>${buildDiscoveredLevelAsciiMap()}</pre>`;
+}
+function toggleLandscapeMapOverlay(){
+  const ov = document.getElementById('landscapeMapOverlay');
+  if(!ov) return;
+  _landscapeMapVisible = !_landscapeMapVisible;
+  if(_landscapeMapVisible){
+    _renderLandscapeMapOverlay();
+    ov.hidden = false;
+  } else {
+    ov.hidden = true;
+  }
+}
+const _btnToggleMap = document.getElementById('btnToggleMapOverlay');
+if(_btnToggleMap) _btnToggleMap.onclick = toggleLandscapeMapOverlay;
+// Refresh the overlay map on every UI tick if it's visible.
+const _origRefreshUIForLandscape = refreshUI;
+refreshUI = function(){
+  _origRefreshUIForLandscape();
+  if(_landscapeMapVisible) _renderLandscapeMapOverlay();
+};
 // Fire-and-forget: enemy chatter library loads on its own; phrases will
 // start appearing once the JSON arrives. No-op if it can't be fetched.
 loadAllEnemyPhraseLibraries();
