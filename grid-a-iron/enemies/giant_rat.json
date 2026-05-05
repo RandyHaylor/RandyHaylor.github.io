@@ -1,14 +1,14 @@
 {
   "name": "Giant Rat",
   "phrases": [
-    "Squeak squeak", "I want cheese.", "THIS IS MY TURF", "spreading plague here",
-    "Nibble nibble...", "my tail twitches", "Look at my BEADY eyes", "I'm gonna bite",
-    "this is my hiding spot", "i'm the rat king", "tiny but terrifying — believe me", "That's my crumb",
-    "I'll scurry in the dark.", "sniff sniff sniff", "my fur is SO fluffed up",
-    "my whiskers... they tickle", "claw claw claw!", "old cheese — my FAVORITE", "underground is where i belong",
-    "I'M PESTILENCE INCARNATE", "run run run", "i'm furious", "Fang flash",
+    "Squeak squeak", "I want cheese.", "THIS IS MY TURF", "Where's that cheese...",
+    "Nibble nibble...", "my tail itches", "You smell of plague", "I'm gonna bite",
+    "this is my hiding spot", "I'M the rat king", "i'm strong for my size", "That's my crumb",
+    "Oh no, another adventurer...", "sniff sniff sniff", "my fur is SO fluffed up",
+    "my whiskers... they tickle", "claw claw claw!", "old cheese — my FAVORITE", "easy brie-zy",
+    "I'M PESTILENCE INCARNATE", "run run run", "i'm furious", "somthing's caught in my teeth...",
     "that's MINE!", "so greedy...", "i'm the cellar lord", "my nose won't stop twitching",
-    "I'll eat your toes", "a disease vector, me", "the brown menace approaches"
+    "I'll eat your toes", "A disease vector, me?", "You're not so big"
   ],
   "movements": [
     "scurries", "sniffs", "bares fangs", "twitches whiskers",
