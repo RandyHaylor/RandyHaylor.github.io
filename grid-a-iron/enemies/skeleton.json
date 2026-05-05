@@ -1,12 +1,14 @@
 {
   "name": "Skeleton",
   "phrases": [
-    "My bones rattle...", "This grave is so cold.", "My duty is endless.", "I stand again!", "I sigh so hollow.",
-    "I once breathed air.", "My sockets are empty.", "Your turn comes soon.", "I've forgotten my name.", "My bones are brittle.",
-    "March, march, march.", "My lord called me.", "I keep eternal vigil.", "I forget what warmth is.", "This cold is eternal.",
-    "Click clack click!", "I have no fear left.", "I serve still.", "My soul is sealed away.", "Dust to dust.",
-    "Do my ribs ache? Yes.", "I have no lungs.", "I'm old, old, old.", "I'm the corpse king.", "My bones know all.",
-    "I have hollow hunger.", "Ash and dust.", "I crave nothing.", "I'm a cold guard.", "I'm death's pawn."
+    "my bones rattle", "This grave is so cold", "My duty is endless", "I STAND AGAIN",
+    "i sigh... so hollow", "I once breathed air", "my sockets — empty", "Your turn comes soon",
+    "I've forgotten my name.", "my bones are brittle", "march, march, march...", "My lord called me",
+    "i keep eternal vigil", "I forget what warmth is", "this cold is eternal", "CLICK CLACK CLICK",
+    "I have no fear left", "i serve still", "My soul is sealed away", "dust to dust",
+    "do my ribs ache? yes", "I have no lungs", "so old... ancient really", "I'M THE CORPSE KING",
+    "my bones know all", "I have hollow hunger", "ash and dust", "I crave nothing",
+    "cold guard, that's me", "death's pawn... always", "can't remember the sun"
   ],
   "movements": [
     "clatters", "bones grind", "creaks", "rattles",

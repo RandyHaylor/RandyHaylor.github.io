@@ -1,13 +1,14 @@
 {
   "name": "Bunny",
   "phrases": [
-    "Watch me hop!", "Sniff sniff!", "Got any carrots?", "I'm gonna nibble you!", "Twitch twitch!",
-    "Oof, I flopped!", "Don't step on me!", "Where's the lettuce hiding?", "Boop your nose!",
-    "I bite ankles, you know!", "Don't tell my mom!", "I'm small but deadly!", "I'm fast, I swear!",
-    "Too cute to kill, right?", "Wiggle wiggle!", "I'll dig a hole right here!", "These ears hear EVERYTHING!",
-    "Squeak! Squeak!", "BINKY!", "Thump thump thump!", "I'm cute AND fierce!",
-    "Munch munch crunch crunch!", "Pounce!", "Can't catch me!", "Nom nom nom!",
-    "Catch me if you can!", "You can't harm this fluffball!", "Here I go, zooming away!", "Look at my puffy tail!"
+    "Watch me hop.", "Sniff sniff sniff...", "Got any carrots", "I'm gonna nibble you!",
+    "...so twitchy today", "Oof, I flopped hard", "Don't step on me!", "Where's that lettuce",
+    "Boop your nose", "I bite ankles, you know", "Don't tell my mom", "SO SMALL BUT DEADLY",
+    "i'm fast — swear it", "Too cute to kill, right?", "Wiggle wiggle...", "gonna dig a hole here",
+    "These ears hear EVERYTHING", "BINKY!", "thump thump thump", "cute and fierce. period.",
+    "munch munch crunch crunch", "Pounce", "can't catch me!", "nom nom nom",
+    "Catch me if you can", "you can't harm this fluffball", "here i go zooming away", "look at my PUFFY tail",
+    "restless little paws", "did i eat already?", "my ears are itching"
   ],
   "movements": [
     "hops", "wiggles nose", "flicks ear", "thumps foot",

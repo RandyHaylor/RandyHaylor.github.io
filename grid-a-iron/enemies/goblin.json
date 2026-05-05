@@ -1,12 +1,14 @@
 {
   "name": "Goblin",
   "phrases": [
-    "You're so squishy, human!", "I'll get ya!", "Grog smash!", "That's MY loot!", "Your toes look tasty!",
-    "Look at my pointy teeth!", "My tribe rules!", "Get outta here!", "You're stupid, hero!", "Your skull's too soft!",
-    "Filthy elf!", "You're worm food!", "Everything's mine, MINE!", "Ratface!", "I'm the boogeyman!",
-    "I see you!", "Loot loot loot!", "So shiny, so pretty!", "Stab stab stab!", "I hate you!",
-    "Gimme gimme!", "The boss says I kill you!", "I'm a dungeon dweller!", "You're a garbage hero!", "I'm the cave king!",
-    "Tribe forever!", "I'm gonna spit on you!", "Snot rocket!", "You stink!", "I'm so hungry!"
+    "You're so squishy, human", "I'll get ya", "GROG SMASH", "That's MY loot",
+    "your toes look tasty", "Look at my pointy teeth.", "my tribe rules", "get outta here",
+    "you're stupid, hero", "your skull's too soft!", "Filthy elf", "you're worm food",
+    "everything's mine — MINE MINE MINE", "ratface", "I'M THE BOOGEYMAN", "i see you",
+    "loot loot loot...", "so shiny, so pretty", "stab stab stab", "I hate you",
+    "gimme gimme gimme", "The boss says I kill you", "I'm a dungeon dweller", "you're garbage",
+    "i'm the cave king", "tribe forever", "gonna spit on you", "snot rocket",
+    "you stink", "so hungry... always hungry", "need to eat something"
   ],
   "movements": [
     "snickers", "spits", "picks nose", "scratches butt",
