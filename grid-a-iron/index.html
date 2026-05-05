@@ -846,26 +846,16 @@ function makeLevel(level){
     c.items.push(choice(itemsPool));
   }
 
-  // Sprinkle enemies (not in player's start cell, not on stairs).
-  // Per ENEMY_PLAN.md — every level introduces a new tier and phases
-  // the weakest options out (minLevel..maxLevel inclusive).
-  // firstStrike: enemy gets a free attack the moment the player enters
-  // its cell.
-  const enemiesPool = [
-    {name:'Bunny',            hp:3,  atk:1,  minLevel:1,  maxLevel:4 },
-    {name:'Giant Rat',        hp:5,  atk:2,  minLevel:1,  maxLevel:5 },
-    {name:'Slime',            hp:6,  atk:2,  minLevel:1,  maxLevel:5 },
-    {name:'Goblin',           hp:8,  atk:3,  minLevel:1,  maxLevel:6 },
-    {name:'Skeleton',         hp:12, atk:4,  minLevel:2,  maxLevel:7 },
-    {name:'Floating Eyeball', hp:10, atk:4,  minLevel:3,  maxLevel:8,  firstStrike:true },
-    {name:'Cave Troll',       hp:22, atk:6,  minLevel:4,  maxLevel:9 },
-    {name:'Lich',             hp:30, atk:7,  minLevel:5,  maxLevel:10 },
-    {name:'Shadow Fiend',     hp:28, atk:8,  minLevel:6,  maxLevel:10 },
-    {name:'Vampire Bat',      hp:18, atk:7,  minLevel:7,  maxLevel:10 },
-    {name:'Evil Vendor',      hp:40, atk:9,  minLevel:8,  maxLevel:10, firstStrike:true },
-    {name:'Demon Lord',       hp:55, atk:11, minLevel:9,  maxLevel:10 },
-    {name:'Dragon',           hp:90, atk:14, minLevel:10, maxLevel:10, firstStrike:true },
-  ];
+  // Spawn pool comes from enemies/_pool.json, loaded async at startup
+  // by loadEnemyPoolFromJson(). See ENEMY_PLAN.md for the table and
+  // phasing rules. We fall back to a tiny safety pool only if the
+  // JSON hasn't loaded yet (first level can fire before fetch resolves).
+  const enemiesPool = (Array.isArray(window._enemySpawnPool) && window._enemySpawnPool.length)
+    ? window._enemySpawnPool
+    : [
+        {name:'Giant Rat', hp:5, atk:2, minLevel:1, maxLevel:99},
+        {name:'Goblin',    hp:8, atk:3, minLevel:1, maxLevel:99},
+      ];
   const eligibleEnemies = enemiesPool.filter(
     e => e.minLevel <= level && level <= (e.maxLevel || 99)
   );
@@ -1050,7 +1040,9 @@ const ENEMY_SPRITE_PATH = {
   'Floating Eyeball': 'sprites/enemy_floating_eyeball.png',
   'Shadow Fiend':     'sprites/enemy_shadow_fiend.png',
   'Vampire Bat':      'sprites/enemy_vampire_bat.png',
-  'Evil Vendor':      'sprites/enemy_evil_vendor.png',
+  // Evil Vendor reuses the friendly vendor sprite verbatim — runtime
+  // SpriteMaterial.color tint (below in the spawn code) darkens it.
+  'Evil Vendor':      'sprites/npc_vendor.png',
   'Demon Lord':       'sprites/enemy_demon_lord.png',
   'Dragon':           'sprites/enemy_dragon.png',
 };
@@ -1311,6 +1303,11 @@ function drawRoom(c, gx, gy){
     let eObj;
     if(path){
       eObj = makeBillboardSprite(path, 1.6);
+      // Evil Vendor: tint the friendly vendor sprite dark blue so it
+      // reads as a corrupted version of the merchant.
+      if(c.enemy.name === 'Evil Vendor' && eObj.material){
+        eObj.material.color = new THREE.Color(0x3a4080);
+      }
       eObj.position.set(ex, 0.85, ez);
     } else if(typeof ENEMY_SPRITE_FACTORY === 'object' && ENEMY_SPRITE_FACTORY[c.enemy.name]){
       // Canvas-built sprite for new enemies that ship no PNG.
@@ -3199,6 +3196,19 @@ refreshUI = function(){
 // Fire-and-forget: enemy chatter library loads on its own; phrases will
 // start appearing once the JSON arrives. No-op if it can't be fetched.
 loadAllEnemyPhraseLibraries();
+// Load the level-gated enemy spawn pool from enemies/_pool.json.
+window._enemySpawnPool = null;
+async function loadEnemyPoolFromJson(){
+  try {
+    const r = await fetch('enemies/_pool.json');
+    if(!r.ok) return;
+    const data = await r.json();
+    if(Array.isArray(data.enemies)){
+      window._enemySpawnPool = data.enemies;
+    }
+  } catch(_){}
+}
+loadEnemyPoolFromJson();
 function tickAnimation(now){
   const a = state.anim;
   if(!a) return;
