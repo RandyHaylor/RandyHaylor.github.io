@@ -2194,13 +2194,19 @@ function fitWrapToViewport(){
     el.style.transform = 'none';
     document.body.style.height = vh + 'px';
     document.body.style.width  = vw + 'px';
+    // Layout from RIGHT to LEFT, all dynamically derived from vh:
+    //   [edge gap] [left panel] [side gap] [3D 4:3] [side gap]
+    //   [right buffer] [edge gap]
     const gameH = vh;
     const gameW = Math.floor(vh * 4 / 3);
     const rightBufferW = 100;
-    const sideGap = 50;
-    const gameRight = vw - rightBufferW - sideGap;
+    const sideGap      = 50;   // gap on each side of the 3D view
+    const edgeBuffer   = 50;   // empty space against the viewport edges
+    const rightBufferLeft = vw - edgeBuffer - rightBufferW;
+    const gameRight = rightBufferLeft - sideGap;
     const gameLeft  = gameRight - gameW;
-    const leftPanelW = Math.max(0, gameLeft - sideGap);
+    const leftPanelLeft = edgeBuffer;
+    const leftPanelW    = Math.max(0, gameLeft - sideGap - leftPanelLeft);
     const game = document.getElementById('game');
     if(game){
       game.style.left = gameLeft + 'px';
@@ -2210,14 +2216,14 @@ function fitWrapToViewport(){
     }
     const ui = document.getElementById('ui');
     if(ui){
-      ui.style.left = '0px';
+      ui.style.left = leftPanelLeft + 'px';
       ui.style.top = '0px';
       ui.style.width = leftPanelW + 'px';
       ui.style.height = vh + 'px';
     }
     const buf = document.getElementById('landscapeRightBuffer');
     if(buf){
-      buf.style.right = '0px';
+      buf.style.right = edgeBuffer + 'px';
       buf.style.top = '0px';
       buf.style.width = rightBufferW + 'px';
       buf.style.height = vh + 'px';
