@@ -209,13 +209,13 @@
   /* HP block is multi-line stacked text, not a 40x40 icon. Constrain
      only the actual icons (compass + buttons). */
   body.landscape #landscapeRightBuffer > *:not(#landscapeHp) {
-    width:40px; height:40px; max-width:40px; max-height:40px;
-    box-sizing:border-box; flex:0 0 40px;
+    width:32px; height:32px; max-width:32px; max-height:32px;
+    box-sizing:border-box; flex:0 0 32px;
     display:flex; align-items:center; justify-content:center;
     flex-direction:column;
   }
   body.landscape #landscapeRightBuffer #landscapeHp { width:auto; }
-  body.landscape #landscapeCompassMini { width:40px; height:40px; }
+  body.landscape #landscapeCompassMini { width:32px; height:32px; }
   /* HP stacked block: label / current / "/" / max — no rotation. */
   body.landscape #landscapeHp {
     display:flex; flex-direction:column; align-items:center;
@@ -246,8 +246,8 @@
   body.landscape #btnToggleHelpOverlay,
   body.landscape #btnToggleDpad {
     background:#020; color:#0f0; border:1px solid #0a0;
-    font-size:14px; padding:0; font-family:inherit;
-    width:40px; height:40px; min-width:40px;
+    font-size:12px; padding:0; font-family:inherit;
+    width:32px; height:32px; min-width:32px;
     line-height:1;
   }
   /* Help (?) toggle button must sit above the help overlay so it can
@@ -367,11 +367,11 @@
   /* Hamburger sits at the top of the 80px icon column, square 40x40
      centered horizontally to match the other 40x40 icons below. */
   body.landscape #hamburgerBtn {
-    position:absolute; top:0; right:20px; left:auto;
-    width:40px; height:40px; padding:0; line-height:1;
+    position:absolute; top:0; right:24px; left:auto;
+    width:32px; height:32px; padding:0; line-height:1;
     text-align:center; box-sizing:border-box;
     background:#000; border-color:#0a0;
-    font-size:18px;
+    font-size:16px;
     display:flex; align-items:center; justify-content:center;
     z-index:200;
   }
@@ -2629,6 +2629,9 @@ function initAudioGraphIfNeeded(){
   // existed, _audioMuted is true but the gain nodes are at the
   // remembered volumes. Reapply now so init respects mute state.
   if(typeof setAudioMuted === 'function') setAudioMuted(_audioMuted);
+  // Predecode every SFX so playSfx can play instantly on iOS
+  // regardless of user-gesture timing.
+  if(typeof preloadAllSfxBuffers === 'function') preloadAllSfxBuffers();
 }
 
 function pickRandomMusicTrack(){
@@ -2739,25 +2742,65 @@ function fadeOutMusicThenPlayDeathSting(){
   };
   tick();
 }
+// SFX now go through pre-decoded AudioBuffers played via
+// AudioBufferSourceNode. iOS Safari refuses to play new Audio()
+// elements unless created inside the user-gesture chain, which
+// breaks footstep / damage / pickup sounds fired from animation
+// callbacks. Decoded buffers + BufferSource sidesteps that — once
+// the AudioContext is unlocked via a user gesture, all later sources
+// connected to it play freely.
+const _sfxBufferCache = {}; // path -> AudioBuffer (decoded)
+const _sfxFetchInFlight = {}; // path -> Promise (avoid duplicate fetches)
+function _fetchAndDecodeSfxBuffer(path){
+  if(_sfxBufferCache[path]) return Promise.resolve(_sfxBufferCache[path]);
+  if(_sfxFetchInFlight[path]) return _sfxFetchInFlight[path];
+  if(!audioCtx) return Promise.reject(new Error('audioCtx not ready'));
+  const p = fetch(path)
+    .then(r => r.arrayBuffer())
+    .then(buf => new Promise((resolve, reject) => {
+      audioCtx.decodeAudioData(buf, resolve, reject);
+    }))
+    .then(decoded => { _sfxBufferCache[path] = decoded; delete _sfxFetchInFlight[path]; return decoded; })
+    .catch(err => { delete _sfxFetchInFlight[path]; throw err; });
+  _sfxFetchInFlight[path] = p;
+  return p;
+}
+function preloadAllSfxBuffers(){
+  if(!audioCtx) return;
+  for(const cat in SFX_BANK){
+    for(const path of SFX_BANK[cat]){
+      _fetchAndDecodeSfxBuffer(path).catch(()=>{});
+    }
+  }
+}
 function playSfx(category){
   if(!audioStarted) return;
   const list = SFX_BANK[category];
   if(!list || !list.length) return;
   const path = list[Math.floor(Math.random()*list.length)];
+  // Web Audio path (preferred — works on iOS regardless of gesture
+  // chain because the BufferSource is started programmatically on a
+  // long-lived already-unlocked context).
+  if(audioCtx && sfxGainNode){
+    const buf = _sfxBufferCache[path];
+    if(buf){
+      try {
+        const src = audioCtx.createBufferSource();
+        src.buffer = buf;
+        src.connect(sfxGainNode);
+        src.start(0);
+      } catch(_){}
+      return;
+    }
+    // Buffer not yet decoded — kick off decode for next time and
+    // fall through to the HTMLAudio fallback so this attempt still
+    // makes a sound when it can.
+    _fetchAndDecodeSfxBuffer(path).catch(()=>{});
+  }
   try {
     const a = new Audio(path);
     a.crossOrigin = 'anonymous';
-    if(audioCtx && sfxGainNode){
-      a.volume = 1;
-      try {
-        const src = audioCtx.createMediaElementSource(a);
-        src.connect(sfxGainNode);
-      } catch(_){
-        a.volume = audioSfxVolume;
-      }
-    } else {
-      a.volume = audioSfxVolume;
-    }
+    a.volume = audioSfxVolume;
     a.play().catch(()=>{});
   } catch(_){}
 }
