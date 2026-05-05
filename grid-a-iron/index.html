@@ -196,7 +196,7 @@
     width:80px; height:100%;
     background:rgba(0,0,0,0.55); border-left:1px solid #0a0;
     color:#cfc; font-family:"VT323","Courier New",monospace;
-    box-sizing:border-box; z-index:6;
+    box-sizing:border-box; z-index:150;
   }
   /* All children share a uniform width matching the compass (48px) so
      no item is wider than another. */
@@ -238,6 +238,9 @@
     font-size:11px; padding:4px 0; font-family:inherit;
     width:48px; min-width:48px;
   }
+  /* Help (?) toggle button must sit above the help overlay so it can
+     close the overlay (which now uses ? as its toggle, no Close btn). */
+  body.landscape #btnToggleHelpOverlay { position:relative; z-index:150; }
   #btnToggleHelpOverlay, #btnToggleDpad { display:none; }
   body.landscape #btnToggleHelpOverlay,
   body.landscape #btnToggleDpad { display:inline-block; }
@@ -314,12 +317,8 @@
     padding:4px 8px; font-size:14px; color:#cfc;
     text-align:center; line-height:1.1;
   }
-  #btnHelpClose {
-    position:absolute; left:24px; bottom:24px;
-    font-size:18px; padding:6px 18px;
-    background:#020; color:#0f0; border:1px solid #0a0;
-    font-family:inherit;
-  }
+  /* Close button hidden — ? toggle button doubles as the close. */
+  #btnHelpClose { display:none; }
   body.landscape #landscapeMapOverlay {
     display:block; position:relative; left:auto; top:auto;
     grid-column: 2; grid-row: 1;
@@ -891,9 +890,17 @@ function initThree(){
   // 3D viewport: 4:3 (400x300), top of the layout — same on every device.
   const VIEW_W = 400, VIEW_H = 300;
   camera = new THREE.PerspectiveCamera(75, VIEW_W/VIEW_H, 0.05, 50);
-  renderer = new THREE.WebGLRenderer({ antialias:false });
+  renderer = new THREE.WebGLRenderer({
+    antialias:false,
+    powerPreference: 'high-performance',
+    precision: 'lowp',
+    stencil: false,
+    alpha: false,
+    depth: true,
+  });
   renderer.setPixelRatio(1);
   renderer.setSize(VIEW_W, VIEW_H);
+  renderer.shadowMap.enabled = false;
   // Use physically-correct light units (not legacy). With this set,
   // PointLight intensity is in lumens-style values and decay=2 gives
   // a real inverse-square falloff. We keep this on so behavior matches
@@ -901,22 +908,17 @@ function initThree(){
   renderer.useLegacyLights = false;
   document.getElementById('game').appendChild(renderer.domElement);
 
-  // Ambient light disabled — only the omnidirectional torch point
-  // light contributes illumination. Unlit pixels render pure black.
-  const amb = new THREE.AmbientLight(0xffeedd, 0);
-  amb.name = 'ambient';
-  scene.add(amb);
-  // Omnidirectional point light. Intensity / distance / decay are
-  // adjusted live by applyTorchLightingEffects.
+  // ONLY ONE LIGHT in the scene: a single PointLight (the torch).
+  // Previously there was also an AmbientLight at intensity 0 which the
+  // shader still counts toward the lighting cost. Removed for perf;
+  // applyTorchLightingEffects already guards `if(ambLight)`.
   const torch = new THREE.PointLight(0xffaa66, 60, CELL*4, 2);
   torch.name='torch';
   scene.add(torch);
   // VISIBLE flame marker — a small unlit emissive sphere that follows
-  // torch.position every frame, so you can SEE exactly where the
-  // omnidirectional point light source is in the scene. Equivalent to
-  // a PointLightHelper but uses MeshBasicMaterial so it's pure color
-  // (not affected by lighting itself, always visible).
-  const flameMarkerGeom = new THREE.SphereGeometry(0.18, 10, 10);
+  // torch.position every frame. Pure color (MeshBasicMaterial, not
+  // lit). Reduced from 10x10 to 6x6 segments for perf.
+  const flameMarkerGeom = new THREE.SphereGeometry(0.18, 6, 6);
   const flameMarkerMat  = new THREE.MeshBasicMaterial({ color: 0xffcc66 });
   const flameMarker     = new THREE.Mesh(flameMarkerGeom, flameMarkerMat);
   flameMarker.name = 'torchFlameMarker';
@@ -2756,7 +2758,11 @@ function setHelpOverlayHidden(hide){
   const ov = document.getElementById('helpOverlay');
   if(ov) ov.hidden = !!hide;
 }
-if(_btnToggleHelp) _btnToggleHelp.onclick = ()=> setHelpOverlayHidden(false);
+if(_btnToggleHelp) _btnToggleHelp.onclick = (e)=>{
+  e.stopPropagation();
+  const ov = document.getElementById('helpOverlay');
+  if(ov) ov.hidden = !ov.hidden;
+};
 if(_btnHelpClose)  _btnHelpClose.onclick  = ()=> setHelpOverlayHidden(true);
 const _btnToggleDpad = document.getElementById('btnToggleDpad');
 if(_btnToggleDpad){
