@@ -109,7 +109,7 @@
   body.preparingWinSequence #landscapeDpad,
   body.preparingWinSequence #landscapeMapOverlay,
   body.preparingWinSequence #movePanel {
-    transition: opacity 1500ms linear;
+    transition: opacity 1200ms linear;
     opacity: 0;
   }
   /* Damage flash: full red veil over the 3D viewport, fades out fast. */
@@ -1791,6 +1791,7 @@ function toggleDoor(){
 }
 
 const FINAL_LEVEL = 10;
+const GUI_AND_MUSIC_FADE_MS = 1200; // post-stair-fade dim of GUI + bgm
 function descendStairs(){
   const c = cellAt(state.player.x, state.player.y);
   if(!c.stairs){ log("No stairs here."); return; }
@@ -1809,18 +1810,14 @@ function descendStairs(){
   // black-screen can be exercised from a real gameplay action.
   const isFinalDescent = (state.level >= FINAL_LEVEL)
                        || _isTestModeActive();
-  if(isFinalDescent){
-    // Fade play GUI containers to opacity 0 across the descend window
-    // (CSS rule below body.preparingWinSequence handles it) and start
-    // a synchronized music fade so the soundtrack settles before the
-    // typewriter begins.
-    document.body.classList.add('preparingWinSequence');
-    fadeOutBackgroundMusicForWinSequence(1500);
-  }
   setTimeout(()=>{
     if(isFinalDescent){
-      // End of dungeon: screen stays black, win sequence takes over.
-      beginWinSequence();
+      // Stair fade has completed (1.5s of darkening). Now fade the
+      // GUI + music to silence over GUI_AND_MUSIC_FADE_MS, then start
+      // the typewriter.
+      document.body.classList.add('preparingWinSequence');
+      fadeOutBackgroundMusicForWinSequence(GUI_AND_MUSIC_FADE_MS);
+      setTimeout(beginWinSequence, GUI_AND_MUSIC_FADE_MS);
       // _descending intentionally stays true — no further descents.
       return;
     }
