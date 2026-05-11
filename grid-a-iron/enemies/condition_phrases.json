@@ -1,0 +1,55 @@
+{
+  "_doc": "Phrases shown in the combat panel in place of enemy HP numbers. Each bracket below has 5 species-agnostic options (no blood / no bones / no breath references) so they read for any enemy. One option per bracket is comedic per spec. minHpFraction is inclusive; runtime walks the array top-down and picks the first matching bracket. Random choice per enemy is cached on the enemy object so the phrase stays stable while the enemy is in that bracket.",
+  "brackets": [
+    {
+      "minHpFraction": 0.8,
+      "phrases": [
+        "A few scrapes — barely fazed.",
+        "Looks mildly inconvenienced.",
+        "Eyeing the exits but not yet worried.",
+        "Pretty sure it can take a couple more like that.",
+        "Reminds itself it has a dental plan."
+      ]
+    },
+    {
+      "minHpFraction": 0.6,
+      "phrases": [
+        "Visibly roughed up now.",
+        "Has dropped its smug grin.",
+        "Doing the math and not liking the answer.",
+        "No longer holding back.",
+        "Wishing it had called in sick today."
+      ]
+    },
+    {
+      "minHpFraction": 0.4,
+      "phrases": [
+        "Starting to regret coming to work today.",
+        "Visibly worse for wear.",
+        "Stance has gotten a lot more defensive.",
+        "Has stopped trash-talking entirely.",
+        "Updating its will in its head."
+      ]
+    },
+    {
+      "minHpFraction": 0.2,
+      "phrases": [
+        "In rough shape and slowing down.",
+        "Drawing on the last of its reserves.",
+        "Wobbling on every step.",
+        "Mostly held together by spite at this point.",
+        "Quietly composing a strongly-worded review of you."
+      ]
+    },
+    {
+      "minHpFraction": 0.0,
+      "phrases": [
+        "On its last legs — one good hit away from oblivion.",
+        "Fading fast. Barely upright.",
+        "Whatever animates it is almost out.",
+        "About to file its final retirement papers.",
+        "Hanging on by sheer stubbornness."
+      ]
+    }
+  ]
+}

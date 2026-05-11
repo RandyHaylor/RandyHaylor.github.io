@@ -2088,22 +2088,30 @@ function triggerAttackSwingAnimation(){
 }
 
 // HP-bracket descriptions used in place of the bare HP number in
-// the combat panel. Phrases are intentionally species-agnostic — no
-// blood (skeletons are dry), no bones (slimes have none), no breath
-// (constructs / undead) — so the same line reads correctly for any
-// enemy in the pool. Brackets go top-down; the 100% (full HP) case
-// returns null so the panel shows just 'In combat with X.' on the
-// first turn before any damage has been dealt. Two of the five
-// lines lean comedic per spec.
+// the combat panel. Brackets and 5-phrase arrays come from
+// enemies/condition_phrases.json (loaded at startup). For each
+// enemy + bracket the runtime picks ONE phrase at random and
+// caches it on the enemy as conditionPhraseByBracketIndex so the
+// message doesn't flicker every refreshUI.
 function describeEnemyConditionByHpFraction(enemy){
   if(!enemy || typeof enemy.hp !== 'number' || typeof enemy.hpMax !== 'number') return null;
+  const brackets = window._enemyConditionPhraseBrackets;
+  if(!brackets) return null;
   const hpFraction = enemy.hpMax > 0 ? (enemy.hp / enemy.hpMax) : 0;
   if(hpFraction >= 1.0) return null; // 100% — no message yet
-  if(hpFraction >= 0.8) return 'A few scrapes — barely fazed.';
-  if(hpFraction >= 0.6) return 'Visibly roughed up now.';                  // funny-ish
-  if(hpFraction >= 0.4) return 'Starting to regret coming to work today.'; // funny
-  if(hpFraction >= 0.2) return 'In rough shape and slowing down.';
-  return 'On its last legs — one good hit away from oblivion.';
+  let chosenBracketIndex = -1;
+  for(let i=0; i<brackets.length; i++){
+    if(hpFraction >= brackets[i].minHpFraction){ chosenBracketIndex = i; break; }
+  }
+  if(chosenBracketIndex < 0) chosenBracketIndex = brackets.length - 1;
+  if(!enemy.conditionPhraseByBracketIndex) enemy.conditionPhraseByBracketIndex = {};
+  let phrase = enemy.conditionPhraseByBracketIndex[chosenBracketIndex];
+  if(!phrase){
+    const phrases = brackets[chosenBracketIndex].phrases;
+    phrase = phrases[ri(phrases.length)];
+    enemy.conditionPhraseByBracketIndex[chosenBracketIndex] = phrase;
+  }
+  return phrase;
 }
 function combatAttack(){
   if(state.dead) return;
@@ -3484,6 +3492,7 @@ async function runMainStartup(){
   await Promise.all([
     loadEnemyPoolFromJson(),
     loadAllEnemyPhraseLibraries(),
+    loadEnemyConditionPhrasesFromJson(),
   ]);
   initThree();
   newLevel(1);
@@ -3656,6 +3665,26 @@ refreshUI = function(){
   if(_landscapeMapVisible) _renderLandscapeMapOverlay();
 };
 // Load the level-gated enemy spawn pool from enemies/pool.json.
+window._enemyConditionPhraseBrackets = null;
+async function loadEnemyConditionPhrasesFromJson(){
+  const r = await fetch('enemies/condition_phrases.json');
+  if(!r.ok){
+    throw new Error(`Required condition phrases missing: enemies/condition_phrases.json — HTTP ${r.status}`);
+  }
+  const data = await r.json();
+  if(!Array.isArray(data.brackets) || data.brackets.length === 0){
+    throw new Error('Required condition phrases malformed: brackets must be a non-empty array');
+  }
+  for(const bracket of data.brackets){
+    if(typeof bracket.minHpFraction !== 'number'
+       || !Array.isArray(bracket.phrases) || bracket.phrases.length === 0){
+      throw new Error('Required condition phrases malformed: each bracket needs minHpFraction + non-empty phrases array');
+    }
+  }
+  // Defensive sort so runtime can rely on descending fraction order.
+  data.brackets.sort((a, b) => b.minHpFraction - a.minHpFraction);
+  window._enemyConditionPhraseBrackets = data.brackets;
+}
 window._enemySpawnPool = null;
 async function loadEnemyPoolFromJson(){
   const r = await fetch('enemies/pool.json');
