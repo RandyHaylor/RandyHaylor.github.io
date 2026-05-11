@@ -3101,6 +3101,55 @@ document.getElementById('btnSettingsClose').onclick = closeSettingsOverlay;
 // -------- main --------
 initThree();
 newLevel(1);
+// Dev/test cheat mode: ?test=1 in the URL gives Diamond gear + 100
+// Healing Herbs, forces ALL enemy types from the pool onto the first
+// floor (one of each, ignoring level gates). For sandbox testing.
+function _isTestModeActive(){
+  try { return new URLSearchParams(location.search).get('test') === '1'; }
+  catch(_){ return false; }
+}
+function _applyTestModeCheats(){
+  if(!_isTestModeActive()) return;
+  state.player.weapon = { name:'Diamond Sword',  atk: (typeof WEAPON_STATS === 'object' ? WEAPON_STATS['Diamond Sword'] : 10) };
+  state.player.shield = { name:'Diamond Shield', dr:  (typeof SHIELD_STATS === 'object' ? SHIELD_STATS['Diamond Shield'] : 4) };
+  // 100 herbs.
+  state.player.inv = [];
+  for(let i=0;i<100;i++) state.player.inv.push('Healing Herb');
+  state.player.torchCharges = 80;
+  // Drop one of every pool entry into a free random cell on the
+  // current level (ignores minLevel/maxLevel). Skip cells with stairs,
+  // existing enemies, or the player's start cell.
+  const pool = (Array.isArray(window._enemySpawnPool) && window._enemySpawnPool.length)
+    ? window._enemySpawnPool : [];
+  const d = state.dungeon;
+  if(!d) return;
+  for(const t of pool){
+    for(let attempt=0; attempt<60; attempt++){
+      const ex = Math.floor(Math.random()*d.W_);
+      const ey = Math.floor(Math.random()*d.H_);
+      if(ex === state.player.x && ey === state.player.y) continue;
+      const c = cellAt(ex, ey);
+      if(!c || c.enemy || c.stairs) continue;
+      c.enemy = { ...t, hpMax: t.hp };
+      break;
+    }
+  }
+  // Re-render and refresh after mutating cells.
+  if(typeof renderVisibleRooms === 'function') renderVisibleRooms();
+  if(typeof refreshUI === 'function') refreshUI();
+}
+// Pool JSON is fetched async; wait for it before applying the
+// force-spawn cheat. Poll briefly.
+function _waitForPoolThenApplyTestCheats(triesLeft){
+  if(!_isTestModeActive()) return;
+  if(Array.isArray(window._enemySpawnPool) && window._enemySpawnPool.length){
+    _applyTestModeCheats();
+    return;
+  }
+  if(triesLeft <= 0){ _applyTestModeCheats(); return; }
+  setTimeout(()=> _waitForPoolThenApplyTestCheats(triesLeft - 1), 100);
+}
+_waitForPoolThenApplyTestCheats(40);
 fitWrapToViewport();
 attachGameTouchHandlers();
 // Landscape map-overlay toggle wiring.
