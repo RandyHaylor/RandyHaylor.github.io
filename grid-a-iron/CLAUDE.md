@@ -12,6 +12,8 @@ Before reading `index.html` end-to-end, skim the `design-docs/` folder:
   — spawn pool, 3-pass spawn algorithm, current roster, how to add one.
 - [design-docs/user-interface.md](design-docs/user-interface.md)
   — portrait vs landscape layout, overlays, input map.
+- [design-docs/refactor-guidance.md](design-docs/refactor-guidance.md)
+  — iterative engine-vs-content / core-vs-UI extraction plan.
 
 [ENEMY_PLAN.md](ENEMY_PLAN.md) is older but still useful context for
 the lvl 1–10 ramp design.

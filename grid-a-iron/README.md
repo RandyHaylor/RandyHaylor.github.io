@@ -135,5 +135,6 @@ oriented before reading code:
 - [design-docs/game-rules.md](design-docs/game-rules.md)
 - [design-docs/enemies.md](design-docs/enemies.md)
 - [design-docs/user-interface.md](design-docs/user-interface.md)
+- [design-docs/refactor-guidance.md](design-docs/refactor-guidance.md)
 
 These are intentionally brief — the code is the source of truth.
