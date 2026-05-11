@@ -3150,11 +3150,11 @@ function _showStartupFailureBanner(err){
   banner.textContent = '[gridiron] startup failed: ' + msg;
   document.body.appendChild(banner);
 }
-// runMainStartup() is invoked at the very bottom of this script — see
-// the call just before the closing </script>. It needs every top-level
-// `const` (ENEMY_PHRASE_FILE, NPC_PHRASE_FILE, etc.) to have been
-// initialized first, so the invocation belongs at the end of the file,
-// not inline here next to the function definition.
+// runMainStartup() is invoked at the very bottom of this script (see
+// the call just before the closing script tag). It needs every
+// top-level const (ENEMY_PHRASE_FILE, NPC_PHRASE_FILE, etc.) to have
+// been initialized first, so the invocation belongs at the end of the
+// file, not inline here next to the function definition.
 // Landscape map-overlay toggle wiring.
 let _landscapeMapVisible = false;
 function _renderLandscapeMapOverlay(){
