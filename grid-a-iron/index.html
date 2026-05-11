@@ -59,7 +59,7 @@
   /* Win-sequence typewriter overlay: layers above descendFade,
      pure black with center-aligned white text. */
   #winSequenceOverlay { position:fixed; inset:0; z-index:500;
-                         background:#000; color:#f4f4f4;
+                         background:#000; color:#e6e2d6;
                          display:flex; flex-direction:column;
                          align-items:center; justify-content:center;
                          padding:32px; box-sizing:border-box;
@@ -89,7 +89,10 @@
   body.winSequence #deathOverlay,
   body.winSequence #startScreen,
   body.winSequence #topHud,
-  body.winSequence #movePanel { display:none !important; }
+  body.winSequence #movePanel,
+  body.winSequence #compass,
+  body.winSequence #roomPanel,
+  body.winSequence #combatPanel { display:none !important; }
   /* Damage flash: full red veil over the 3D viewport, fades out fast. */
   #hitFlash { position:absolute; inset:0; background:rgba(220,30,30,0.55);
               pointer-events:none; opacity:0; z-index:8; }
@@ -690,13 +693,6 @@
   <div id="hitFlash"></div>
   <!-- Black descend-stairs fade. -->
   <div id="descendFade"></div>
-  <!-- Win sequence: black-screen typewriter shown after final descend
-       (or via ?test=2). The descend fade stays at opacity 1; this div
-       layers above it so the white text is legible. -->
-  <div id="winSequenceOverlay" hidden>
-    <p id="winSequenceText"></p>
-    <button id="btnWinSequencePlayAgain" hidden type="button">Slumber and dream again&hellip;</button>
-  </div>
   <!-- Big red damage number when the player gets hit. -->
   <div id="playerDamageNum"></div>
   <!-- Radial vignette: shown only when torch is out, gives a fuzzy
@@ -707,6 +703,14 @@
     <span id="topHudLvl">Lv 1</span>
     <span id="topHudHp">HP 20/20</span>
   </div>
+</div>
+<!-- Win sequence overlay: full-viewport black with center typewriter
+     text. Lives at the top level of #wrap so it stays painted even
+     when individual play UI containers are display:none'd via
+     body.winSequence. -->
+<div id="winSequenceOverlay" hidden>
+  <p id="winSequenceText"></p>
+  <button id="btnWinSequencePlayAgain" hidden type="button">Slumber and dream again&hellip;</button>
 </div>
 <div id="compass">
   <div id="compassRose">
