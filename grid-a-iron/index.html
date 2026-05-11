@@ -10,7 +10,7 @@
      the 8086-era PC text-mode look. Already referenced in the CSS stack. -->
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=VT323&display=swap" />
 <style>
-  html,body { margin:0; padding:0; background:#111; color:#0f0;
+  html,body { margin:0; padding:0; background:#000; color:#0f0;
               font-family: "VT323","Courier New",monospace; overflow:hidden;
               overscroll-behavior:none; touch-action:manipulation;
               display:flex; justify-content:center; align-items:flex-start;
@@ -23,7 +23,6 @@
      and doesn't shave 2px off the inner content area, which previously
      made the canvas overlap the right-side border. */
   #wrap { width:400px; height:700px; position:relative; background:#000;
-          outline:1px solid #0a0;
           transform-origin: top left; }
   /* 3D area: 4:3 (400x300) at top, UI takes the remaining 400px below. */
   #game { position:absolute; left:0; top:0; width:400px; height:300px; overflow:hidden; }
@@ -707,14 +706,6 @@
     <span id="topHudLvl">Lv 1</span>
     <span id="topHudHp">HP 20/20</span>
   </div>
-</div>
-<!-- Win sequence overlay: full-viewport black with center typewriter
-     text. Lives at the top level of #wrap so it stays painted even
-     when individual play UI containers are display:none'd via
-     body.winSequence. -->
-<div id="winSequenceOverlay" hidden>
-  <p id="winSequenceText"></p>
-  <button id="btnWinSequencePlayAgain" hidden type="button">Slumber and dream again&hellip;</button>
 </div>
 <div id="compass">
   <div id="compassRose">
@@ -1788,7 +1779,7 @@ function descendStairs(){
 }
 
 // ---- win sequence ----
-const WIN_SEQUENCE_TEXT = "You awake as if from a dream, yet all you see is darkness. You begin to remember that sight is merely a mental construct, which your species abandoned long ago. Shaking off the disturbing mammalian dreams you resume your pacing through the halls of the eternal shrine, forever at peace...";
+const WIN_SEQUENCE_TEXT = "You awake as if from a dream, yet all you see is darkness. You begin to remember that sight is merely a mental construct, which your species abandoned long ago. Shaking off the disturbing mammalian dreams, you resume your pacing through the halls of the eternal shrine, forever at peace...";
 function beginWinSequence(){
   document.body.classList.add('winSequence');
   // Force fade to fully black if not already.
@@ -4070,5 +4061,15 @@ runMainStartup().catch(err => {
   throw err;
 });
 </script>
+<!-- Win sequence overlay: direct child of <body> so it is NOT inside
+     the CSS-transformed #wrap. A position:fixed descendant of a
+     transformed ancestor is positioned relative to that ancestor,
+     not the viewport, which made the overlay shrink with the
+     scaled wrap and let the body background show on the right /
+     bottom edges. -->
+<div id="winSequenceOverlay" hidden>
+  <p id="winSequenceText"></p>
+  <button id="btnWinSequencePlayAgain" hidden type="button">Slumber and dream again&hellip;</button>
+</div>
 </body>
 </html>
