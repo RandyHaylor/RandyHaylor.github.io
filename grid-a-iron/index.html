@@ -3150,10 +3150,17 @@ function _showStartupFailureBanner(err){
   banner.textContent = '[gridiron] startup failed: ' + msg;
   document.body.appendChild(banner);
 }
-runMainStartup().catch(err => {
-  console.error('[gridiron] startup failed', err);
-  _showStartupFailureBanner(err);
-  throw err;
+// Defer to a microtask: top-level `const`s for ENEMY_PHRASE_FILE,
+// NPC_PHRASE_FILE etc are declared further down in this script and
+// would be in the TDZ if runMainStartup() ran synchronously here.
+// Microtasks fire after the entire script's top-level sync execution
+// completes, by which point all those consts are initialized.
+queueMicrotask(() => {
+  runMainStartup().catch(err => {
+    console.error('[gridiron] startup failed', err);
+    _showStartupFailureBanner(err);
+    throw err;
+  });
 });
 // Landscape map-overlay toggle wiring.
 let _landscapeMapVisible = false;
