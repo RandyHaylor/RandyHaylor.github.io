@@ -120,6 +120,16 @@
     100% { opacity:0; }
   }
   #hitFlash.active { animation: hitFlashKf 360ms ease-out; }
+  /* Low-HP danger vignette: a soft red radial gradient overlay that
+     darkens the edges of the 3D viewport. Opacity is driven by JS
+     from refreshUI() — proportional to how far HP has dropped below
+     LOW_HP_VIGNETTE_THRESHOLD (10). */
+  #lowHpVignette { position:absolute; inset:0; pointer-events:none;
+                    background: radial-gradient(ellipse at center,
+                                rgba(180,0,0,0) 35%,
+                                rgba(180,0,0,0.55) 75%,
+                                rgba(120,0,0,0.85) 100%);
+                    opacity:0; z-index:7; transition:opacity 220ms linear; }
   /* Big red damage number on player hit. */
   #playerDamageNum { position:absolute; left:0; right:0; top:30%;
                      text-align:center; font-size:84px; font-weight:bold;
@@ -710,6 +720,7 @@
   <div class="hand right" id="rightHand" hidden><img src="sprites/item_rusty_sword.png" alt="weapon" /></div>
   <!-- Red flash overlay: pulsed when an enemy hit lands. -->
   <div id="hitFlash"></div>
+  <div id="lowHpVignette"></div>
   <!-- Black descend-stairs fade. -->
   <div id="descendFade"></div>
   <!-- Big red damage number when the player gets hit. -->
@@ -842,8 +853,14 @@ function makeLevel(level){
     const here=cellAt(x,y), there=cellAt(nx,ny);
     // 30% chance carve becomes a closed door; else open passage
     const isDoor = R()<0.3;
-    here.walls[d] = isDoor ? {type:'door',open:false} : {type:'open'};
-    there.walls[(d+2)%4] = isDoor ? {type:'door',open:false} : {type:'open'};
+    if(isDoor){
+      const sharedDoorVariantIndex = ri(3);
+      here.walls[d]            = { type:'door', open:false, variantIndex: sharedDoorVariantIndex };
+      there.walls[(d+2)%4]     = { type:'door', open:false, variantIndex: sharedDoorVariantIndex };
+    } else {
+      here.walls[d]            = { type:'open' };
+      there.walls[(d+2)%4]     = { type:'open' };
+    }
     there.visited=true;
     stack.push([nx,ny]);
   }
@@ -1156,6 +1173,12 @@ const ITEM_SPRITE_PATH = {
   'Healing Herb': 'sprites/item_healing_herb.png',
   'Torch':        'sprites/item_torch.png',
 };
+// Gold drops carry a variable amount in the item name (e.g. "Gold (5gp)"),
+// so they need a name-prefix lookup rather than an exact map entry.
+function getItemSpritePathByName(itemName){
+  if(itemName && itemName.indexOf('Gold (') === 0) return 'sprites/item_gold.png';
+  return ITEM_SPRITE_PATH[itemName];
+}
 function makeBillboardSprite(path, worldHeight){
   const m = new THREE.SpriteMaterial({ map:loadSpriteTexture(path), depthTest:true, transparent:true });
   const sp = new THREE.Sprite(m);
@@ -1233,6 +1256,45 @@ const matFloor = new THREE.MeshStandardMaterial({ map:floorTex, roughness:1 });
 const matCeil = new THREE.MeshStandardMaterial({ map:ceilTex, roughness:1 });
 const matDoorClosed = new THREE.MeshStandardMaterial({ color:0x884422, roughness:.7 });
 const matDoorOpen = new THREE.MeshStandardMaterial({ color:0x000000, transparent:true, opacity:0 });
+// Door texture variants. Each door cell picks one at level-gen time
+// and stores the choice on the wall object so it stays consistent
+// across re-renders.
+const DOOR_VARIANT_TEXTURE_PATHS = [
+  'sprites/tex_door_wood_planks.png',
+  'sprites/tex_door_iron_studded.png',
+  'sprites/tex_door_rune_etched.png',
+];
+const DOOR_VARIANT_MATERIALS = DOOR_VARIANT_TEXTURE_PATHS.map(p => {
+  const tex = TEX_LOADER.load(p);
+  tex.magFilter = THREE.NearestFilter;
+  tex.minFilter = THREE.LinearFilter;
+  return new THREE.MeshStandardMaterial({ map:tex, roughness:.7 });
+});
+function pickDoorMaterialForVariantIndex(variantIndex){
+  if(typeof variantIndex !== 'number') variantIndex = 0;
+  return DOOR_VARIANT_MATERIALS[variantIndex % DOOR_VARIANT_MATERIALS.length]
+      || matDoorClosed;
+}
+// Wall decal overlay textures. Some wall faces get a random one
+// pasted on with low probability for visual variety.
+const WALL_DECAL_TEXTURE_PATHS = [
+  'sprites/tex_wall_decal_crack.png',
+  'sprites/tex_wall_decal_moss.png',
+  'sprites/tex_wall_decal_blood_smear.png',
+  'sprites/tex_wall_decal_mold_patch.png',
+  'sprites/tex_wall_decal_claw_marks.png',
+];
+const WALL_DECAL_MATERIALS = WALL_DECAL_TEXTURE_PATHS.map(p => {
+  const tex = TEX_LOADER.load(p);
+  tex.magFilter = THREE.NearestFilter;
+  tex.minFilter = THREE.LinearFilter;
+  return new THREE.MeshStandardMaterial({
+    map: tex, transparent: true, roughness: 1,
+    depthWrite: false, // sit cleanly over the wall plane
+  });
+});
+const WALL_DECAL_CHANCE_PER_WALL = 0.22;
+const WALL_DECAL_OFFSET_FROM_WALL = 0.01;
 const matStairsDoor = new THREE.MeshStandardMaterial({ color:0x000000, emissive:0x000000 });
 const matEnemy = new THREE.MeshStandardMaterial({ color:0xaa2222, emissive:0x440000 });
 const matItem = new THREE.MeshStandardMaterial({ color:0xffcc33, emissive:0x664400 });
@@ -1363,7 +1425,7 @@ function drawRoom(c, gx, gy){
     const ang = (idx / Math.max(c.items.length,1)) * Math.PI*2;
     const ix = ox+CELL/2 + Math.cos(ang)*spread;
     const iz = oz+CELL/2 + Math.sin(ang)*spread;
-    const path = ITEM_SPRITE_PATH[name];
+    const path = getItemSpritePathByName(name);
     if(path){
       const sp = makeBillboardSprite(path, 0.7);
       // Diamond items reuse steel sprites — tint blue so they read
@@ -1457,12 +1519,42 @@ function drawWall(w, dir, ox, oz, c){
     const m = new THREE.Mesh(new THREE.PlaneGeometry(CELL, WALL_H), matWall);
     m.position.set(px, WALL_H/2, pz); m.rotation.y = rotY;
     dungeonGroup.add(m);
+    // Random decal overlay. Choice is stored on the wall object so
+    // a wall keeps the same decal across re-renders instead of
+    // randomizing each time the player turns.
+    if(typeof w.decalIndex !== 'number'){
+      if(R() < WALL_DECAL_CHANCE_PER_WALL){
+        w.decalIndex = ri(WALL_DECAL_MATERIALS.length);
+      } else {
+        w.decalIndex = -1;
+      }
+    }
+    if(w.decalIndex >= 0){
+      const decalMat = WALL_DECAL_MATERIALS[w.decalIndex];
+      // Smaller plane sits just in front of the wall plane so the
+      // wall texture still reads through the transparent areas.
+      const decalSize = CELL * 0.65;
+      const decalMesh = new THREE.Mesh(
+        new THREE.PlaneGeometry(decalSize, decalSize),
+        decalMat
+      );
+      const nudgeX = Math.sin(rotY) * WALL_DECAL_OFFSET_FROM_WALL;
+      const nudgeZ = Math.cos(rotY) * WALL_DECAL_OFFSET_FROM_WALL;
+      decalMesh.position.set(
+        px + nudgeX,
+        WALL_H * 0.5,
+        pz + nudgeZ
+      );
+      decalMesh.rotation.y = rotY;
+      dungeonGroup.add(decalMesh);
+    }
   } else if(w.type==='door'){
     const frame = new THREE.Mesh(new THREE.PlaneGeometry(CELL, WALL_H*0.25), matWall);
     frame.position.set(px, WALL_H*0.875, pz); frame.rotation.y=rotY;
     dungeonGroup.add(frame);
     if(!w.open){
-      const door = new THREE.Mesh(new THREE.PlaneGeometry(CELL*0.6, WALL_H*0.75), matDoorClosed);
+      const doorMaterial = pickDoorMaterialForVariantIndex(w.variantIndex);
+      const door = new THREE.Mesh(new THREE.PlaneGeometry(CELL*0.6, WALL_H*0.75), doorMaterial);
       door.position.set(px, WALL_H*0.375, pz); door.rotation.y=rotY;
       dungeonGroup.add(door);
     }
@@ -2335,11 +2427,28 @@ function updateDiscoveredMapTranslate(visX, visY){
   pre.style.transform = `translate(${dxCh}ch, ${dyEm}em)`;
 }
 
+// Below this HP the low-HP red vignette starts appearing; at 0 HP
+// it would be fully opaque (in practice the death overlay takes
+// over before then). Drives the #lowHpVignette opacity.
+const LOW_HP_VIGNETTE_THRESHOLD = 10;
+function updateLowHpVignetteOpacity(){
+  const el = document.getElementById('lowHpVignette');
+  if(!el) return;
+  const hp = state.player.hp;
+  if(hp >= LOW_HP_VIGNETTE_THRESHOLD || state.dead){
+    el.style.opacity = '0';
+    return;
+  }
+  // Linear ramp: hp = threshold -> 0 opacity; hp = 1 -> ~0.85; hp <= 0 -> 1.
+  const t = Math.max(0, (LOW_HP_VIGNETTE_THRESHOLD - hp) / LOW_HP_VIGNETTE_THRESHOLD);
+  el.style.opacity = String(Math.min(1, t));
+}
 function refreshUI(){
   const p = state.player;
   const c = cellAt(p.x,p.y);
   updateRightHandSprite();
   updatePlayerArrowRotation();
+  updateLowHpVignetteOpacity();
   // Top HUD strip over the 3D view.
   const lvlEl = document.getElementById('topHudLvl');
   const hpEl  = document.getElementById('topHudHp');
