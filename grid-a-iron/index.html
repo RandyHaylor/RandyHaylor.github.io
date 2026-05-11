@@ -851,7 +851,7 @@ function makeLevel(level){
   // newLevel() call. If it's missing the startup contract is broken
   // and the game shouldn't pretend to work.
   if(!Array.isArray(window._enemySpawnPool) || window._enemySpawnPool.length === 0){
-    throw new Error('newLevel() called before enemies/_pool.json finished loading');
+    throw new Error('newLevel() called before enemies/pool.json finished loading');
   }
   const enemiesPool = window._enemySpawnPool;
   const eligibleEnemies = enemiesPool.filter(
@@ -3291,16 +3291,16 @@ refreshUI = function(){
   _origRefreshUIForLandscape();
   if(_landscapeMapVisible) _renderLandscapeMapOverlay();
 };
-// Load the level-gated enemy spawn pool from enemies/_pool.json.
+// Load the level-gated enemy spawn pool from enemies/pool.json.
 window._enemySpawnPool = null;
 async function loadEnemyPoolFromJson(){
-  const r = await fetch('enemies/_pool.json');
+  const r = await fetch('enemies/pool.json');
   if(!r.ok){
-    throw new Error(`Required enemy pool missing: enemies/_pool.json — HTTP ${r.status}`);
+    throw new Error(`Required enemy pool missing: enemies/pool.json — HTTP ${r.status}`);
   }
   const data = await r.json();
   if(!Array.isArray(data.enemies) || data.enemies.length === 0){
-    throw new Error(`Required enemy pool malformed: enemies/_pool.json — 'enemies' must be a non-empty array`);
+    throw new Error(`Required enemy pool malformed: enemies/pool.json — 'enemies' must be a non-empty array`);
   }
   window._enemySpawnPool = data.enemies;
 }
