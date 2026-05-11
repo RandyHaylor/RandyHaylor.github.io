@@ -3139,6 +3139,10 @@ async function runMainStartup(){
   if(_isTestModeActive()) _applyTestModeCheats();
   fitWrapToViewport();
   attachGameTouchHandlers();
+  // Start the render loop AFTER initThree built scene/camera/renderer.
+  // Starting it earlier would call renderer.render(scene, camera) with
+  // undefined args every frame.
+  loop();
 }
 function _showStartupFailureBanner(err){
   const msg = (err && err.message) ? err.message : String(err);
@@ -3919,8 +3923,6 @@ function loop(){
   // oriented with the level. The death overlay handles the visual end.)
   renderer.render(scene, camera);
 }
-loop();
-
 // ---- entrypoint ----
 // Runs after every top-level const/let declaration above has
 // initialized. runMainStartup awaits all required JSON data, then
