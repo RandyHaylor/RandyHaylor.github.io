@@ -93,6 +93,10 @@
   body.winSequence #compass,
   body.winSequence #roomPanel,
   body.winSequence #combatPanel { display:none !important; }
+  /* The portrait #wrap has a green outline that frames the playfield.
+     Suppress it during the win sequence so the screen reads as a
+     pure black void. */
+  body.winSequence #wrap { outline:none !important; }
   /* Damage flash: full red veil over the 3D viewport, fades out fast. */
   #hitFlash { position:absolute; inset:0; background:rgba(220,30,30,0.55);
               pointer-events:none; opacity:0; z-index:8; }
