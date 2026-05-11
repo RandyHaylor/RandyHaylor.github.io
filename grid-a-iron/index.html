@@ -846,16 +846,14 @@ function makeLevel(level){
     c.items.push(choice(itemsPool));
   }
 
-  // Spawn pool comes from enemies/_pool.json, loaded async at startup
-  // by loadEnemyPoolFromJson(). See ENEMY_PLAN.md for the table and
-  // phasing rules. We fall back to a tiny safety pool only if the
-  // JSON hasn't loaded yet (first level can fire before fetch resolves).
-  const enemiesPool = (Array.isArray(window._enemySpawnPool) && window._enemySpawnPool.length)
-    ? window._enemySpawnPool
-    : [
-        {name:'Giant Rat', hp:5, atk:2, minLevel:1, maxLevel:99},
-        {name:'Goblin',    hp:8, atk:3, minLevel:1, maxLevel:99},
-      ];
+  // Spawn pool is required — loaded synchronously into
+  // window._enemySpawnPool by loadEnemyPoolFromJson() before any
+  // newLevel() call. If it's missing the startup contract is broken
+  // and the game shouldn't pretend to work.
+  if(!Array.isArray(window._enemySpawnPool) || window._enemySpawnPool.length === 0){
+    throw new Error('newLevel() called before enemies/_pool.json finished loading');
+  }
+  const enemiesPool = window._enemySpawnPool;
   const eligibleEnemies = enemiesPool.filter(
     e => e.minLevel <= level && level <= (e.maxLevel || 99)
   );
@@ -3099,30 +3097,21 @@ document.getElementById('hamburgerBtn').onclick = toggleSettingsOverlay;
 document.getElementById('btnSettingsClose').onclick = closeSettingsOverlay;
 
 // -------- main --------
-initThree();
-newLevel(1);
-// Dev/test cheat mode: ?test=1 in the URL gives Diamond gear + 100
-// Healing Herbs, forces ALL enemy types from the pool onto the first
-// floor (one of each, ignoring level gates). For sandbox testing.
+// Test-mode helpers (defined unconditionally so they're available
+// regardless of URL; runMainStartup only invokes them if ?test=1).
 function _isTestModeActive(){
-  try { return new URLSearchParams(location.search).get('test') === '1'; }
-  catch(_){ return false; }
+  return new URLSearchParams(location.search).get('test') === '1';
 }
 function _applyTestModeCheats(){
-  if(!_isTestModeActive()) return;
-  state.player.weapon = { name:'Diamond Sword',  atk: (typeof WEAPON_STATS === 'object' ? WEAPON_STATS['Diamond Sword'] : 10) };
-  state.player.shield = { name:'Diamond Shield', dr:  (typeof SHIELD_STATS === 'object' ? SHIELD_STATS['Diamond Shield'] : 4) };
-  // 100 herbs.
+  state.player.weapon = { name:'Diamond Sword',  atk: WEAPON_STATS['Diamond Sword'] };
+  state.player.shield = { name:'Diamond Shield', dr:  SHIELD_STATS['Diamond Shield'] };
   state.player.inv = [];
   for(let i=0;i<100;i++) state.player.inv.push('Healing Herb');
   state.player.torchCharges = 80;
-  // Drop one of every pool entry into a free random cell on the
-  // current level (ignores minLevel/maxLevel). Skip cells with stairs,
-  // existing enemies, or the player's start cell.
-  const pool = (Array.isArray(window._enemySpawnPool) && window._enemySpawnPool.length)
-    ? window._enemySpawnPool : [];
+  // Drop one of every pool entry into a free random cell (ignores
+  // minLevel/maxLevel). Pool is guaranteed loaded by now.
+  const pool = window._enemySpawnPool;
   const d = state.dungeon;
-  if(!d) return;
   for(const t of pool){
     for(let attempt=0; attempt<60; attempt++){
       const ex = Math.floor(Math.random()*d.W_);
@@ -3134,24 +3123,38 @@ function _applyTestModeCheats(){
       break;
     }
   }
-  // Re-render and refresh after mutating cells.
-  if(typeof renderVisibleRooms === 'function') renderVisibleRooms();
-  if(typeof refreshUI === 'function') refreshUI();
+  renderVisibleRooms();
+  refreshUI();
 }
-// Pool JSON is fetched async; wait for it before applying the
-// force-spawn cheat. Poll briefly.
-function _waitForPoolThenApplyTestCheats(triesLeft){
-  if(!_isTestModeActive()) return;
-  if(Array.isArray(window._enemySpawnPool) && window._enemySpawnPool.length){
-    _applyTestModeCheats();
-    return;
-  }
-  if(triesLeft <= 0){ _applyTestModeCheats(); return; }
-  setTimeout(()=> _waitForPoolThenApplyTestCheats(triesLeft - 1), 100);
+// Loud-failure startup: every required data file must load before the
+// game initializes. If any required fetch throws, propagate so the
+// console shows it and a banner replaces the start screen.
+async function runMainStartup(){
+  await Promise.all([
+    loadEnemyPoolFromJson(),
+    loadAllEnemyPhraseLibraries(),
+  ]);
+  initThree();
+  newLevel(1);
+  if(_isTestModeActive()) _applyTestModeCheats();
+  fitWrapToViewport();
+  attachGameTouchHandlers();
 }
-_waitForPoolThenApplyTestCheats(40);
-fitWrapToViewport();
-attachGameTouchHandlers();
+function _showStartupFailureBanner(err){
+  const msg = (err && err.message) ? err.message : String(err);
+  const banner = document.createElement('div');
+  banner.style.cssText =
+    'position:fixed;left:0;right:0;top:0;bottom:0;z-index:9999;' +
+    'background:#200;color:#fbb;padding:24px;font-family:"VT323",monospace;' +
+    'font-size:18px;line-height:1.4;overflow:auto;';
+  banner.textContent = '[gridiron] startup failed: ' + msg;
+  document.body.appendChild(banner);
+}
+runMainStartup().catch(err => {
+  console.error('[gridiron] startup failed', err);
+  _showStartupFailureBanner(err);
+  throw err;
+});
 // Landscape map-overlay toggle wiring.
 let _landscapeMapVisible = false;
 function _renderLandscapeMapOverlay(){
@@ -3284,22 +3287,19 @@ refreshUI = function(){
   _origRefreshUIForLandscape();
   if(_landscapeMapVisible) _renderLandscapeMapOverlay();
 };
-// Fire-and-forget: enemy chatter library loads on its own; phrases will
-// start appearing once the JSON arrives. No-op if it can't be fetched.
-loadAllEnemyPhraseLibraries();
 // Load the level-gated enemy spawn pool from enemies/_pool.json.
 window._enemySpawnPool = null;
 async function loadEnemyPoolFromJson(){
-  try {
-    const r = await fetch('enemies/_pool.json');
-    if(!r.ok) return;
-    const data = await r.json();
-    if(Array.isArray(data.enemies)){
-      window._enemySpawnPool = data.enemies;
-    }
-  } catch(_){}
+  const r = await fetch('enemies/_pool.json');
+  if(!r.ok){
+    throw new Error(`Required enemy pool missing: enemies/_pool.json — HTTP ${r.status}`);
+  }
+  const data = await r.json();
+  if(!Array.isArray(data.enemies) || data.enemies.length === 0){
+    throw new Error(`Required enemy pool malformed: enemies/_pool.json — 'enemies' must be a non-empty array`);
+  }
+  window._enemySpawnPool = data.enemies;
 }
-loadEnemyPoolFromJson();
 function tickAnimation(now){
   const a = state.anim;
   if(!a) return;
@@ -3568,17 +3568,18 @@ const FUNNY_PHRASE_CHANCE = 0.10;
 async function loadAllEnemyPhraseLibraries(){
   const all = Object.entries(ENEMY_PHRASE_FILE).concat(Object.entries(NPC_PHRASE_FILE));
   await Promise.all(all.map(async ([name, path])=>{
-    try{
-      const r = await fetch(path);
-      if(!r.ok) return;
-      const data = await r.json();
-      enemyPhraseLibrariesByName[name] = {
-        phrases:   Array.isArray(data.phrases)   ? data.phrases   : [],
-        movements: Array.isArray(data.movements) ? data.movements : [],
-      };
-    }catch(e){
-      console.warn('[gridiron] phrase fetch failed for', name, e);
+    const r = await fetch(path);
+    if(!r.ok){
+      throw new Error(`Required phrase library missing: ${name} (${path}) — HTTP ${r.status}`);
     }
+    const data = await r.json();
+    if(!Array.isArray(data.phrases) || !Array.isArray(data.movements)){
+      throw new Error(`Required phrase library malformed: ${name} (${path}) — phrases/movements must be arrays`);
+    }
+    enemyPhraseLibrariesByName[name] = {
+      phrases: data.phrases,
+      movements: data.movements,
+    };
   }));
 }
 function shuffleInPlace(a){
