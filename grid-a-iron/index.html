@@ -1492,19 +1492,31 @@ function shortestYawDelta(from, to){
 }
 function smoothstep(t){ return t*t*(3 - 2*t); }
 
+// Pixel cap on a single rendered line of the speech-bubble canvas.
+// Words past this are flowed onto the next line via greedy wrapping.
+// Beyond this the bubble was clipping ('A troll made a hat from stev').
+const TEXT_SPRITE_MAX_LINE_WIDTH_PX = 360;
 function makeTextSprite(text, opts){
   opts = opts || {};
   const borderColor = opts.borderColor || '#0f0';
   const textColor   = opts.textColor   || '#bfffbf';
   const padX=12, padY=8;
-  const cv = document.createElement('canvas');
-  const ctx = cv.getContext('2d');
   const font = 'bold 36px "Courier New", monospace';
-  ctx.font = font;
-  const metrics = ctx.measureText(text);
-  cv.width  = Math.ceil(metrics.width) + padX*2;
-  cv.height = 48 + padY*2;
-  // redo because resizing canvas resets ctx
+  const lineHeightPx = 48;
+  // Measure step: build wrapped lines using a temporary canvas context.
+  const measureCanvas = document.createElement('canvas');
+  const measureCtx = measureCanvas.getContext('2d');
+  measureCtx.font = font;
+  const wrappedLines = wrapTextIntoLinesByPixelWidth(
+    text, measureCtx, TEXT_SPRITE_MAX_LINE_WIDTH_PX
+  );
+  let widestLinePx = 0;
+  for(const line of wrappedLines){
+    widestLinePx = Math.max(widestLinePx, measureCtx.measureText(line).width);
+  }
+  const cv = document.createElement('canvas');
+  cv.width  = Math.ceil(widestLinePx) + padX*2;
+  cv.height = lineHeightPx * wrappedLines.length + padY*2;
   const c2 = cv.getContext('2d');
   c2.font = font;
   if(!opts.noBackground){
@@ -1518,16 +1530,37 @@ function makeTextSprite(text, opts){
   }
   c2.fillStyle = textColor;
   c2.textBaseline = 'middle';
-  c2.fillText(text, padX, cv.height/2);
+  for(let i=0; i<wrappedLines.length; i++){
+    const yCenter = padY + (i + 0.5) * lineHeightPx;
+    c2.fillText(wrappedLines[i], padX, yCenter);
+  }
   const tex = new THREE.CanvasTexture(cv);
   tex.minFilter = THREE.LinearFilter;
   // depthTest:true so walls/doors occlude the label like a real object.
   const mat = new THREE.SpriteMaterial({ map:tex, depthTest:true, transparent:true });
   const sp = new THREE.Sprite(mat);
-  // Halved from previous size — labels were dominating the frame.
   const scale = 0.007;
   sp.scale.set(cv.width*scale, cv.height*scale, 1);
   return sp;
+}
+// Greedy word-wrap. A single word longer than the limit is kept intact
+// on its own line (we don't break inside words).
+function wrapTextIntoLinesByPixelWidth(text, ctx, maxWidthPx){
+  const words = text.split(/\s+/).filter(Boolean);
+  if(words.length === 0) return [text];
+  const lines = [];
+  let currentLine = words[0];
+  for(let i=1; i<words.length; i++){
+    const candidate = currentLine + ' ' + words[i];
+    if(ctx.measureText(candidate).width <= maxWidthPx){
+      currentLine = candidate;
+    } else {
+      lines.push(currentLine);
+      currentLine = words[i];
+    }
+  }
+  lines.push(currentLine);
+  return lines;
 }
 
 // Lazily-loaded stairs-down floor texture (top-down hatch sprite).
