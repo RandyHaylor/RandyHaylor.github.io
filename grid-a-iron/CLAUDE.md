@@ -53,3 +53,16 @@ the iteration loop is painful otherwise.
   stair-descend triggers the win sequence.
 - `?test=2` — jumps straight to the win-sequence typewriter, useful
   for iterating on that overlay without playing through anything.
+
+## Historical reference
+
+The session that built most of this project (lvl 1–10 enemy ramp,
+landscape mode, win sequence, design docs, refactor plan, deploy
+workflow, the loud-failure startup contract) is logged at:
+
+- session id: `b21a0abc-e62b-4b18-85cc-7900a20c3024`
+- transcript: `~/.claude/projects/-home-aikenyon-ai-skills-agents-resources-source-of-truth-test-1/b21a0abc-e62b-4b18-85cc-7900a20c3024.jsonl`
+
+If you need to recover *why* a decision was made (e.g. why no inline
+fallbacks, why renamed `_pool.json` → `pool.json`, why phrases got
+shortened twice), the answer is in that transcript.
