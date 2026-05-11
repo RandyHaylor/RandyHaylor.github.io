@@ -2087,6 +2087,24 @@ function triggerAttackSwingAnimation(){
   state.attackSwing = { startTs: performance.now(), durMs: ATTACK_SWING_DURATION_MS };
 }
 
+// HP-bracket descriptions used in place of the bare HP number in
+// the combat panel. Phrases are intentionally species-agnostic — no
+// blood (skeletons are dry), no bones (slimes have none), no breath
+// (constructs / undead) — so the same line reads correctly for any
+// enemy in the pool. Brackets go top-down; the 100% (full HP) case
+// returns null so the panel shows just 'In combat with X.' on the
+// first turn before any damage has been dealt. Two of the five
+// lines lean comedic per spec.
+function describeEnemyConditionByHpFraction(enemy){
+  if(!enemy || typeof enemy.hp !== 'number' || typeof enemy.hpMax !== 'number') return null;
+  const hpFraction = enemy.hpMax > 0 ? (enemy.hp / enemy.hpMax) : 0;
+  if(hpFraction >= 1.0) return null; // 100% — no message yet
+  if(hpFraction >= 0.8) return 'A few scrapes — barely fazed.';
+  if(hpFraction >= 0.6) return 'Visibly roughed up now.';                  // funny-ish
+  if(hpFraction >= 0.4) return 'Starting to regret coming to work today.'; // funny
+  if(hpFraction >= 0.2) return 'In rough shape and slowing down.';
+  return 'On its last legs — one good hit away from oblivion.';
+}
 function combatAttack(){
   if(state.dead) return;
   if(state.combatBusy) return;        // ignore while previous attack-turn is in flight
@@ -2529,7 +2547,10 @@ function refreshUI(){
   if(state.combat){
     const e = state.combat.enemy;
     const t = document.createElement('div');
-    t.textContent = `In combat with ${e.name} (HP ${e.hp}/${e.hpMax})`;
+    const condition = describeEnemyConditionByHpFraction(e);
+    t.textContent = condition
+      ? `In combat with ${e.name}. ${condition}`
+      : `In combat with ${e.name}.`;
     ca.appendChild(t);
     const ba = document.createElement('button'); ba.textContent='Attack (F)'; ba.onclick=combatAttack;
     const bf = document.createElement('button'); bf.textContent='Run (R)'; bf.onclick=combatRun;
