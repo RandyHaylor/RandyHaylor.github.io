@@ -1760,7 +1760,11 @@ function descendStairs(){
     void fade.offsetWidth;
     fade.style.opacity = '1';
   }
-  const isFinalDescent = (state.level >= FINAL_LEVEL);
+  // ?test=1 short-circuits the level grind: the first stair-descend
+  // triggers the end-of-dungeon win sequence so the typewriter +
+  // black-screen can be exercised from a real gameplay action.
+  const isFinalDescent = (state.level >= FINAL_LEVEL)
+                       || _isTestModeActive();
   setTimeout(()=>{
     if(isFinalDescent){
       // End of dungeon: screen stays black, win sequence takes over.
