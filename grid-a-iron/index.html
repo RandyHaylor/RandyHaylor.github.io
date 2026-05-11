@@ -3150,18 +3150,11 @@ function _showStartupFailureBanner(err){
   banner.textContent = '[gridiron] startup failed: ' + msg;
   document.body.appendChild(banner);
 }
-// Defer to a microtask: top-level `const`s for ENEMY_PHRASE_FILE,
-// NPC_PHRASE_FILE etc are declared further down in this script and
-// would be in the TDZ if runMainStartup() ran synchronously here.
-// Microtasks fire after the entire script's top-level sync execution
-// completes, by which point all those consts are initialized.
-queueMicrotask(() => {
-  runMainStartup().catch(err => {
-    console.error('[gridiron] startup failed', err);
-    _showStartupFailureBanner(err);
-    throw err;
-  });
-});
+// runMainStartup() is invoked at the very bottom of this script — see
+// the call just before the closing </script>. It needs every top-level
+// `const` (ENEMY_PHRASE_FILE, NPC_PHRASE_FILE, etc.) to have been
+// initialized first, so the invocation belongs at the end of the file,
+// not inline here next to the function definition.
 // Landscape map-overlay toggle wiring.
 let _landscapeMapVisible = false;
 function _renderLandscapeMapOverlay(){
@@ -3927,6 +3920,18 @@ function loop(){
   renderer.render(scene, camera);
 }
 loop();
+
+// ---- entrypoint ----
+// Runs after every top-level const/let declaration above has
+// initialized. runMainStartup awaits all required JSON data, then
+// kicks off initThree() -> newLevel(1) -> the rest. If anything
+// required fails to load, the catch shows a red startup-failure
+// banner and the game does not boot in a half-broken state.
+runMainStartup().catch(err => {
+  console.error('[gridiron] startup failed', err);
+  _showStartupFailureBanner(err);
+  throw err;
+});
 </script>
 </body>
 </html>
