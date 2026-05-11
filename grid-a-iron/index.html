@@ -1972,7 +1972,15 @@ function pickUpItem(idx){
 
 // -------- combat --------
 // Player hit chance is 75% on every attack.
-const PLAYER_HIT_CHANCE = 0.75;
+const PLAYER_HIT_CHANCE = 0.85;
+// Damage roll for a weapon with attack=atk. Minimum is ceil(atk/2)
+// so even a low roll feels meaningful; max is atk. Replaces the old
+// uniform 1..atk which let a Diamond Sword sometimes deal 1.
+function rollPlayerWeaponDamage(atk){
+  const minDamage = Math.ceil(atk / 2);
+  const rollRange = atk - minDamage + 1;
+  return minDamage + ri(rollRange);
+}
 
 function triggerAttackSwingAnimation(){
   playSfx('sword_swing');
@@ -1998,7 +2006,7 @@ function combatAttack(){
   // log feels matched to this swing), but defer applying it and the
   // enemy turn until the player's full attack animation finishes.
   const playerHit = R() < PLAYER_HIT_CHANCE;
-  const playerDmg = playerHit ? (1 + ri(state.player.weapon.atk)) : 0;
+  const playerDmg = playerHit ? rollPlayerWeaponDamage(state.player.weapon.atk) : 0;
   // Schedule the enemy red-tint flash at the peak of the rotation (mid-swing)
   // so the visual hit lands when the sword visually does.
   if(playerHit){
@@ -3135,6 +3143,28 @@ function fadeOutBackgroundMusicForWinSequence(fadeDurMs){
   };
   tick();
 }
+// iOS Chrome / Safari auto-suspend the AudioContext when the page is
+// backgrounded. When the user returns, the context is still suspended
+// and every SFX BufferSource silently does nothing. Listen for the
+// page becoming visible (or window focus) and resume.
+function resumeAudioContextIfSuspendedOnVisibilityReturn(){
+  if(!audioStarted) return;
+  if(audioCtx && audioCtx.state === 'suspended' && !_audioMuted){
+    try { audioCtx.resume(); } catch(_){}
+  }
+  // The HTMLAudio music element also frequently pauses on background.
+  // Resume if it was playing and not muted.
+  if(audioMusicEl && audioMusicEl.paused && !_audioMuted){
+    try { audioMusicEl.play().catch(()=>{}); } catch(_){}
+  }
+}
+document.addEventListener('visibilitychange', function onVisibilityChange(){
+  if(document.visibilityState === 'visible'){
+    resumeAudioContextIfSuspendedOnVisibilityReturn();
+  }
+});
+window.addEventListener('focus', resumeAudioContextIfSuspendedOnVisibilityReturn);
+
 function fadeOutMusicThenPlayDeathSting(){
   const startGain = musicTrackGain ? musicTrackGain.gain.value : 1;
   const fadeDurMs = 350;
