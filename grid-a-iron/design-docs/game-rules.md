@@ -2,42 +2,33 @@
 
 ## Map & movement
 
-- 10 dungeon levels generated procedurally on entry. Each level is a
-  randomized grid of rooms connected by walls / doors / open passages.
-- Movement is grid-based, one cell at a time, with smoothed transitions
-  (~0.25s tween). Player can rotate 90° CCW / CW or step forward /
-  backward.
-- Stepping into a room containing an enemy starts combat; a "first
-  strike" enemy gets a free attack the same turn.
-- Pressing descend on the stairs cell moves to the next floor with a
-  black fade. Descending from level 10 triggers the **win sequence**
-  (see architecture overview).
+- 10 procedurally-generated dungeon levels.
+- Grid-based, one cell per step, ~0.25s tweened transitions.
+- Rotate 90° CCW/CW, step forward/backward.
+- Entering an enemy room → combat starts.
+  - `firstStrike` enemies get a free attack the same turn.
+- Stairs cell + descend → next floor with black fade.
+- Level-10 descend → **win sequence** (see architecture overview).
 
 ## Player
 
 - 20 HP, no max-HP growth between levels.
-- One weapon slot, one shield slot. Picking up a different weapon /
-  shield drops the previous one onto the floor.
-- Inventory holds consumables (only `Healing Herb` today) and gold
-  drops. Carrying a Torch counts toward the lit torch when the current
-  one runs out.
+- One weapon slot, one shield slot.
+  - Picking up a different weapon / shield drops the previous one.
+- Inventory: consumables (`Healing Herb`) + gold drops.
+- Spare Torch in inventory auto-equips when the lit one runs out.
 
 ## Combat
 
-- Player attacks with `F` key, attack button, or sword button on the
-  d-pad.
-- Hit chance: **85%** flat.
-- Damage roll: `ceil(atk/2) + ri(floor(atk/2)+1)` — minimum is
-  ceil(weapon.atk / 2), maximum is weapon.atk. Diamond Sword (atk 10)
-  rolls 5–10; Fists (atk 2) rolls 1–2.
-- Enemy hit chance starts ~50% and scales upward with floor depth
-  (see `enemyHitChance` in code).
-- Damage taken = `1 + ri(enemy.atk) - shield.dr` (clamped to ≥ 0).
-- Run: 60% chance to flee one cell back, otherwise the enemy hits.
-
-The combat panel does **not** show enemy HP numbers; instead it shows
-a phrase keyed to the enemy's current HP-bracket (see
-`enemies/condition_phrases.json`).
+- Attack: `F` key / Attack button / sword button on the d-pad.
+- **Hit chance: 85%** flat.
+- **Damage roll:** `ceil(atk/2) + ri(floor(atk/2)+1)`.
+  - Min: `ceil(weapon.atk / 2)`. Max: `weapon.atk`.
+  - Diamond Sword (atk 10) → 5–10. Fists (atk 2) → 1–2.
+- Enemy hit chance: ~50% on lvl 1, +5%/floor (cap 90%). See `enemyHitChance`.
+- Damage taken: `1 + ri(enemy.atk) - shield.dr` (clamped ≥ 0).
+- Run: 60% chance to flee back one cell; otherwise enemy hits.
+- Combat panel shows **no HP number** — phrase from `enemies/condition_phrases.json` keyed to the enemy's HP bracket.
 
 ## Weapons & shields
 
@@ -53,29 +44,25 @@ a phrase keyed to the enemy's current HP-bracket (see
 | Steel Shield    | dr 3   | 6–8            |
 | Diamond Shield  | dr 4   | 7–10           |
 
-Each floor spawns exactly one sword and one shield (tier per the
-table above) and exactly one Torch.
+- Each floor spawns exactly: 1 sword (by tier table), 1 shield (by tier table), 1 Torch.
 
 ## Torch
 
-- Each torch has 75–90 steps of life (random per pickup). Stepping
-  consumes one charge.
-- Below 10 charges the torch sprite and the room light flicker.
-- At 0 charges the torch goes out. If the player carries a spare
-  Torch in inventory it auto-equips after a brief darkness; otherwise
-  the room dims to a tight close-quarters lighting mode.
+- 75–90 steps of life per pickup (random).
+- Each step consumes 1 charge.
+- < 10 charges → sprite + room light flicker.
+- 0 charges → goes out.
+  - Spare Torch in inventory → auto-equips after a brief darkness.
+  - No spare → room dims to tight close-quarters lighting.
 
 ## Vendor
 
-- Spawns once on even-numbered floors only, somewhere adjacent to the
-  player's start cell with no wall between (always reachable without
-  combat).
-- Sells torches (10gp) and herbs (5gp). Press `V` on the vendor cell
-  to open the vendor UI; `B` buys the first item.
+- Even floors only.
+- Placed adjacent to player start cell, no wall between (always reachable without combat).
+- Sells: Torch 10gp, Healing Herb 5gp.
+- `V` on vendor cell → opens vendor UI. `B` → buy first item.
 
 ## Win / lose
 
-- HP reaches 0 → death overlay with "one more skeleton for my army…"
-  Play Again resets state and goes back to the start screen.
-- Final descend from level 10 → black screen typewriter ending. A
-  `Slumber and dream again…` button reloads the page.
+- HP → 0: death overlay (`one more skeleton for my army…`) + Play Again.
+- Final descend from lvl 10: black-screen typewriter ending + `Slumber and dream again…` (reloads page).

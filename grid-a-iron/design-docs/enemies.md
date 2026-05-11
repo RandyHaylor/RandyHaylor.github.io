@@ -1,22 +1,17 @@
 # Enemies
 
-## Where the data lives
+## Where data lives
 
-- `enemies/pool.json` — the spawn table. Single source of truth for who
-  appears on which floors, in what numbers, and which ones get a first
-  strike. See `architecture-overview.md` for how it's loaded.
-- `enemies/<name>.json` — per-enemy chatter library. Shape:
-  `{ "name": "...", "phrases": [...], "movements": [...] }`. Phrases
-  are first-person speech; movements are short third-person actions
-  (rendered with asterisks around them in-game). 30 phrases + 20
-  movements per entry.
-- `enemies/condition_phrases.json` — HP-bracket lines that replace
-  the combat panel's HP readout (5 brackets, 5 options per bracket,
-  one comedic per bracket).
-- `sprites/enemy_<name>.png` — 32×32 RGBA pixel art. Evil Vendor
-  reuses `sprites/npc_vendor.png` with a runtime blue tint.
+- `enemies/pool.json` — spawn table. Single source of truth for who/where/how many/first-strike.
+- `enemies/<name>.json` — per-enemy chatter. Shape: `{ "name", "phrases":[…30], "movements":[…20] }`.
+  - Phrases: first-person speech.
+  - Movements: short third-person actions (rendered with asterisks).
+- `enemies/condition_phrases.json` — HP-bracket lines replacing the combat HP readout.
+  - 5 brackets × 5 options. One comedic per bracket.
+- `sprites/enemy_<name>.png` — 32×32 RGBA pixel art.
+  - Evil Vendor reuses `sprites/npc_vendor.png` with runtime blue tint.
 
-## Spawn pool fields
+## Spawn-pool entry shape
 
 ```jsonc
 {
@@ -24,25 +19,20 @@
   "hp": 22,
   "atk": 6,
   "minLevel": 4,           // first floor it can appear on
-  "maxLevel": 7,           // last floor (filter is inclusive)
+  "maxLevel": 7,           // last floor (inclusive)
   "mincount": 1,           // OPTIONAL — guaranteed copies per floor
   "maxcount": 1,           // OPTIONAL — hard cap per floor
   "firstStrike": true      // OPTIONAL — free attack on cell-entry
 }
 ```
 
-## 3-pass spawn at level generation
+## 3-pass spawn at level gen
 
-1. **Mincount pass.** Every entry with `mincount > 0` gets exactly that
-   many copies placed first, in pool declaration order, honoring
-   `maxcount`.
-2. **Variety pass.** For every other eligible entry, place one copy
-   so each species appears at least once.
-3. **Random fill.** Pad up to the per-floor budget (`3 + level`)
-   with random picks from any entry that hasn't hit its `maxcount`.
+1. **Mincount pass** — every entry with `mincount > 0` placed first (pool order, honoring `maxcount`).
+2. **Variety pass** — one copy of every other eligible entry, so each species appears at least once.
+3. **Random fill** — pad to per-floor budget `3 + level` with random eligible entries, skipping any at `maxcount`.
 
-This means a level-9 floor reliably contains one Demon Lord + one of
-each other eligible species + extras, rather than ten random rolls.
+Result: lvl-9 floor reliably has 1 Demon Lord + 1 of each other eligible species + extras (not 10 random rolls).
 
 ## Current roster (lvl 1 → 10)
 
@@ -64,18 +54,14 @@ each other eligible species + extras, rather than ten random rolls.
 | Demon Lord       | 55 | 11  | 9   | 9   | (mincount 1) |
 | Dragon           | 90 | 14  | 10  | 10  | ✓ (mincount 1) |
 
-Numbers reflect `enemies/pool.json` at the time of writing — that file
-is the canonical source if anything looks off.
+- `enemies/pool.json` is canonical — if anything looks off, trust the file.
 
 ## Adding a new enemy
 
-1. Add a row to `enemies/pool.json` with min/max level and any
-   first-strike / mincount / maxcount you want.
-2. Add `enemies/<lowercase_name>.json` with 30 phrases + 20 movements.
-3. Add the file path to `ENEMY_PHRASE_FILE` in `index.html`.
-4. Either drop `sprites/enemy_<name>.png` and add the entry to
-   `ENEMY_SPRITE_PATH`, or build a canvas-text sprite via
-   `ENEMY_SPRITE_FACTORY` (fallback for enemies without PNGs).
-
-Because the loader is loud-on-missing, forgetting any one of those
-steps fails startup with a clear error.
+1. Add row to `enemies/pool.json` (min/max + optional first-strike/mincount/maxcount).
+2. Add `enemies/<lowercase_name>.json` (30 phrases + 20 movements).
+3. Add path to `ENEMY_PHRASE_FILE` in `index.html`.
+4. Either:
+   - drop `sprites/enemy_<name>.png` + add to `ENEMY_SPRITE_PATH`, **or**
+   - build a canvas-text sprite in `ENEMY_SPRITE_FACTORY`.
+5. Loader is loud-on-missing — skipping a step fails startup with a clear error.

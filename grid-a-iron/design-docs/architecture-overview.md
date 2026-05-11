@@ -1,100 +1,88 @@
 # Architecture overview
 
-A single-file static web game. The deploy is whatever sits in this repo
-plus the `enemies/`, `npcs/`, and `sprites/` folders. No build step, no
-framework, no bundler. Browser opens `index.html`, three.js loads from
-unpkg via an importmap, the rest is plain JS.
+- Single-file static web game. No build step, no framework, no bundler.
+- Browser opens `index.html` → three.js loaded from unpkg via importmap → plain JS.
 
-## Files at a glance
+## Files
 
 ```
 index.html               // all game code (one big module script)
 enemies/
-  pool.json              // level-gated spawn table (the data behind newLevel)
-  condition_phrases.json // HP-bracket flavor lines for the combat panel
-  <name>.json            // per-enemy phrases + movements (chatter bubbles)
+  pool.json              // level-gated spawn table (used by newLevel)
+  condition_phrases.json // HP-bracket combat-panel lines
+  <name>.json            // per-enemy chatter (30 phrases + 20 movements)
 npcs/
   vendor.json            // same shape as an enemy chatter file
 sprites/
-  enemy_*.png            // 32x32 RGBA enemy sprites
+  enemy_*.png            // 32×32 RGBA enemy sprites
   item_*.png             // floor + held-item sprites
   tex_*.png              // wall / floor / ceiling / door / decal textures
-audio_files/             // mp3 music + sfx (paths assembled at runtime)
+audio_files/             // mp3 music + sfx
 design-docs/             // you are here
-ENEMY_PLAN.md            // older planning doc — still useful background
+ENEMY_PLAN.md            // older planning doc, still useful
 README.md                // user-facing readme + controls
 ```
 
-## Startup contract
+## Startup contract (`runMainStartup` at bottom of script)
 
-`index.html` boots through `runMainStartup()` at the very bottom of the
-script. The contract is strict on purpose: every required JSON file
-(`enemies/pool.json`, every entry in `ENEMY_PHRASE_FILE` /
-`NPC_PHRASE_FILE`, and `enemies/condition_phrases.json`) must load
-successfully before anything else runs. If any fetch 404s or returns
-malformed JSON the loader throws and a full-screen red banner shows the
-underlying error. The game does **not** start with fallback / stub data.
-
-Order inside `runMainStartup`:
-
-1. `Promise.all` over all required JSON loads.
-2. `initThree()` — renderer, scene, camera, lights.
-3. `newLevel(1)` — generate dungeon, place enemies (3-pass spawn),
-   pick floor sword + shield + torch.
-4. Test-mode hooks if `?test=1` or `?test=2` in the URL.
-5. `fitWrapToViewport()` + `attachGameTouchHandlers()`.
-6. `loop()` — `requestAnimationFrame` render loop.
+- All required JSON must load successfully before anything else.
+  - `enemies/pool.json`
+  - every entry in `ENEMY_PHRASE_FILE` / `NPC_PHRASE_FILE`
+  - `enemies/condition_phrases.json`
+- Any fetch 404 / malformed JSON → throw → full-screen red banner.
+- **No fallback / stub data.**
+- Order:
+  1. `Promise.all` over required JSON loads.
+  2. `initThree()` — renderer, scene, camera, lights.
+  3. `newLevel(1)` — dungeon + 3-pass enemy spawn + sword/shield/torch.
+  4. Test-mode hooks (`?test=1` / `?test=2`).
+  5. `fitWrapToViewport()` + `attachGameTouchHandlers()`.
+  6. `loop()` — `requestAnimationFrame` render loop.
 
 ## Layout (CSS)
 
-There are two big modes driven by `body.landscape` (set by
-`fitWrapToViewport` when viewport aspect > 2:1):
+Two modes driven by `body.landscape` (aspect > 2:1).
 
-- **Portrait** — `#wrap` is a fixed 400×700 logical area scaled to the
-  visible viewport via CSS transform. Inside: `#game` on top (3D
-  canvas + held-item HUD), then `#ui` (status grid + combat / inventory
-  panels), then the `#movePanel` button grid below.
-- **Landscape** — `#wrap` becomes a CSS grid (`[1fr UI] [gameW 3D]
-  [80 buffer]`). The UI panel resizes to fit; the 3D viewport stays at
-  the 4:3 ratio derived from viewport height; the right buffer holds
-  the compass + MAP / ? / WASD buttons. A separate on-screen D-pad is
-  toggled into the bottom-right of `#game`.
+- **Portrait** — `#wrap` 400×700 logical, scaled via CSS transform.
+  Top→bottom: `#game` (canvas + held items) → `#ui` (status + panels)
+  → `#movePanel` buttons.
+- **Landscape** — `#wrap` is a 3-col grid: `[1fr UI] [gameW 3D] [80 buffer]`.
+  `gameW = floor(vh × 4/3)`. Right buffer holds compass + MAP / ? / WASD.
+  Floating on-screen D-pad in bottom-right of `#game`.
 
-Full-screen overlays (`#startScreen`, `#deathOverlay`, `#inventoryOverlay`,
-`#helpOverlay`, `#winSequenceOverlay`, etc.) live as siblings of `#wrap`
-or are upgraded to `position:fixed` in landscape so they cover the
-viewport regardless of mode.
+## Overlays
+
+- `#startScreen`, `#deathOverlay`, `#inventoryOverlay`, `#helpOverlay`,
+  `#winSequenceOverlay`, etc. — siblings of `#wrap` or `position:fixed`
+  in landscape so they cover the viewport regardless of mode.
 
 ## Data flow
 
-- `state` is a single global object holding the player, current level,
-  combat state, animation state, dungeon grid, etc.
-- The dungeon is `state.dungeon.cells[y][x]` with `walls[4]` per cell.
-  Each wall is `{type:'wall'|'door'|'open', ...}`. Doors carry an
-  `open` boolean and a `variantIndex` (which of the 3 door textures
-  to use). Wall faces cache a `decalIndex` so the random decal stays
-  stable across re-renders.
-- `renderVisibleRooms()` rebuilds the player's current room + visible
-  neighbors each move / rotate. Enemy sprites and item billboards are
-  parented to `dungeonGroup`. Phrase bubbles are parented to `scene`
-  so they survive re-renders.
+- `state` — single global. Player, level, combat, animation, dungeon.
+- Dungeon: `state.dungeon.cells[y][x].walls[4]`.
+  - Each wall: `{type:'wall'|'door'|'open', ...}`.
+  - Doors: `open` bool + `variantIndex` (which of 3 door textures).
+  - Wall faces cache `decalIndex` so random decals stay stable across re-renders.
+- `renderVisibleRooms()` — rebuilds current room + visible neighbors on move/rotate.
+  - Enemy sprites + item billboards parented to `dungeonGroup`.
+  - Phrase bubbles parented to `scene` (survive re-renders).
 
 ## Audio
 
-Web Audio API via gain nodes (music + sfx). SFX are pre-decoded into
-`AudioBuffer`s once `audioCtx` exists; `playSfx()` creates a fresh
-`BufferSource` per fire and connects it to `sfxGainNode`. This works on
-iOS where `new Audio(path).play()` outside the user gesture chain
-silently fails.
-
-The context auto-suspends when the tab backgrounds; a
-`visibilitychange` + `focus` listener resumes it on return.
+- Web Audio API: gain nodes for music + sfx.
+- SFX pre-decoded into `AudioBuffer`s once `audioCtx` exists.
+- `playSfx()` creates fresh `BufferSource` per fire → `sfxGainNode`.
+  - Works on iOS where `new Audio(path).play()` outside the user-gesture chain silently fails.
+- Context auto-suspends on tab background → `visibilitychange` + `focus`
+  listener resumes it on return.
 
 ## Win condition
 
-`descendStairs()` checks `state.level >= FINAL_LEVEL` (10). On the
-final descend the stair fade runs, then GUI containers fade to 0
-opacity, then music fades, then the typewriter overlay draws the
-ending text one character at a time. `?test=1` short-circuits this so
-the very first descend triggers the same flow. `?test=2` jumps directly
-into the win overlay.
+- `descendStairs()` checks `state.level >= FINAL_LEVEL` (10).
+- Final descend sequence:
+  1. Stair fade (1.5s).
+  2. GUI containers fade opacity → 0.
+  3. Music gain fades → 0.
+  4. Typewriter overlay draws ending text one char at a time (footstep SFX per non-space).
+- `?test=1` → first descend triggers the same flow.
+- `?test=2` → jumps directly to the win overlay.
