@@ -56,6 +56,40 @@
   #descendFade { position:absolute; inset:0; background:#000;
                   pointer-events:none; opacity:0; z-index:99;
                   transition: opacity 1500ms linear; }
+  /* Win-sequence typewriter overlay: layers above descendFade,
+     pure black with center-aligned white text. */
+  #winSequenceOverlay { position:fixed; inset:0; z-index:500;
+                         background:#000; color:#f4f4f4;
+                         display:flex; flex-direction:column;
+                         align-items:center; justify-content:center;
+                         padding:32px; box-sizing:border-box;
+                         font-family:"VT323","Courier New",monospace; }
+  #winSequenceOverlay[hidden] { display:none !important; }
+  #winSequenceText { max-width:720px; font-size:22px; line-height:1.45;
+                      white-space:pre-wrap; text-align:left;
+                      letter-spacing:0.5px; margin:0;
+                      text-shadow:0 0 6px rgba(220,220,220,0.25); }
+  #btnWinSequencePlayAgain { margin-top:28px; font-size:18px;
+                              padding:8px 22px; background:#020;
+                              color:#9f9; border:1px solid #0a0;
+                              font-family:inherit; cursor:pointer; }
+  /* While the win sequence is active, hide every in-game UI overlay
+     so only the black screen + typewriter text are visible. */
+  body.winSequence #ui,
+  body.winSequence #game,
+  body.winSequence #landscapeRightBuffer,
+  body.winSequence #landscapeMapOverlay,
+  body.winSequence #landscapeTitleBar,
+  body.winSequence #hamburgerBtn,
+  body.winSequence #landscapeDpad,
+  body.winSequence #helpOverlay,
+  body.winSequence #settingsOverlay,
+  body.winSequence #inventoryOverlay,
+  body.winSequence #vendorOverlay,
+  body.winSequence #deathOverlay,
+  body.winSequence #startScreen,
+  body.winSequence #topHud,
+  body.winSequence #movePanel { display:none !important; }
   /* Damage flash: full red veil over the 3D viewport, fades out fast. */
   #hitFlash { position:absolute; inset:0; background:rgba(220,30,30,0.55);
               pointer-events:none; opacity:0; z-index:8; }
@@ -656,6 +690,13 @@
   <div id="hitFlash"></div>
   <!-- Black descend-stairs fade. -->
   <div id="descendFade"></div>
+  <!-- Win sequence: black-screen typewriter shown after final descend
+       (or via ?test=2). The descend fade stays at opacity 1; this div
+       layers above it so the white text is legible. -->
+  <div id="winSequenceOverlay" hidden>
+    <p id="winSequenceText"></p>
+    <button id="btnWinSequencePlayAgain" hidden type="button">Slumber and dream again&hellip;</button>
+  </div>
   <!-- Big red damage number when the player gets hit. -->
   <div id="playerDamageNum"></div>
   <!-- Radial vignette: shown only when torch is out, gives a fuzzy
@@ -1701,6 +1742,7 @@ function toggleDoor(){
   refreshUI();
 }
 
+const FINAL_LEVEL = 10;
 function descendStairs(){
   const c = cellAt(state.player.x, state.player.y);
   if(!c.stairs){ log("No stairs here."); return; }
@@ -1711,11 +1753,17 @@ function descendStairs(){
   const fade = document.getElementById('descendFade');
   if(fade){
     fade.style.transition = 'opacity 1500ms linear';
-    // Force a reflow so the transition picks up from 0 reliably.
     void fade.offsetWidth;
     fade.style.opacity = '1';
   }
+  const isFinalDescent = (state.level >= FINAL_LEVEL);
   setTimeout(()=>{
+    if(isFinalDescent){
+      // End of dungeon: screen stays black, win sequence takes over.
+      beginWinSequence();
+      // _descending intentionally stays true — no further descents.
+      return;
+    }
     state.level++;
     newLevel(state.level);
     if(fade){
@@ -1725,6 +1773,54 @@ function descendStairs(){
     }
     setTimeout(()=>{ state._descending = false; }, 520);
   }, 1500);
+}
+
+// ---- win sequence ----
+const WIN_SEQUENCE_TEXT = "You awake as if from a dream, yet all you see is darkness. You begin to remember that sight is merely a mental construct, which your species abandoned long ago. Shaking off the disturbing mammalian dreams you resume your pacing through the halls of the eternal shrine, forever at peace...";
+function beginWinSequence(){
+  document.body.classList.add('winSequence');
+  // Force fade to fully black if not already.
+  const fade = document.getElementById('descendFade');
+  if(fade){
+    fade.style.transition = 'opacity 1500ms linear';
+    void fade.offsetWidth;
+    fade.style.opacity = '1';
+  }
+  const overlay = document.getElementById('winSequenceOverlay');
+  const textEl  = document.getElementById('winSequenceText');
+  if(!overlay || !textEl) return;
+  textEl.textContent = '';
+  overlay.hidden = false;
+  // Tiny pause so the user perceives the screen-black moment, then
+  // begin the typewriter.
+  setTimeout(()=>{
+    runWinSequenceTypewriter(WIN_SEQUENCE_TEXT, textEl, ()=>{
+      const playAgain = document.getElementById('btnWinSequencePlayAgain');
+      if(playAgain) playAgain.hidden = false;
+    });
+  }, 600);
+}
+function runWinSequenceTypewriter(fullText, targetElement, onDoneCallback){
+  let charIndex = 0;
+  function revealNextCharacter(){
+    if(charIndex >= fullText.length){
+      if(onDoneCallback) onDoneCallback();
+      return;
+    }
+    const character = fullText.charAt(charIndex);
+    targetElement.textContent += character;
+    if(character !== ' ') playSfx('footstep');
+    charIndex++;
+    // Base delay 65..95ms, plus extra time after spaces and harder
+    // beats after sentence punctuation so it reads like measured
+    // dictation.
+    let nextDelayMs = 65 + Math.random() * 30;
+    if(character === ' ')      nextDelayMs += 100;
+    else if(character === '.') nextDelayMs += 400;
+    else if(character === ',') nextDelayMs += 200;
+    setTimeout(revealNextCharacter, nextDelayMs);
+  }
+  revealNextCharacter();
 }
 
 // Weapons table: name -> attack value. Anything in here is treated as a weapon
@@ -3095,12 +3191,26 @@ function toggleSettingsOverlay(){
 }
 document.getElementById('hamburgerBtn').onclick = toggleSettingsOverlay;
 document.getElementById('btnSettingsClose').onclick = closeSettingsOverlay;
+// Slumber and dream again: reload to a fresh dungeon. Strip any test
+// query params so the reload lands in the normal play flow.
+const btnWinSequencePlayAgainElement = document.getElementById('btnWinSequencePlayAgain');
+if(btnWinSequencePlayAgainElement){
+  btnWinSequencePlayAgainElement.onclick = function reloadIntoFreshDungeon(){
+    location.href = location.pathname;
+  };
+}
 
 // -------- main --------
 // Test-mode helpers (defined unconditionally so they're available
 // regardless of URL; runMainStartup only invokes them if ?test=1).
+function _getTestModeParameter(){
+  return new URLSearchParams(location.search).get('test');
+}
 function _isTestModeActive(){
-  return new URLSearchParams(location.search).get('test') === '1';
+  return _getTestModeParameter() === '1';
+}
+function _isWinSequenceTestModeActive(){
+  return _getTestModeParameter() === '2';
 }
 function _applyTestModeCheats(){
   state.player.weapon = { name:'Diamond Sword',  atk: WEAPON_STATS['Diamond Sword'] };
@@ -3139,6 +3249,19 @@ async function runMainStartup(){
   if(_isTestModeActive()) _applyTestModeCheats();
   fitWrapToViewport();
   attachGameTouchHandlers();
+  // ?test=2 — auto-trigger the win sequence so the typewriter +
+  // black-screen flow can be tested without playing through 10 levels.
+  if(_isWinSequenceTestModeActive()){
+    // Skip start screen so audio is unlocked and SFX can play.
+    const startScreenElement = document.getElementById('startScreen');
+    if(startScreenElement) startScreenElement.hidden = true;
+    audioStarted = true;
+    initAudioGraphIfNeeded();
+    if(audioCtx && audioCtx.state === 'suspended'){
+      try { audioCtx.resume(); } catch(_){}
+    }
+    beginWinSequence();
+  }
   // Start the render loop AFTER initThree built scene/camera/renderer.
   // Starting it earlier would call renderer.render(scene, camera) with
   // undefined args every frame.
