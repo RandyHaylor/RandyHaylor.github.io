@@ -96,6 +96,22 @@
      Suppress it during the win sequence so the screen reads as a
      pure black void. */
   body.winSequence #wrap { outline:none !important; }
+  /* Preparing-win-sequence (the 1.5s descend window before the
+     typewriter starts): smoothly fade out all play GUI containers
+     instead of snapping them away. Once .winSequence kicks in those
+     same containers are display:none'd. */
+  body.preparingWinSequence #ui,
+  body.preparingWinSequence #compass,
+  body.preparingWinSequence #topHud,
+  body.preparingWinSequence #hamburgerBtn,
+  body.preparingWinSequence #landscapeRightBuffer,
+  body.preparingWinSequence #landscapeTitleBar,
+  body.preparingWinSequence #landscapeDpad,
+  body.preparingWinSequence #landscapeMapOverlay,
+  body.preparingWinSequence #movePanel {
+    transition: opacity 1500ms linear;
+    opacity: 0;
+  }
   /* Damage flash: full red veil over the 3D viewport, fades out fast. */
   #hitFlash { position:absolute; inset:0; background:rgba(220,30,30,0.55);
               pointer-events:none; opacity:0; z-index:8; }
@@ -1793,6 +1809,14 @@ function descendStairs(){
   // black-screen can be exercised from a real gameplay action.
   const isFinalDescent = (state.level >= FINAL_LEVEL)
                        || _isTestModeActive();
+  if(isFinalDescent){
+    // Fade play GUI containers to opacity 0 across the descend window
+    // (CSS rule below body.preparingWinSequence handles it) and start
+    // a synchronized music fade so the soundtrack settles before the
+    // typewriter begins.
+    document.body.classList.add('preparingWinSequence');
+    fadeOutBackgroundMusicForWinSequence(1500);
+  }
   setTimeout(()=>{
     if(isFinalDescent){
       // End of dungeon: screen stays black, win sequence takes over.
@@ -1814,6 +1838,7 @@ function descendStairs(){
 // ---- win sequence ----
 const WIN_SEQUENCE_TEXT = "You awake as if from a dream, yet all you see is darkness. You begin to remember that sight is merely a mental construct, which your species abandoned long ago. Shaking off the disturbing mammalian dreams, you resume your pacing through the halls of the eternal shrine, forever at peace...";
 function beginWinSequence(){
+  document.body.classList.remove('preparingWinSequence');
   document.body.classList.add('winSequence');
   // Force fade to fully black if not already.
   const fade = document.getElementById('descendFade');
@@ -3090,6 +3115,29 @@ function toggleAudioMute(){ setAudioMuted(!_audioMuted); }
 // Quickly fade out background music, then fire the death sting once
 // it's silent. Used by triggerPlayerDeath so the music doesn't fight
 // the sting cue.
+// Smooth music fade for the win sequence. Drops master music gain
+// (or HTMLAudio element volume in the fallback path) to 0 over
+// fadeDurMs, then pauses the element so we release the audio session.
+function fadeOutBackgroundMusicForWinSequence(fadeDurMs){
+  const durMs = (typeof fadeDurMs === 'number' && fadeDurMs > 0) ? fadeDurMs : 1500;
+  const startGain  = musicGainNode ? musicGainNode.gain.value  : audioMusicVolume;
+  const startElVol = audioMusicEl   ? audioMusicEl.volume       : audioMusicVolume;
+  const startTs = performance.now();
+  const tick = ()=>{
+    const t = Math.min(1, (performance.now() - startTs) / durMs);
+    const f = 1 - t;
+    if(musicGainNode)      musicGainNode.gain.value = startGain * f;
+    else if(audioMusicEl)  audioMusicEl.volume      = startElVol * f;
+    if(t >= 1){
+      if(audioMusicEl){
+        try { audioMusicEl.pause(); } catch(_){}
+      }
+      return;
+    }
+    requestAnimationFrame(tick);
+  };
+  tick();
+}
 function fadeOutMusicThenPlayDeathSting(){
   const startGain = musicTrackGain ? musicTrackGain.gain.value : 1;
   const fadeDurMs = 350;
