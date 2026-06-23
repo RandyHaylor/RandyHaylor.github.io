@@ -76,6 +76,41 @@
       margin-bottom: 1rem;
     }
 
+    .project-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      margin-top: 0.5rem;
+    }
+
+    .project-links a {
+      display: inline-block;
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 600;
+      border: 1px solid #333;
+      color: #eaeaea;
+      background-color: #222;
+      transition: background-color 0.15s ease, border-color 0.15s ease;
+    }
+
+    .project-links a.primary {
+      background-color: #2a6cf0;
+      border-color: #2a6cf0;
+      color: #fff;
+    }
+
+    .project-links a:hover {
+      background-color: #333;
+      border-color: #555;
+    }
+
+    .project-links a.primary:hover {
+      background-color: #3b7cff;
+      border-color: #3b7cff;
+    }
+
     iframe {
       width: 100%;
       max-width: 100%;
@@ -95,6 +130,15 @@
     </div>
     <div class="header">
       <h2>Personal Projects</h2>
+
+    <section>
+      <h2>Asteroid Hunter</h2>
+      <p class="description">A 3D touch-first space combat game built with Three.js, TypeScript, and Vite. Features momentum-based flight (hold thrust to curve your heading), destructible asteroids, a spherical 3D radar with last-seen contact tracking, staged enemy waves, between-wave power-up choices, lead-prediction auto-aim, and a fully procedural 8-bit techno soundtrack and synth SFX generated at runtime via the Web Audio API (no audio files). Plays in desktop and mobile browsers.</p>
+      <div class="project-links">
+        <a class="primary" href="https://randyhaylor.github.io/asteroid-hunter/" target="_blank" rel="noopener">▶ Play it now</a>
+        <a href="https://github.com/RandyHaylor/asteroid-hunter" target="_blank" rel="noopener">Source on GitHub</a>
+      </div>
+    </section>
 
     <section>
       <h2>Racketeer</h2>
